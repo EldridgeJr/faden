@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schritt 1 · Setup</title>
+<meta name="description" content="Faden, Schritt 1: Next.js-Projekt, Git, GitHub und Vercel – was funktioniert, wie es zusammenhängt und warum.">
+<style>
+  :root {
+    --bg: #E9EBEE; --surface: #F6F7F8; --card: #FFFFFF; --tile: #F3F4F6; --line: #E3E5E8;
+    --text: #111315; --muted: #6B7078; --accent: #D6EE57; --on-accent: #111315;
+    --ok: #6E9A1C; --warn-bg: #FDF0D5; --warn: #8A5A00; --err-bg: #FDE4DB; --err: #A3361A;
+    --primary: #111315; --on-primary: #FFFFFF;
+    --c-kw: #8B3FA8; --c-str: #3B7A12; --c-num: #B25A00; --c-com: #8A9099; --c-key: #1F5FA8;
+    --shadow: 0 1px 2px rgba(17,19,21,.04), 0 8px 24px rgba(17,19,21,.06);
+    --r-card: 28px; --r-tile: 18px; --r-pill: 999px;
+    --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+      --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+      --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+      --primary: #EDEFF1; --on-primary: #111315;
+      --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+    --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+    --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+    --primary: #EDEFF1; --on-primary: #111315;
+    --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  code, .mono { font-family: var(--mono); }
+  :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 6px; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 96px; }
+  .topbar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .topbar-in { max-width: 980px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; text-decoration: none; }
+  .brand-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+  .crumb { color: var(--muted); font-size: 14px; }
+  .spacer { flex: 1; }
+  .icon-btn { border: 1px solid var(--line); background: var(--card); color: var(--text); width: 36px; height: 36px; border-radius: var(--r-pill); display: grid; place-items: center; cursor: pointer; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .toc { display: flex; gap: 6px; overflow-x: auto; padding: 14px 0 4px; scrollbar-width: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc a { flex: none; text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); color: var(--muted); transition: color .2s, border-color .2s; }
+  .toc a:hover { color: var(--text); border-color: var(--muted); }
+
+  .hero { padding: 40px 0 8px; }
+  .eyebrow { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+  h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.05; letter-spacing: -0.03em; margin: 10px 0 14px; font-weight: 650; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 640px; margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); }
+  .chip.ok::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+  .chip.err { background: var(--err-bg); color: var(--err); border-color: transparent; }
+
+  section { margin-top: 56px; scroll-margin-top: 70px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .sec-num { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  h2 { font-size: 26px; letter-spacing: -0.02em; margin: 0; font-weight: 620; }
+  h3 { font-size: 17px; margin: 0 0 6px; font-weight: 600; }
+  p { margin: 0 0 12px; }
+  .card { background: var(--card); border-radius: var(--r-card); padding: 28px; box-shadow: var(--shadow); }
+  .tile { background: var(--tile); border-radius: var(--r-tile); padding: 18px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+
+  /* 1. Was funktioniert */
+  .facts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 20px; }
+  .fact .k { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .fact .v { font-weight: 600; margin-top: 2px; word-break: break-word; }
+
+  /* 2. Diagramm */
+  .diagram-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer; font: 500 14px var(--sans); padding: 10px 16px; border-radius: var(--r-pill); background: var(--primary); color: var(--on-primary); transition: transform .15s; }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: var(--tile); color: var(--text); }
+  .btn.accent { background: var(--accent); color: var(--on-accent); }
+  .btn svg { width: 16px; height: 16px; }
+  .scroll-x { overflow-x: auto; margin: 0 -8px; padding: 0 8px; }
+  .diagram { display: block; width: 100%; min-width: 760px; height: auto; }
+  .diagram .node rect { fill: var(--tile); stroke: var(--line); stroke-width: 1.5; transition: fill .25s, stroke .25s; }
+  .diagram .node text { fill: var(--text); font: 600 13px var(--sans); }
+  .diagram .node .sub { fill: var(--muted); font: 400 11px var(--mono); }
+  .diagram .node .ico { stroke: var(--text); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .diagram .node, .diagram .edge { cursor: pointer; }
+  .diagram .node.later rect { fill: none; stroke-dasharray: 5 5; }
+  .diagram .node.later text, .diagram .node.later .ico { opacity: .55; }
+  .diagram .edge path { stroke: var(--muted); stroke-width: 1.8; fill: none; transition: stroke .25s; }
+  .diagram .edge .hit { stroke: transparent; stroke-width: 18; }
+  .diagram .edge.later path { stroke-dasharray: 4 5; opacity: .6; }
+  .diagram .edge text { fill: var(--muted); font: 500 11px var(--mono); }
+  .diagram .edge .label-bg { fill: var(--surface); }
+  .diagram .arrowhead { fill: var(--muted); }
+  .diagram .is-active rect { fill: var(--accent); stroke: var(--accent); }
+  .diagram .is-active text, .diagram .is-active .sub { fill: #111315; }
+  .diagram .is-active .ico { stroke: #111315; }
+  .diagram .edge.is-active path:not(.hit) { stroke: var(--text); stroke-width: 2.4; stroke-dasharray: 7 6; animation: flow .8s linear infinite; }
+  .diagram .edge.is-active text { fill: var(--text); }
+  @keyframes flow { to { stroke-dashoffset: -13; } }
+  .detail { margin-top: 14px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; min-height: 92px; }
+  .detail .badge { font-family: var(--mono); font-size: 12px; background: var(--accent); color: var(--on-accent); padding: 4px 10px; border-radius: var(--r-pill); white-space: nowrap; }
+  .detail h3 { margin-bottom: 4px; }
+  .detail p { margin: 0; color: var(--muted); }
+  .detail.swap { animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .step-dots { display: flex; gap: 6px; margin-left: auto; }
+  .step-dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; transition: background .2s, transform .2s; }
+  .step-dots button.on { background: var(--text); transform: scale(1.25); }
+
+  /* 3. Dateien */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; font-size: 12px; font-weight: 500; color: var(--muted); font-family: var(--mono); padding: 0 12px 10px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { white-space: nowrap; }
+  td code { font-size: 13px; background: var(--tile); padding: 2px 7px; border-radius: 6px; }
+  .filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter button { font: 500 13px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 6px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .filter button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  tr.hidden { display: none; }
+
+  /* 4. Code */
+  .code-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .code-tabs button { font: 500 13px var(--mono); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 7px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .code-tabs button[aria-selected="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .code-card { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .code-head { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .code-head .file { font: 500 13px var(--mono); }
+  .code-head .why { color: var(--muted); font-size: 14px; flex: 1; min-width: 0; }
+  .copy { font: 500 12px var(--sans); border: 1px solid var(--line); background: var(--tile); color: var(--text); border-radius: var(--r-pill); padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .copy svg { width: 14px; height: 14px; }
+  pre { margin: 0; padding: 14px 0; overflow-x: auto; font: 13.5px/1.7 var(--mono); }
+  .ln { display: flex; padding: 0 20px 0 0; }
+  .ln .n { width: 44px; flex: none; text-align: right; padding-right: 16px; color: var(--c-com); user-select: none; }
+  .ln .t { white-space: pre; }
+  .ln.has-note { cursor: pointer; position: relative; }
+  .ln.has-note .n { color: var(--text); }
+  .ln.has-note .n::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 6px; vertical-align: middle; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .ln.has-note:hover { background: var(--tile); }
+  .ln.sel { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+  .note { margin: 0 20px 18px; padding: 14px 16px; border-radius: var(--r-tile); background: var(--tile); font-size: 15px; min-height: 52px; }
+  .note b { font-family: var(--mono); font-weight: 500; font-size: 13px; }
+  .tok-kw { color: var(--c-kw); } .tok-str { color: var(--c-str); } .tok-num { color: var(--c-num); }
+  .tok-com { color: var(--c-com); font-style: italic; } .tok-key { color: var(--c-key); } .tok-neg { color: var(--ok); font-weight: 600; }
+
+  /* Demo */
+  .demo-grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .demo-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; gap: 8px; }
+  .field input { flex: 1; min-width: 0; font: 15px var(--mono); padding: 12px 16px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); color: var(--text); }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .presets button { font: 12px var(--mono); border: 1px dashed var(--line); background: transparent; color: var(--muted); padding: 5px 10px; border-radius: var(--r-pill); cursor: pointer; }
+  .presets button:hover { color: var(--text); border-color: var(--muted); }
+  .verdict { margin-top: 16px; padding: 16px; border-radius: var(--r-tile); font-weight: 600; transition: background .25s, color .25s; }
+  .verdict.in { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+  .verdict.out { background: var(--err-bg); color: var(--err); }
+  .verdict small { display: block; font-weight: 400; color: var(--text); margin-top: 4px; font-size: 14px; }
+  .rules { list-style: none; margin: 0; padding: 0; font: 13.5px var(--mono); }
+  .rules li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 12px; border-radius: 10px; transition: background .2s; }
+  .rules li .hint { color: var(--muted); font-family: var(--sans); font-size: 12px; }
+  .rules li.hit { background: var(--tile); }
+  .rules li.win { background: var(--accent); color: #111315; }
+  .rules li.win .hint { color: #111315; }
+
+  /* Entscheidungen */
+  .decisions { display: grid; gap: 12px; }
+  .decision { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--card); border-radius: var(--r-card); overflow: hidden; box-shadow: var(--shadow); }
+  .decision > div { padding: 20px 24px; }
+  .decision .alt { background: var(--tile); }
+  .decision .lbl { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .decision .pick .lbl::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .decision p { margin: 0; font-size: 15px; }
+  @media (max-width: 640px) { .decision { grid-template-columns: 1fr; } }
+
+  /* Risiken */
+  .risks { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .risk { background: var(--card); border-radius: var(--r-tile); padding: 18px 20px; box-shadow: var(--shadow); }
+  .risk .chip { margin-bottom: 10px; }
+  .risk p { margin: 0; font-size: 15px; color: var(--muted); }
+
+  /* Lernkarten */
+  .quiz-top { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .progress { flex: 1; min-width: 160px; height: 10px; background: var(--card); border-radius: var(--r-pill); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+  .progress span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: var(--r-pill); transition: width .4s ease; }
+  .score { font: 500 14px var(--mono); }
+  .cards { display: grid; gap: 12px; }
+  .fc { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .fc-q { width: 100%; text-align: left; border: 0; background: transparent; color: var(--text); font: 600 17px/1.4 var(--sans); padding: 22px 24px; display: flex; gap: 14px; align-items: flex-start; cursor: pointer; }
+  .fc-q .num { font: 500 12px var(--mono); color: var(--muted); padding-top: 4px; }
+  .fc-q .chev { margin-left: auto; flex: none; width: 20px; height: 20px; transition: transform .3s; color: var(--muted); }
+  .fc.open .fc-q .chev { transform: rotate(180deg); }
+  .fc-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  .fc.open .fc-a { grid-template-rows: 1fr; }
+  .fc-a > div { overflow: hidden; }
+  .fc-a .inner { padding: 0 24px 22px 58px; }
+  .fc-a p { color: var(--text); }
+  .fc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .fc.known { box-shadow: var(--shadow), inset 0 0 0 2px var(--accent); }
+  .fc.known .num { color: var(--ok); }
+  @media (max-width: 520px) { .fc-a .inner { padding-left: 24px; } .card { padding: 22px; } }
+
+  footer { margin-top: 72px; color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html" aria-label="Zur Übersicht aller Schritte">
+      <span class="brand-dot" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#111315" stroke-width="2.4" stroke-linecap="round"><path d="M4 12c4-8 12 8 16 0"/></svg></span>
+      Faden
+    </a>
+    <span class="crumb">/ Erklärungen / Schritt 1</span>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten"></button>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Abschnitte">
+    <a href="#funktioniert">Was funktioniert</a>
+    <a href="#ablauf">Ablauf</a>
+    <a href="#dateien">Dateien</a>
+    <a href="#code">Code</a>
+    <a href="#demo">Demo</a>
+    <a href="#entscheidungen">Entscheidungen</a>
+    <a href="#risiken">Was schiefgehen kann</a>
+    <a href="#interview">Interview-Check</a>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">SCHRITT 1 VON 7 · 10.10.2026</div>
+    <h1>Setup: vom leeren Ordner zur Live-URL</h1>
+    <p class="lead">Ein Next.js-Projekt mit TypeScript, Tailwind und Vitest. Git, GitHub und Vercel sind verbunden. Jeder Push auf <code>main</code> geht automatisch live.</p>
+    <div class="chips">
+      <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test</span><span class="chip ok">build</span><span class="chip ok">deploy</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section id="funktioniert">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Was jetzt funktioniert</h2></div>
+    <div class="card">
+      <p>Das Projekt läuft lokal mit <code>npm run dev</code> auf Node 24. Vier Befehle prüfen den Code: <code>lint</code>, <code>typecheck</code>, <code>test</code> und <code>build</code>. Alle vier sind grün. Der Code liegt in einem öffentlichen GitHub-Repo. Vercel baut jeden Push auf <code>main</code> und stellt ihn unter einer öffentlichen URL bereit.</p>
+      <p class="muted small" style="margin:0">Supabase und OpenAI sind noch nicht angeschlossen. Sie kommen in Schritt 2 und 3.</p>
+      <div class="facts">
+        <div class="tile fact"><div class="k">REPO</div><div class="v"><a href="https://github.com/EldridgeJr/faden">github.com/EldridgeJr/faden</a></div></div>
+        <div class="tile fact"><div class="k">LIVE</div><div class="v" id="liveUrl"><a href="https://faden-eldridge1.vercel.app">faden-eldridge1.vercel.app</a></div></div>
+        <div class="tile fact"><div class="k">VERSIONEN</div><div class="v mono small">Next 16.4 · React 19.3 · Node 24</div></div>
+        <div class="tile fact"><div class="k">TESTS</div><div class="v mono small">Vitest 5 · noch 0 Tests</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="ablauf">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Ablauf: vom Commit zur Seite</h2></div>
+    <div class="card">
+      <div class="diagram-tools">
+        <button class="btn" id="playBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg><span>Abspielen</span></button>
+        <button class="btn ghost" id="prevBtn" type="button" aria-label="Vorheriger Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button class="btn ghost" id="nextBtn" type="button" aria-label="Nächster Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        <div class="step-dots" id="dots" role="tablist" aria-label="Schritte im Ablauf"></div>
+      </div>
+      <div class="scroll-x">
+        <svg class="diagram" id="diagram" viewBox="0 0 880 300" role="img" aria-label="Datenfluss: Rechner, GitHub, Vercel Build, Vercel Hosting, Browser. Supabase und OpenAI folgen später.">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0 0 10 5 0 10z"/></marker>
+          </defs>
+
+          <!-- edges -->
+          <g class="edge" data-id="e1"><path class="hit" d="M130 96 H194"/><path d="M130 96 H192" marker-end="url(#ah)"/><rect class="label-bg" x="134" y="70" width="56" height="18" rx="9"/><text x="162" y="83" text-anchor="middle">git push</text></g>
+          <g class="edge" data-id="e2"><path class="hit" d="M314 96 H378"/><path d="M314 96 H376" marker-end="url(#ah)"/><rect class="label-bg" x="316" y="70" width="60" height="18" rx="9"/><text x="346" y="83" text-anchor="middle">Webhook</text></g>
+          <g class="edge" data-id="e3"><path class="hit" d="M498 96 H562"/><path d="M498 96 H560" marker-end="url(#ah)"/><rect class="label-bg" x="504" y="70" width="52" height="18" rx="9"/><text x="530" y="83" text-anchor="middle">Deploy</text></g>
+          <g class="edge" data-id="e4"><path class="hit" d="M682 97 H746"/><path d="M746 88 H684" marker-end="url(#ah)"/><path d="M682 106 H744" marker-end="url(#ah)"/><rect class="label-bg" x="672" y="140" width="84" height="18" rx="9"/><text x="714" y="153" text-anchor="middle">GET / → HTML</text></g>
+          <g class="edge later" data-id="e5"><path class="hit" d="M580 132 V210"/><path d="M580 132 V208" marker-end="url(#ah)"/><rect class="label-bg" x="534" y="160" width="40" height="18" rx="9"/><text x="554" y="173" text-anchor="middle">SQL</text></g>
+          <g class="edge later" data-id="e6"><path class="hit" d="M640 132 L718 210"/><path d="M640 132 L716 208" marker-end="url(#ah)"/></g>
+
+          <!-- nodes -->
+          <g class="node" data-id="n1" tabindex="0" role="button" aria-label="Dein Rechner">
+            <rect x="10" y="60" width="120" height="72" rx="18"/>
+            <path class="ico" d="M26 76h18v12H26zM22 92h26"/>
+            <text x="56" y="88">Rechner</text><text class="sub" x="26" y="114">lint · test</text>
+          </g>
+          <g class="node" data-id="n2" tabindex="0" role="button" aria-label="GitHub">
+            <rect x="194" y="60" width="120" height="72" rx="18"/>
+            <path class="ico" d="M214 76v16M214 80a5 5 0 0 0 10 4M224 84v-2"/><circle class="ico" cx="214" cy="76" r="2.5"/><circle class="ico" cx="224" cy="80" r="2.5"/>
+            <text x="238" y="88">GitHub</text><text class="sub" x="210" y="114">Repo · main</text>
+          </g>
+          <g class="node" data-id="n3" tabindex="0" role="button" aria-label="Vercel Build">
+            <rect x="378" y="60" width="120" height="72" rx="18"/>
+            <path class="ico" d="M394 92l9-16 9 16z"/>
+            <text x="420" y="88">Build</text><text class="sub" x="394" y="114">next build</text>
+          </g>
+          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="Vercel Hosting">
+            <rect x="562" y="60" width="120" height="72" rx="18"/>
+            <rect class="ico" x="578" y="76" width="18" height="16" rx="3" style="fill:none"/><path class="ico" d="M578 84h18"/>
+            <text x="604" y="88">Hosting</text><text class="sub" x="578" y="114">Vercel</text>
+          </g>
+          <g class="node" data-id="n5" tabindex="0" role="button" aria-label="Browser">
+            <rect x="746" y="60" width="124" height="72" rx="18"/>
+            <circle class="ico" cx="771" cy="84" r="9"/><path class="ico" d="M762 84h18M771 75c-4 5-4 13 0 18M771 75c4 5 4 13 0 18"/>
+            <text x="790" y="88">Browser</text><text class="sub" x="762" y="114">Nutzer:in</text>
+          </g>
+          <g class="node later" data-id="n6" tabindex="0" role="button" aria-label="Supabase, ab Schritt 2">
+            <rect x="510" y="210" width="140" height="72" rx="18"/>
+            <ellipse class="ico" cx="535" cy="232" rx="9" ry="4"/><path class="ico" d="M526 232v12c0 2 4 4 9 4s9-2 9-4v-12"/>
+            <text x="554" y="240">Supabase</text><text class="sub" x="526" y="264">ab Schritt 2</text>
+          </g>
+          <g class="node later" data-id="n7" tabindex="0" role="button" aria-label="OpenAI, ab Schritt 3">
+            <rect x="700" y="210" width="140" height="72" rx="18"/>
+            <path class="ico" d="M725 228v16M717 236h16M719 230l12 12M731 230l-12 12"/>
+            <text x="744" y="240">OpenAI</text><text class="sub" x="716" y="264">ab Schritt 3</text>
+          </g>
+        </svg>
+      </div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="dateien">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Geänderte Dateien</h2></div>
+    <div class="card">
+      <div class="filter" role="group" aria-label="Dateien filtern">
+        <button type="button" data-f="all" aria-pressed="true">Alle</button>
+        <button type="button" data-f="new" aria-pressed="false">Von mir angepasst</button>
+        <button type="button" data-f="gen" aria-pressed="false">Unverändert aus der Vorlage</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>DATEI</th><th>AUFGABE</th><th>WARUM SO</th></tr></thead>
+          <tbody id="fileRows">
+            <tr data-k="new"><td><code>package.json</code></td><td>Abhängigkeiten, Skripte, Node-Version</td><td><code>engines</code> setzt Node 24. Vercel liest dieses Feld. <code>typecheck</code> und <code>test</code> sind neu.</td></tr>
+            <tr data-k="gen"><td><code>package-lock.json</code></td><td>Exakte Versionen aller Pakete</td><td>Jede Installation bekommt dieselben Versionen, lokal und auf Vercel.</td></tr>
+            <tr data-k="new"><td><code>.nvmrc</code></td><td>Node-Version für nvm</td><td><code>nvm use</code> wählt Node 24 ohne Nachdenken.</td></tr>
+            <tr data-k="new"><td><code>next.config.ts</code></td><td>Next.js-Konfiguration</td><td>Aus der Vorlage, nur ein Kommentar entfernt. <code>cacheComponents</code> ist bewusst noch offen.</td></tr>
+            <tr data-k="gen"><td><code>tsconfig.json</code></td><td>TypeScript-Regeln, Alias <code>@/</code></td><td><code>strict: true</code> ist Pflicht laut Stack. <code>@/</code> zeigt auf <code>src/</code>.</td></tr>
+            <tr data-k="gen"><td><code>eslint.config.mjs</code></td><td>Lint-Regeln für Next und TypeScript</td><td>Flat Config von ESLint 9. Regeln für Core Web Vitals sind dabei.</td></tr>
+            <tr data-k="new"><td><code>vitest.config.ts</code></td><td>Unit-Tests</td><td>Läuft in Node, sucht nur <code>src/**/*.test.ts</code>. Alias über Vite selbst, ohne Plugin.</td></tr>
+            <tr data-k="new"><td><code>.gitignore</code></td><td>Was nie ins Repo darf</td><td>Ausnahme <code>!.env.example</code> ergänzt. Sonst wäre die Vorlage auch ignoriert.</td></tr>
+            <tr data-k="new"><td><code>.env.example</code></td><td>Namen aller Umgebungsvariablen</td><td>Nur Namen, keine Werte. <code>NEXT_PUBLIC_</code> heißt: geht in den Browser.</td></tr>
+            <tr data-k="new"><td><code>src/app/layout.tsx</code></td><td>HTML-Gerüst, Schriften, Titel</td><td><code>lang="de"</code>, Titel „Faden“. Geist kommt über <code>next/font</code>.</td></tr>
+            <tr data-k="new"><td><code>src/app/page.tsx</code></td><td>Startseite</td><td>Platzhalter. Das echte Design folgt in Schritt 5.</td></tr>
+            <tr data-k="new"><td><code>src/app/globals.css</code></td><td>Tailwind und Grundfarben</td><td>Arial entfernt, damit Geist wirklich gilt. Faden-Hintergrund gesetzt.</td></tr>
+            <tr data-k="gen"><td><code>AGENTS.md</code></td><td>Hinweis für KI-Agenten</td><td>Von Next erzeugt. Verweist auf die Doku in <code>node_modules/next/dist/docs/</code>.</td></tr>
+            <tr data-k="new"><td><code>README.md</code></td><td>Einstieg ins Repo</td><td>Gerüst mit Stack und Befehlen. Wird bis Schritt 7 vollständig.</td></tr>
+            <tr data-k="new"><td><code>CLAUDE.md</code> · <code>NOTIZEN.md</code></td><td>Regeln und Lernprotokoll</td><td>Befehle ergänzt, Schritt 1 abgehakt, sechs Fehler und Annahmen notiert.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="code">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Wichtigster Code</h2></div>
+    <p class="muted">Zeilen mit Punkt sind anklickbar. Ein Klick zeigt, was die Zeile tut.</p>
+    <div class="code-tabs" role="tablist" id="codeTabs"></div>
+    <div class="code-card">
+      <div class="code-head">
+        <span class="file" id="codeFile"></span>
+        <span class="why" id="codeWhy"></span>
+        <button class="copy" id="copyBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Kopieren</span></button>
+      </div>
+      <pre id="codePre" role="tabpanel"></pre>
+      <div class="note" id="codeNote" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo">
+    <div class="sec-head"><span class="sec-num">04b</span><h2>Mini-Demo: Was landet im Repo?</h2></div>
+    <div class="card">
+      <p class="muted">Gib einen Dateipfad ein. Die Demo prüft ihn gegen die echten Regeln aus unserer <code>.gitignore</code>. Wie bei Git gewinnt die <strong>letzte</strong> passende Regel.</p>
+      <div class="demo-grid">
+        <div>
+          <div class="field"><input id="pathIn" type="text" value=".env.local" spellcheck="false" autocomplete="off" aria-label="Dateipfad"></div>
+          <div class="presets" id="presets"></div>
+          <div class="verdict" id="verdict" aria-live="polite"></div>
+        </div>
+        <div class="tile">
+          <ul class="rules" id="rules"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="entscheidungen">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Entscheidungen und Alternativen</h2></div>
+    <div class="decisions">
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Erzeugen im Unterordner, dann verschieben</h3><p><code>create-next-app</code> bricht in Ordnern mit Dateien ab. So bleiben <code>CLAUDE.md</code> und <code>NOTIZEN.md</code> unberührt.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Dateien kurz wegräumen und im Projektordner erzeugen. Risiko: etwas vergessen zurückzulegen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Node 24 LTS, festgelegt an zwei Stellen</h3><p><code>.nvmrc</code> für lokal, <code>engines</code> für Vercel. Beide Umgebungen nutzen dieselbe Hauptversion.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Node 23 behalten. Das geht mit Next 16, ist aber keine LTS-Version und weicht von Vercel ab.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3><code>src/</code>-Ordner</h3><p>App-Code ist getrennt von Konfiguration, Migrationen und Doku.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Alles im Wurzelverzeichnis. Ein Ordner weniger, aber mehr Durcheinander ab Schritt 2.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Vercel über Git verbunden</h3><p>Push auf <code>main</code> erzeugt Production. Jeder andere Branch erzeugt eine Preview-URL.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Manuell mit <code>vercel deploy</code>. Mehr Kontrolle, aber leicht zu vergessen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>shadcn/ui erst in Schritt 5</h3><p><code>shadcn init</code> schreibt <code>globals.css</code> neu. Das gehört zum Design-Schritt.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Jetzt einrichten. Dann müssten wir die Farben in Schritt 5 ein zweites Mal anfassen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Offen bis Schritt 2</div><h3><code>cacheComponents</code> anlassen?</h3><p>Die Vorlage schaltet es ein. Seiten mit Login müssen dann den Cookie-Teil hinter <code>&lt;Suspense&gt;</code> legen.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Ausschalten. Dann rendert jede Seite mit Cookies einfach pro Anfrage. Einfacher zu erklären.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="risiken">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Was schiefgehen kann</h2></div>
+    <div class="risks">
+      <div class="risk"><span class="chip err">Sicherheit</span><h3>Secret im Repo</h3><p>Eine <code>.env.local</code> mit echtem Key darf nie committet werden. Die <code>.gitignore</code> verhindert das. Wenn es doch passiert: Key sofort beim Anbieter widerrufen. Löschen aus Git reicht nicht.</p></div>
+      <div class="risk"><span class="chip err">Sicherheit</span><h3><code>NEXT_PUBLIC_</code> verwechselt</h3><p>Variablen mit diesem Präfix landen im Browser-Code. Ein Secret-Key darf dieses Präfix nie tragen.</p></div>
+      <div class="risk"><span class="chip warn">Abhängigkeiten</span><h3>5 Meldungen in <code>npm audit</code></h3><p>Alle betreffen nur ESLint, nicht den ausgelieferten Code. <code>npm audit fix --force</code> würde Next 16 kaputt machen. Wir warten auf ein Update.</p></div>
+      <div class="risk"><span class="chip warn">Umgebung</span><h3>Falsche Node-Version</h3><p>Ohne <code>nvm use</code> läuft lokal eventuell Node 23. npm warnt dann wegen <code>engines</code>, bricht aber nicht ab.</p></div>
+      <div class="risk"><span class="chip warn">Öffentlich</span><h3>Jeder Push ist live</h3><p>Ein kaputter Commit auf <code>main</code> wird sofort ausgeliefert. Darum laufen lint, typecheck, test und build vor jedem Commit.</p></div>
+      <div class="risk"><span class="chip">Hinweis</span><h3>Neue Next-Version</h3><p>Next 16.4 weicht von älteren Tutorials ab. Bei Zweifeln gilt die Doku in <code>node_modules/next/dist/docs/</code>.</p></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="interview">
+    <div class="sec-head"><span class="sec-num">07</span><h2>Interview-Check</h2></div>
+    <div class="quiz-top">
+      <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+      <span class="score" id="score">0 von 5 gewusst</span>
+      <button class="btn ghost" id="resetQuiz" type="button">Zurücksetzen</button>
+    </div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <footer>
+    <span>Faden · Erklärung zu Schritt 1</span>
+    <a href="index.html">Alle Schritte →</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function store(key, val) {
+    try { if (val === undefined) return localStorage.getItem(key); localStorage.setItem(key, val); } catch (e) { return null; }
+  }
+  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* ---------- Theme ---------- */
+  var root = document.documentElement, themeBtn = document.getElementById("themeBtn");
+  var sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var moon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
+  function isDark() { var t = root.getAttribute("data-theme"); return t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches; }
+  function paintThemeBtn() { themeBtn.innerHTML = isDark() ? sun : moon; }
+  var saved = store("faden-doc-theme"); if (saved) root.setAttribute("data-theme", saved);
+  paintThemeBtn();
+  themeBtn.addEventListener("click", function () { var next = isDark() ? "light" : "dark"; root.setAttribute("data-theme", next); store("faden-doc-theme", next); paintThemeBtn(); });
+
+  /* ---------- Diagram ---------- */
+  var steps = [
+    { id: "n1", tag: "1 · Rechner", title: "Du prüfst und committest lokal", text: "Vor jedem Commit laufen npm run lint, typecheck, test und build. Erst wenn alle grün sind, folgt git commit und git push." },
+    { id: "e1", tag: "2 · git push", title: "Der Commit geht zu GitHub", text: "git push schickt die neuen Commits über HTTPS an das Repo EldridgeJr/faden, Branch main. .env.local und node_modules bleiben lokal, die .gitignore filtert sie." },
+    { id: "n2", tag: "3 · GitHub", title: "GitHub speichert den Code", text: "Das Repo ist öffentlich. Es ist die eine Quelle der Wahrheit für den Code. Vercel hat über die GitHub-App Lesezugriff." },
+    { id: "e2", tag: "4 · Webhook", title: "GitHub meldet den Push an Vercel", text: "Bei jedem Push schickt GitHub ein Ereignis an Vercel. Vercel startet daraufhin einen Build. Push auf main heißt Production, jeder andere Branch heißt Preview." },
+    { id: "n3", tag: "5 · Build", title: "Vercel baut die App", text: "Vercel klont den Commit, führt npm install und next build aus, mit Node 24 aus engines. Schlägt der Build fehl, bleibt die alte Version live." },
+    { id: "e3", tag: "6 · Deploy", title: "Das Ergebnis wird ausgerollt", text: "Statische Seiten gehen ins CDN. Server-Code wird zu Vercel Functions. Die Production-Domain zeigt danach auf das neue Deployment." },
+    { id: "n4", tag: "7 · Hosting", title: "Vercel liefert aus", text: "Die Startseite ist im Moment statisch, also vorgerendert. Ab Schritt 2 rendern Seiten pro Anfrage, weil sie den Login lesen." },
+    { id: "e4", tag: "8 · Anfrage", title: "Der Browser holt die Seite", text: "Der Browser sendet GET /. Vercel antwortet mit HTML, CSS und JavaScript. React übernimmt danach im Browser (Hydration)." },
+    { id: "n5", tag: "9 · Browser", title: "Die Nutzerin sieht Faden", text: "Im Moment eine einfache Startseite in Geist auf dem Faden-Hintergrund. Das echte Design folgt in Schritt 5." }
+  ];
+  var extras = {
+    n6: { tag: "Später · Supabase", title: "Datenbank, Storage und Login", text: "Ab Schritt 2: Postgres mit pgvector, Row Level Security und Auth in der Region Frankfurt. Der Server spricht mit Supabase, der Browser nur mit dem Publishable Key." },
+    e5: { tag: "Später · SQL", title: "Server fragt Supabase", text: "Ab Schritt 2 liest und schreibt der Server Notebooks, Quellen und Abschnitte. RLS prüft dabei jede Zeile gegen den eingeloggten Nutzer." },
+    n7: { tag: "Später · OpenAI", title: "Embeddings, Chat, Sprache", text: "Ab Schritt 3: text-embedding-3-small für die Suche, später Chat-Antworten und Text-to-Speech für den Podcast. Der API-Key bleibt auf dem Server." },
+    e6: { tag: "Später · API", title: "Server ruft OpenAI auf", text: "Nur der Server ruft OpenAI auf. Der Browser sieht den Key nie." }
+  };
+  var diagram = document.getElementById("diagram"), detail = document.getElementById("detail"), dots = document.getElementById("dots");
+  var current = -1, timer = null, playBtn = document.getElementById("playBtn");
+
+  steps.forEach(function (s, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.setAttribute("aria-label", "Schritt " + (i + 1) + ": " + s.title);
+    b.addEventListener("click", function () { stop(); show(i); });
+    dots.appendChild(b);
+  });
+
+  function highlight(id) {
+    diagram.querySelectorAll(".is-active").forEach(function (el) { el.classList.remove("is-active"); });
+    var el = diagram.querySelector('[data-id="' + id + '"]'); if (el) el.classList.add("is-active");
+  }
+  function renderDetail(d) {
+    detail.innerHTML = '<span class="badge">' + esc(d.tag) + '</span><div><h3>' + esc(d.title) + '</h3><p>' + esc(d.text) + '</p></div>';
+    detail.classList.remove("swap"); void detail.offsetWidth; detail.classList.add("swap");
+  }
+  function show(i) {
+    current = (i + steps.length) % steps.length;
+    highlight(steps[current].id); renderDetail(steps[current]);
+    Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle("on", k === current); d.setAttribute("aria-current", k === current ? "step" : "false"); });
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } playBtn.querySelector("span").textContent = "Abspielen"; }
+  function play() {
+    if (timer) { stop(); return; }
+    playBtn.querySelector("span").textContent = "Pause";
+    if (current >= steps.length - 1) current = -1;
+    show(current + 1);
+    timer = setInterval(function () { if (current >= steps.length - 1) { stop(); return; } show(current + 1); }, reduce ? 2600 : 1800);
+  }
+  playBtn.addEventListener("click", play);
+  document.getElementById("prevBtn").addEventListener("click", function () { stop(); show(current <= 0 ? steps.length - 1 : current - 1); });
+  document.getElementById("nextBtn").addEventListener("click", function () { stop(); show(current + 1); });
+  function pick(id) {
+    stop();
+    var idx = steps.findIndex(function (s) { return s.id === id; });
+    if (idx >= 0) { show(idx); return; }
+    current = -1; highlight(id); renderDetail(extras[id]);
+    Array.prototype.forEach.call(dots.children, function (d) { d.classList.remove("on"); });
+  }
+  diagram.querySelectorAll(".node, .edge").forEach(function (el) {
+    el.addEventListener("click", function () { pick(el.getAttribute("data-id")); });
+    el.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(el.getAttribute("data-id")); } });
+  });
+  show(0);
+
+  /* ---------- File filter ---------- */
+  document.querySelectorAll(".filter button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".filter button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      var f = b.getAttribute("data-f");
+      document.querySelectorAll("#fileRows tr").forEach(function (tr) { tr.classList.toggle("hidden", f !== "all" && tr.getAttribute("data-k") !== f); });
+    });
+  });
+
+  /* ---------- Code ---------- */
+  var snippets = [
+    { file: "package.json", lang: "json", why: "Skripte und Node-Version",
+      code: '{\n  "name": "faden",\n  "private": true,\n  "engines": {\n    "node": "24.x"\n  },\n  "scripts": {\n    "dev": "next dev",\n    "build": "next build",\n    "lint": "eslint",\n    "typecheck": "next typegen && tsc --noEmit",\n    "test": "vitest run --passWithNoTests"\n  }\n}',
+      notes: { 3: "private: true verhindert, dass das Projekt aus Versehen auf npm veröffentlicht wird.", 5: "Vercel liest engines.node und baut mit Node 24. npm warnt lokal, wenn eine andere Version läuft.", 10: "eslint ohne Pfad prüft das ganze Projekt mit den Regeln aus eslint.config.mjs.", 11: "next typegen erzeugt zuerst die Routen-Typen wie LayoutProps<\"/\">. tsc --noEmit prüft dann alle Typen, ohne Dateien zu schreiben.", 12: "vitest run läuft einmal statt im Watch-Modus. --passWithNoTests: Ohne Testdateien endet Vitest sonst mit Fehler. Die ersten Tests kommen in Schritt 3." } },
+    { file: "next.config.ts", lang: "ts", why: "Von create-next-app 16.4 erzeugt",
+      code: 'import type { NextConfig } from "next";\n\nconst nextConfig: NextConfig = {\n  cacheComponents: true,\n  partialPrefetching: true,\n  turbopack: {\n    rules: {\n      "*.css": {\n        loaders: ["@tailwindcss/turbopack"],\n        as: "*.css",\n      },\n    },\n  },\n};\n\nexport default nextConfig;',
+      notes: { 1: "import type importiert nur den Typ. Im ausgelieferten JavaScript bleibt davon nichts übrig.", 4: "Cache Components: Next rendert eine statische Hülle vor. Teile, die pro Anfrage Daten lesen (z. B. Cookies), streamen hinter <Suspense> nach. Ob wir das behalten, entscheiden wir in Schritt 2.", 5: "Partial Prefetching: Ein <Link> lädt vorab nur die Hülle der Zielseite, nicht die ganze Seite. Funktioniert nur zusammen mit Cache Components.", 9: "Tailwind 4 läuft als Turbopack-Loader für alle CSS-Dateien. Darum gibt es keine postcss.config." } },
+    { file: "vitest.config.ts", lang: "ts", why: "Unit-Tests für die Kernlogik",
+      code: 'import { defineConfig } from "vitest/config";\n\nexport default defineConfig({\n  resolve: {\n    // Resolve the "@/*" alias from tsconfig.json, same as Next.js does.\n    tsconfigPaths: true,\n  },\n  test: {\n    // Core logic (chunking, RRF, citations) runs in Node, not in a browser.\n    environment: "node",\n    include: ["src/**/*.test.ts"],\n  },\n});',
+      notes: { 3: "defineConfig gibt Autovervollständigung und Typprüfung für die Konfiguration.", 6: "Vite 8 kann Pfad-Aliase aus tsconfig.json selbst auflösen. Ein Import wie @/lib/chunk funktioniert im Test genauso wie in Next. Wir brauchen kein Zusatz-Plugin.", 10: "Chunking, RRF und Belegprüfung sind reine Logik ohne DOM. Node ist schneller als eine simulierte Browser-Umgebung.", 11: "Nur Dateien mit .test.ts unter src/ zählen als Tests. Playwright-Tests (Schritt 7) liegen woanders und laufen nicht aus Versehen mit." } },
+    { file: ".gitignore", lang: "ignore", why: "Ausschnitt: was nie ins Repo darf",
+      code: '# dependencies\n/node_modules\n\n# next.js\n/.next/\n\n# env files: never commit secrets, but keep the template\n.env*\n!.env.example\n\n# vercel\n.vercel',
+      notes: { 2: "Der führende / bindet die Regel an das Wurzelverzeichnis. node_modules ist groß und wird aus package-lock.json neu installiert.", 5: "Build-Ausgabe von Next. Wird bei jedem Build neu erzeugt.", 8: ".env* trifft .env, .env.local, .env.production und so weiter. Dort stehen echte Keys.", 9: "Das ! hebt die Regel davor wieder auf. Bei Git gewinnt die letzte passende Regel. So bleibt nur die Vorlage im Repo.", 12: ".vercel enthält die Projekt-ID aus vercel link. Sie ist lokal und gehört nicht ins Repo." } },
+    { file: "src/app/layout.tsx", lang: "ts", why: "HTML-Gerüst für jede Seite",
+      code: 'import { Geist, Geist_Mono } from "next/font/google";\nimport "./globals.css";\n\nconst geistSans = Geist({\n  variable: "--font-geist-sans",\n  subsets: ["latin"],\n});\n\nexport default function RootLayout({ children }: LayoutProps<"/">) {\n  return (\n    <html lang="de" className={`${geistSans.variable} h-full antialiased`}>\n      <body className="min-h-full flex flex-col font-sans">{children}</body>\n    </html>\n  );\n}',
+      notes: { 1: "next/font lädt die Schrift beim Build herunter und liefert sie von unserer eigenen Domain aus. Der Browser fragt Google nie direkt. Das ist gut für Datenschutz und Tempo.", 5: "Die Schrift wird als CSS-Variable bereitgestellt. globals.css verbindet sie mit der Tailwind-Klasse font-sans.", 9: "LayoutProps<\"/\"> ist ein globaler Typ, den Next selbst erzeugt. Deshalb läuft next typegen vor tsc.", 11: "lang=\"de\" sagt Screenreadern und Suchmaschinen, dass die Seite deutsch ist. Die Vorlage hatte \"en\".", 12: "font-sans nutzt Geist. Vorher hat globals.css mit Arial überschrieben." } }
+  ];
+  var KW = /^(import|from|export|default|const|function|return|type|true|false)$/;
+  function hlLine(line, lang) {
+    if (lang === "ignore") {
+      if (/^\s*#/.test(line)) return '<span class="tok-com">' + esc(line) + '</span>';
+      if (/^!/.test(line)) return '<span class="tok-neg">' + esc(line) + '</span>';
+      return esc(line);
+    }
+    var re = /(\/\/.*$)|("(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`)(\s*:)?|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(\s*:)?/g;
+    var out = "", last = 0, m;
+    while ((m = re.exec(line))) {
+      out += esc(line.slice(last, m.index));
+      if (m[1]) out += '<span class="tok-com">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += (m[3] && lang === "json") ? '<span class="tok-key">' + esc(m[2]) + '</span>' + esc(m[3]) : '<span class="tok-str">' + esc(m[2]) + '</span>' + esc(m[3] || "");
+      else if (m[4]) out += '<span class="tok-num">' + m[4] + '</span>';
+      else if (m[5]) {
+        if (KW.test(m[5])) out += '<span class="tok-kw">' + m[5] + '</span>' + esc(m[6] || "");
+        else if (m[6] && lang === "ts") out += '<span class="tok-key">' + m[5] + '</span>' + esc(m[6]);
+        else out += esc(m[5]) + esc(m[6] || "");
+      }
+      last = re.lastIndex;
+    }
+    return out + esc(line.slice(last));
+  }
+  var tabs = document.getElementById("codeTabs"), pre = document.getElementById("codePre"), note = document.getElementById("codeNote");
+  var active = 0;
+  function defaultNote() { note.innerHTML = '<span class="muted">Klick auf eine Zeile mit Punkt.</span>'; }
+  function renderCode(i) {
+    active = i; var s = snippets[i];
+    Array.prototype.forEach.call(tabs.children, function (t, k) { t.setAttribute("aria-selected", String(k === i)); });
+    document.getElementById("codeFile").textContent = s.file;
+    document.getElementById("codeWhy").textContent = s.why;
+    pre.innerHTML = s.code.split("\n").map(function (l, k) {
+      var n = k + 1, has = s.notes[n] ? " has-note" : "";
+      return '<div class="ln' + has + '" data-n="' + n + '"' + (has ? ' role="button" tabindex="0"' : "") + '><span class="n">' + n + '</span><span class="t">' + (hlLine(l, s.lang) || " ") + '</span></div>';
+    }).join("");
+    defaultNote();
+  }
+  function selectLine(el) {
+    pre.querySelectorAll(".sel").forEach(function (x) { x.classList.remove("sel"); });
+    el.classList.add("sel"); var n = el.getAttribute("data-n");
+    note.innerHTML = '<b>Zeile ' + n + '</b> · ' + esc(snippets[active].notes[n]);
+  }
+  pre.addEventListener("click", function (e) { var el = e.target.closest(".ln.has-note"); if (el) selectLine(el); });
+  pre.addEventListener("keydown", function (e) { var el = e.target.closest(".ln.has-note"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectLine(el); } });
+  snippets.forEach(function (s, i) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = s.file;
+    b.addEventListener("click", function () { renderCode(i); }); tabs.appendChild(b);
+  });
+  renderCode(0);
+  var copyBtn = document.getElementById("copyBtn");
+  copyBtn.addEventListener("click", function () {
+    var text = snippets[active].code, label = copyBtn.querySelector("span");
+    function done() { label.textContent = "Kopiert"; setTimeout(function () { label.textContent = "Kopieren"; }, 1400); }
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+    function fallback() { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
+  });
+
+  /* ---------- Demo: .gitignore ---------- */
+  var rules = [
+    { p: "/node_modules", hint: "Pakete" },
+    { p: "/.next/", hint: "Build" },
+    { p: "/coverage", hint: "Testbericht" },
+    { p: ".DS_Store", hint: "macOS" },
+    { p: ".env*", hint: "Secrets" },
+    { p: "!.env.example", hint: "Ausnahme" },
+    { p: ".vercel", hint: "Vercel-Link" },
+    { p: "*.tsbuildinfo", hint: "TS-Cache" },
+    { p: "next-env.d.ts", hint: "erzeugt" }
+  ];
+  function globToRe(g) { return new RegExp("^" + g.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^/]*") + "$"); }
+  function matches(rule, path) {
+    var pat = rule.replace(/^!/, ""), dirOnly = /\/$/.test(pat);
+    pat = pat.replace(/\/$/, "");
+    var anchored = pat.charAt(0) === "/" || pat.indexOf("/") > 0;
+    pat = pat.replace(/^\//, "");
+    var re = globToRe(pat), parts = path.split("/").filter(Boolean), isDir = /\/$/.test(path);
+    for (var i = 0; i < parts.length; i++) {
+      var isLast = i === parts.length - 1;
+      if (dirOnly && isLast && !isDir) continue;
+      var candidate = anchored ? parts.slice(0, i + 1).join("/") : parts[i];
+      if (re.test(candidate)) return true;
+    }
+    return false;
+  }
+  var rulesEl = document.getElementById("rules"), pathIn = document.getElementById("pathIn"), verdict = document.getElementById("verdict");
+  rulesEl.innerHTML = rules.map(function (r, i) { return '<li data-i="' + i + '"><span>' + esc(r.p) + '</span><span class="hint">' + esc(r.hint) + '</span></li>'; }).join("");
+  function check() {
+    var path = pathIn.value.trim().replace(/^\.\//, "");
+    var win = -1;
+    rules.forEach(function (r, i) {
+      var hit = path && matches(r.p, path);
+      rulesEl.children[i].classList.toggle("hit", !!hit);
+      rulesEl.children[i].classList.remove("win");
+      if (hit) win = i;
+    });
+    if (!path) { verdict.className = "verdict"; verdict.innerHTML = '<small>Gib einen Pfad ein.</small>'; return; }
+    if (win >= 0) rulesEl.children[win].classList.add("win");
+    var ignored = win >= 0 && rules[win].p.charAt(0) !== "!";
+    if (ignored) {
+      verdict.className = "verdict out";
+      verdict.innerHTML = "Ignoriert – bleibt lokal<small>Letzte passende Regel: <code>" + esc(rules[win].p) + "</code></small>";
+    } else {
+      verdict.className = "verdict in";
+      verdict.innerHTML = "Wird committet – landet auf GitHub" + (win >= 0 ? "<small>Die Ausnahme <code>" + esc(rules[win].p) + "</code> hebt die Regel davor auf.</small>" : "<small>Keine Regel passt.</small>");
+    }
+  }
+  [".env.local", ".env.example", "src/app/page.tsx", "node_modules/react/index.js", ".vercel/project.json", "next-env.d.ts", "src/.DS_Store"].forEach(function (p) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = p;
+    b.addEventListener("click", function () { pathIn.value = p; check(); pathIn.focus(); });
+    document.getElementById("presets").appendChild(b);
+  });
+  pathIn.addEventListener("input", check);
+  check();
+
+  /* ---------- Flashcards ---------- */
+  var qa = [
+    { q: "Wie kommt eine Änderung von deinem Rechner auf die Live-URL?", a: ["Ich committe lokal und pushe auf main. GitHub schickt per Webhook ein Ereignis an Vercel. Vercel klont den Commit, führt npm install und next build aus und rollt das Ergebnis aus.", "Ein Push auf einen anderen Branch erzeugt eine Preview-URL. Schlägt der Build fehl, bleibt die alte Version live."] },
+    { q: "Warum steht !.env.example in der .gitignore?", a: ["Die Vorlage ignoriert .env*. Das trifft auch .env.example. Die Datei soll aber ins Repo, damit jeder sieht, welche Variablen nötig sind.", "Das ! hebt die Regel davor auf. Bei Git gewinnt die letzte passende Regel. Echte Werte stehen nur in .env.local und in den Vercel-Einstellungen."] },
+    { q: "npm audit meldet 5 Schwachstellen „high“. Warum hast du nicht npm audit fix --force ausgeführt?", a: ["Alle fünf liegen in der ESLint-Kette: braces, micromatch, fast-glob, eslint-config-next. ESLint läuft nur bei der Entwicklung. Nichts davon landet im ausgelieferten Code.", "Der Fix mit --force hätte eslint-config-next auf Version 14 zurückgestuft. Das passt nicht zu Next 16. Ich warte auf ein reguläres Update."] },
+    { q: "Was macht cacheComponents, und warum ist es noch an?", a: ["Next rendert eine statische Hülle vor. Teile, die pro Anfrage Daten lesen, etwa Cookies, streamen hinter einer <Suspense>-Grenze nach. Daten lassen sich gezielt mit „use cache“ zwischenspeichern.", "create-next-app 16.4 schaltet es standardmäßig ein. In Schritt 1 liest noch keine Seite Cookies. Die Entscheidung fällt in Schritt 2, wenn der Supabase-Login dazukommt."] },
+    { q: "Warum steht Node 24 an zwei Stellen, in .nvmrc und in engines?", a: [".nvmrc gilt lokal: nvm use wählt damit Node 24. engines in package.json liest Vercel und baut mit dieser Version.", "So laufen lokal und in Produktion dieselbe Hauptversion. Node 23 wäre keine LTS-Version gewesen und hätte von Vercel abgewichen."] }
+  ];
+  var known = {};
+  try { known = JSON.parse(store("faden-doc-s1-quiz") || "{}") || {}; } catch (e) { known = {}; }
+  var cardsEl = document.getElementById("cards");
+  var chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  cardsEl.innerHTML = qa.map(function (c, i) {
+    return '<div class="fc" data-i="' + i + '"><button class="fc-q" type="button" aria-expanded="false"><span class="num">0' + (i + 1) + '</span><span>' + esc(c.q) + '</span>' + chev + '</button>' +
+      '<div class="fc-a"><div><div class="inner">' + c.a.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("") +
+      '<div class="fc-actions"><button class="btn accent" type="button" data-k="1">Gewusst</button><button class="btn ghost" type="button" data-k="0">Noch nicht</button></div></div></div></div></div>';
+  }).join("");
+  function paintQuiz() {
+    var n = 0;
+    Array.prototype.forEach.call(cardsEl.children, function (el, i) { var k = !!known[i]; el.classList.toggle("known", k); if (k) n++; });
+    document.getElementById("score").textContent = n + " von " + qa.length + " gewusst";
+    document.getElementById("bar").style.width = (n / qa.length * 100) + "%";
+  }
+  cardsEl.addEventListener("click", function (e) {
+    var card = e.target.closest(".fc"); if (!card) return;
+    var i = card.getAttribute("data-i");
+    if (e.target.closest(".fc-q")) {
+      var open = card.classList.toggle("open");
+      card.querySelector(".fc-q").setAttribute("aria-expanded", String(open));
+      return;
+    }
+    var act = e.target.closest("[data-k]");
+    if (act) {
+      if (act.getAttribute("data-k") === "1") known[i] = true; else delete known[i];
+      store("faden-doc-s1-quiz", JSON.stringify(known));
+      card.classList.remove("open"); card.querySelector(".fc-q").setAttribute("aria-expanded", "false");
+      paintQuiz();
+    }
+  });
+  document.getElementById("resetQuiz").addEventListener("click", function () { known = {}; store("faden-doc-s1-quiz", "{}"); paintQuiz(); });
+  paintQuiz();
+})();
+</script>
+</body>
+</html>
