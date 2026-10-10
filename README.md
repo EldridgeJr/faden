@@ -5,7 +5,7 @@ Faden antwortet **nur aus diesen Quellen** – mit klickbaren Belegen, die direk
 
 > Status: im Aufbau. Testprojekt für die Bewerbung als Junior Entwickler bei Everlast AI.
 
-**Live:** _folgt_
+**Live:** <https://faden-one.vercel.app>
 
 ## Stack
 

@@ -8,6 +8,7 @@
 - **10.10.2026 · `npm audit` meldet 5 „high“.** Alle in der ESLint-Kette (`braces` → `micromatch` → `fast-glob` → `eslint-config-next`), also nur Entwicklungswerkzeug, nicht im ausgelieferten Code. `npm audit fix --force` hätte `eslint-config-next` auf 14 zurückgestuft und Next 16 kaputt gemacht. Gelöst: bewusst **nicht** ausgeführt, auf ein Update von `eslint-config-next` warten.
 - **10.10.2026 · Vorlage lädt Geist, nutzt aber Arial.** `globals.css` setzte `font-family: Arial` auf `body`. Die Geist-Schrift wurde geladen, aber nie benutzt. Gelöst: Zeile entfernt, `font-sans` auf `body`.
 - **10.10.2026 · Vitest 5 passt nicht zu `@types/node@20`.** Vitest 5 verlangt `@types/node` ab 22. Gelöst: auf `^24` angehoben, passt zu Node 24.
+- **10.10.2026 · Falsche Live-URL geraten.** Die KI hat `faden-eldridge1.vercel.app` vor dem ersten Deployment in die Erklärseite geschrieben. Nach dem Deployment per `curl` geprüft: Diese Team-Domain antwortet mit 302 auf den Vercel-Login (Deployment Protection). Öffentlich ist nur `faden-one.vercel.app` (200). Gelöst: URL in Erklärseite und README ersetzt. Lehre: URLs erst nach dem Deployment eintragen und von außen testen.
 - **10.10.2026 · `nvm install 24` wirkte in der Claude-Shell nicht.** Jeder Befehl startet eine neue Shell mit Node 23 im Pfad. Gelöst: Pfad zu Node 24 vor jedem Befehl setzen (steht in `CLAUDE.md` unter „Befehle“). Im eigenen Terminal reicht `nvm use`.
 
 ## Entscheidungen
