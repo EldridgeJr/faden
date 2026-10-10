@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Schritt 1 · Setup</title>
-<meta name="description" content="Faden, Schritt 1: Next.js-Projekt, Git, GitHub und Vercel – was funktioniert, wie es zusammenhängt und warum.">
+<meta name="description" content="Faden, Schritt 1: Wie aus einem leeren Ordner eine Live-Seite wird – einfach erklärt, mit Begriffen zum Antippen.">
 <style>
   :root {
     --bg: #E9EBEE; --surface: #F6F7F8; --card: #FFFFFF; --tile: #F3F4F6; --line: #E3E5E8;
@@ -121,6 +121,7 @@
   .detail p { margin: 0; color: var(--muted); }
   .detail.swap { animation: fade .3s ease; }
   @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 520px) { .detail { grid-template-columns: 1fr; gap: 8px; } .detail .badge { justify-self: start; } }
   .step-dots { display: flex; gap: 6px; margin-left: auto; }
   .step-dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; transition: background .2s, transform .2s; }
   .step-dots button.on { background: var(--text); transform: scale(1.25); }
@@ -223,6 +224,16 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   }
+
+  /* Begriffe zum Antippen */
+  .term { display: inline; cursor: help; padding: 0 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; text-decoration: underline dotted; text-decoration-color: var(--muted); text-decoration-thickness: 1.5px; text-underline-offset: 3px; border-radius: 4px; transition: background .2s; }
+  .term:hover, .term[aria-expanded="true"] { background: color-mix(in srgb, var(--accent) 45%, transparent); text-decoration-color: transparent; }
+  .detail .badge .term, .lbl .term { text-decoration: none; }
+  .pop { position: fixed; z-index: 50; width: max-content; max-width: min(320px, calc(100vw - 24px)); background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: var(--r-tile); box-shadow: 0 12px 32px rgba(17,19,21,.18); padding: 12px 14px; font: 14.5px/1.5 var(--sans); text-align: left; animation: fade .18s ease; }
+  .pop[hidden] { display: none; }
+  .pop b { display: block; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 4px; letter-spacing: .02em; }
+  .pop p { margin: 0; color: var(--text); }
+  .tipline { font-size: 14px; color: var(--muted); margin-top: 14px; }
 </style>
 </head>
 <body>
@@ -252,22 +263,23 @@
 
   <header class="hero">
     <div class="eyebrow">SCHRITT 1 VON 7 · 10.10.2026</div>
-    <h1>Setup: vom leeren Ordner zur Live-URL</h1>
-    <p class="lead">Ein Next.js-Projekt mit TypeScript, Tailwind und Vitest. Git, GitHub und Vercel sind verbunden. Jeder Push auf <code>main</code> geht automatisch live.</p>
+    <h1>Setup: vom leeren Ordner zur Live-Seite</h1>
+    <p class="lead" data-rich>Das Grundgerüst steht. Faden ist ein [[nextjs|Next.js]]-Projekt mit [[typescript|TypeScript]]. Der Code liegt auf [[github|GitHub]]. Jede Änderung geht über [[vercel|Vercel]] automatisch online.</p>
     <div class="chips">
-      <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test</span><span class="chip ok">build</span><span class="chip ok">deploy</span>
+      <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test</span><span class="chip ok">build</span><span class="chip ok">online</span>
     </div>
+    <div class="tipline" data-rich>Tipp: [[term|Gepunktet unterstrichene Wörter]] antippen. Dann erscheint eine kurze Erklärung.</div>
   </header>
 
   <!-- 1 -->
   <section id="funktioniert">
     <div class="sec-head"><span class="sec-num">01</span><h2>Was jetzt funktioniert</h2></div>
-    <div class="card">
-      <p>Das Projekt läuft lokal mit <code>npm run dev</code> auf Node 24. Vier Befehle prüfen den Code: <code>lint</code>, <code>typecheck</code>, <code>test</code> und <code>build</code>. Alle vier sind grün. Der Code liegt in einem öffentlichen GitHub-Repo. Vercel baut jeden Push auf <code>main</code> und stellt ihn unter einer öffentlichen URL bereit.</p>
-      <p class="muted small" style="margin:0">Supabase und OpenAI sind noch nicht angeschlossen. Sie kommen in Schritt 2 und 3.</p>
+    <div class="card" data-rich>
+      <p>Das Projekt läuft auf dem eigenen Rechner mit dem Befehl <code>npm run dev</code>. Vier Prüfungen kontrollieren den Code: [[lint|lint]], [[typecheck|typecheck]], [[test|test]] und [[build|build]]. Alle vier sind grün. Der Code liegt in einem öffentlichen [[repo|Repo]] auf GitHub. Vercel baut jede Änderung auf dem Hauptzweig und stellt sie unter einer öffentlichen Adresse online.</p>
+      <p class="muted small" style="margin:0">Datenbank und KI fehlen hier noch. Sie kommen in Schritt 2 und 3.</p>
       <div class="facts">
-        <div class="tile fact"><div class="k">REPO</div><div class="v"><a href="https://github.com/EldridgeJr/faden">github.com/EldridgeJr/faden</a></div></div>
-        <div class="tile fact"><div class="k">LIVE</div><div class="v" id="liveUrl"><a href="https://faden-one.vercel.app">faden-one.vercel.app</a></div></div>
+        <div class="tile fact"><div class="k">CODE</div><div class="v"><a href="https://github.com/EldridgeJr/faden">github.com/EldridgeJr/faden</a></div></div>
+        <div class="tile fact"><div class="k">LIVE-SEITE</div><div class="v" id="liveUrl"><a href="https://faden-one.vercel.app">faden-one.vercel.app</a></div></div>
         <div class="tile fact"><div class="k">VERSIONEN</div><div class="v mono small">Next 16.4 · React 19.3 · Node 24</div></div>
         <div class="tile fact"><div class="k">TESTS</div><div class="v mono small">Vitest 5 · noch 0 Tests</div></div>
       </div>
@@ -276,7 +288,7 @@
 
   <!-- 2 -->
   <section id="ablauf">
-    <div class="sec-head"><span class="sec-num">02</span><h2>Ablauf: vom Commit zur Seite</h2></div>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Ablauf: von der Änderung zur Live-Seite</h2></div>
     <div class="card">
       <div class="diagram-tools">
         <button class="btn" id="playBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg><span>Abspielen</span></button>
@@ -285,39 +297,39 @@
         <div class="step-dots" id="dots" role="tablist" aria-label="Schritte im Ablauf"></div>
       </div>
       <div class="scroll-x">
-        <svg class="diagram" id="diagram" viewBox="0 0 880 300" role="img" aria-label="Datenfluss: Rechner, GitHub, Vercel Build, Vercel Hosting, Browser. Supabase und OpenAI folgen später.">
+        <svg class="diagram" id="diagram" viewBox="0 0 880 300" role="img" aria-label="Datenfluss: Rechner, GitHub, Vercel baut, Vercel liefert aus, Browser. Supabase und OpenAI folgen später.">
           <defs>
             <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0 0 10 5 0 10z"/></marker>
           </defs>
 
           <!-- edges -->
           <g class="edge" data-id="e1"><path class="hit" d="M130 96 H194"/><path d="M130 96 H192" marker-end="url(#ah)"/><rect class="label-bg" x="134" y="70" width="56" height="18" rx="9"/><text x="162" y="83" text-anchor="middle">git push</text></g>
-          <g class="edge" data-id="e2"><path class="hit" d="M314 96 H378"/><path d="M314 96 H376" marker-end="url(#ah)"/><rect class="label-bg" x="316" y="70" width="60" height="18" rx="9"/><text x="346" y="83" text-anchor="middle">Webhook</text></g>
-          <g class="edge" data-id="e3"><path class="hit" d="M498 96 H562"/><path d="M498 96 H560" marker-end="url(#ah)"/><rect class="label-bg" x="504" y="70" width="52" height="18" rx="9"/><text x="530" y="83" text-anchor="middle">Deploy</text></g>
-          <g class="edge" data-id="e4"><path class="hit" d="M682 97 H746"/><path d="M746 88 H684" marker-end="url(#ah)"/><path d="M682 106 H744" marker-end="url(#ah)"/><rect class="label-bg" x="672" y="140" width="84" height="18" rx="9"/><text x="714" y="153" text-anchor="middle">GET / → HTML</text></g>
-          <g class="edge later" data-id="e5"><path class="hit" d="M580 132 V210"/><path d="M580 132 V208" marker-end="url(#ah)"/><rect class="label-bg" x="534" y="160" width="40" height="18" rx="9"/><text x="554" y="173" text-anchor="middle">SQL</text></g>
+          <g class="edge" data-id="e2"><path class="hit" d="M314 96 H378"/><path d="M314 96 H376" marker-end="url(#ah)"/><rect class="label-bg" x="316" y="70" width="60" height="18" rx="9"/><text x="346" y="83" text-anchor="middle">Bescheid</text></g>
+          <g class="edge" data-id="e3"><path class="hit" d="M498 96 H562"/><path d="M498 96 H560" marker-end="url(#ah)"/><rect class="label-bg" x="504" y="70" width="52" height="18" rx="9"/><text x="530" y="83" text-anchor="middle">online</text></g>
+          <g class="edge" data-id="e4"><path class="hit" d="M682 97 H746"/><path d="M746 88 H684" marker-end="url(#ah)"/><path d="M682 106 H744" marker-end="url(#ah)"/><rect class="label-bg" x="670" y="140" width="88" height="18" rx="9"/><text x="714" y="153" text-anchor="middle">Seite holen</text></g>
+          <g class="edge later" data-id="e5"><path class="hit" d="M580 132 V210"/><path d="M580 132 V208" marker-end="url(#ah)"/><rect class="label-bg" x="520" y="160" width="54" height="18" rx="9"/><text x="547" y="173" text-anchor="middle">Daten</text></g>
           <g class="edge later" data-id="e6"><path class="hit" d="M640 132 L718 210"/><path d="M640 132 L716 208" marker-end="url(#ah)"/></g>
 
           <!-- nodes -->
           <g class="node" data-id="n1" tabindex="0" role="button" aria-label="Dein Rechner">
             <rect x="10" y="60" width="120" height="72" rx="18"/>
             <path class="ico" d="M26 76h18v12H26zM22 92h26"/>
-            <text x="56" y="88">Rechner</text><text class="sub" x="26" y="114">lint · test</text>
+            <text x="56" y="88">Rechner</text><text class="sub" x="26" y="114">prüfen</text>
           </g>
           <g class="node" data-id="n2" tabindex="0" role="button" aria-label="GitHub">
             <rect x="194" y="60" width="120" height="72" rx="18"/>
             <path class="ico" d="M214 76v16M214 80a5 5 0 0 0 10 4M224 84v-2"/><circle class="ico" cx="214" cy="76" r="2.5"/><circle class="ico" cx="224" cy="80" r="2.5"/>
-            <text x="238" y="88">GitHub</text><text class="sub" x="210" y="114">Repo · main</text>
+            <text x="238" y="88">GitHub</text><text class="sub" x="210" y="114">bewahrt Code</text>
           </g>
-          <g class="node" data-id="n3" tabindex="0" role="button" aria-label="Vercel Build">
+          <g class="node" data-id="n3" tabindex="0" role="button" aria-label="Vercel baut">
             <rect x="378" y="60" width="120" height="72" rx="18"/>
             <path class="ico" d="M394 92l9-16 9 16z"/>
-            <text x="420" y="88">Build</text><text class="sub" x="394" y="114">next build</text>
+            <text x="420" y="88">Bauen</text><text class="sub" x="394" y="114">bei Vercel</text>
           </g>
-          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="Vercel Hosting">
+          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="Vercel liefert aus">
             <rect x="562" y="60" width="120" height="72" rx="18"/>
             <rect class="ico" x="578" y="76" width="18" height="16" rx="3" style="fill:none"/><path class="ico" d="M578 84h18"/>
-            <text x="604" y="88">Hosting</text><text class="sub" x="578" y="114">Vercel</text>
+            <text x="604" y="88">Online</text><text class="sub" x="578" y="114">bei Vercel</text>
           </g>
           <g class="node" data-id="n5" tabindex="0" role="button" aria-label="Browser">
             <rect x="746" y="60" width="124" height="72" rx="18"/>
@@ -346,28 +358,28 @@
     <div class="card">
       <div class="filter" role="group" aria-label="Dateien filtern">
         <button type="button" data-f="all" aria-pressed="true">Alle</button>
-        <button type="button" data-f="new" aria-pressed="false">Von mir angepasst</button>
-        <button type="button" data-f="gen" aria-pressed="false">Unverändert aus der Vorlage</button>
+        <button type="button" data-f="new" aria-pressed="false">Von uns angepasst</button>
+        <button type="button" data-f="gen" aria-pressed="false">Aus der Vorlage</button>
       </div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>DATEI</th><th>AUFGABE</th><th>WARUM SO</th></tr></thead>
-          <tbody id="fileRows">
-            <tr data-k="new"><td><code>package.json</code></td><td>Abhängigkeiten, Skripte, Node-Version</td><td><code>engines</code> setzt Node 24. Vercel liest dieses Feld. <code>typecheck</code> und <code>test</code> sind neu.</td></tr>
-            <tr data-k="gen"><td><code>package-lock.json</code></td><td>Exakte Versionen aller Pakete</td><td>Jede Installation bekommt dieselben Versionen, lokal und auf Vercel.</td></tr>
-            <tr data-k="new"><td><code>.nvmrc</code></td><td>Node-Version für nvm</td><td><code>nvm use</code> wählt Node 24 ohne Nachdenken.</td></tr>
-            <tr data-k="new"><td><code>next.config.ts</code></td><td>Next.js-Konfiguration</td><td>Aus der Vorlage, nur ein Kommentar entfernt. <code>cacheComponents</code> ist bewusst noch offen.</td></tr>
-            <tr data-k="gen"><td><code>tsconfig.json</code></td><td>TypeScript-Regeln, Alias <code>@/</code></td><td><code>strict: true</code> ist Pflicht laut Stack. <code>@/</code> zeigt auf <code>src/</code>.</td></tr>
-            <tr data-k="gen"><td><code>eslint.config.mjs</code></td><td>Lint-Regeln für Next und TypeScript</td><td>Flat Config von ESLint 9. Regeln für Core Web Vitals sind dabei.</td></tr>
-            <tr data-k="new"><td><code>vitest.config.ts</code></td><td>Unit-Tests</td><td>Läuft in Node, sucht nur <code>src/**/*.test.ts</code>. Alias über Vite selbst, ohne Plugin.</td></tr>
-            <tr data-k="new"><td><code>.gitignore</code></td><td>Was nie ins Repo darf</td><td>Ausnahme <code>!.env.example</code> ergänzt. Sonst wäre die Vorlage auch ignoriert.</td></tr>
-            <tr data-k="new"><td><code>.env.example</code></td><td>Namen aller Umgebungsvariablen</td><td>Nur Namen, keine Werte. <code>NEXT_PUBLIC_</code> heißt: geht in den Browser.</td></tr>
-            <tr data-k="new"><td><code>src/app/layout.tsx</code></td><td>HTML-Gerüst, Schriften, Titel</td><td><code>lang="de"</code>, Titel „Faden“. Geist kommt über <code>next/font</code>.</td></tr>
-            <tr data-k="new"><td><code>src/app/page.tsx</code></td><td>Startseite</td><td>Platzhalter. Das echte Design folgt in Schritt 5.</td></tr>
-            <tr data-k="new"><td><code>src/app/globals.css</code></td><td>Tailwind und Grundfarben</td><td>Arial entfernt, damit Geist wirklich gilt. Faden-Hintergrund gesetzt.</td></tr>
-            <tr data-k="gen"><td><code>AGENTS.md</code></td><td>Hinweis für KI-Agenten</td><td>Von Next erzeugt. Verweist auf die Doku in <code>node_modules/next/dist/docs/</code>.</td></tr>
-            <tr data-k="new"><td><code>README.md</code></td><td>Einstieg ins Repo</td><td>Gerüst mit Stack und Befehlen. Wird bis Schritt 7 vollständig.</td></tr>
-            <tr data-k="new"><td><code>CLAUDE.md</code> · <code>NOTIZEN.md</code></td><td>Regeln und Lernprotokoll</td><td>Befehle ergänzt, Schritt 1 abgehakt, sieben Fehler und Annahmen notiert.</td></tr>
+          <tbody id="fileRows" data-rich>
+            <tr data-k="new"><td><code>package.json</code></td><td>Liste aller Pakete und Befehle</td><td>Legt [[node|Node]] 24 fest, das liest auch Vercel. Die Befehle <code>typecheck</code> und <code>test</code> sind neu.</td></tr>
+            <tr data-k="gen"><td><code>package-lock.json</code></td><td>Genaue Versionen aller Pakete</td><td>Jede Installation bekommt exakt dieselben Pakete ([[lockfile|Lockfile]]), lokal und auf Vercel.</td></tr>
+            <tr data-k="new"><td><code>.nvmrc</code></td><td>Welche Node-Version gilt</td><td>Der Befehl <code>nvm use</code> ([[nvm|nvm]]) wählt damit automatisch Node 24.</td></tr>
+            <tr data-k="new"><td><code>next.config.ts</code></td><td>Einstellungen für Next.js</td><td>So aus der Vorlage übernommen. In Schritt 2 haben wir [[cache|cacheComponents]] ausgeschaltet.</td></tr>
+            <tr data-k="gen"><td><code>tsconfig.json</code></td><td>Regeln für TypeScript</td><td>Der strenge Modus ist an. <code>@/</code> ist eine Abkürzung für den Ordner <code>src/</code>.</td></tr>
+            <tr data-k="gen"><td><code>eslint.config.mjs</code></td><td>Regeln für [[eslint|ESLint]]</td><td>Findet typische Fehler in Next.js- und TypeScript-Code.</td></tr>
+            <tr data-k="new"><td><code>vitest.config.ts</code></td><td>Einstellungen für [[vitest|Tests]]</td><td>Tests laufen ohne Browser. Nur Dateien mit <code>.test.ts</code> zählen.</td></tr>
+            <tr data-k="new"><td><code>.gitignore</code></td><td>Was nie ins Repo darf</td><td>Eine Ausnahme ergänzt. Sonst käme auch die Vorlage <code>.env.example</code> nicht ins Repo.</td></tr>
+            <tr data-k="new"><td><code>.env.example</code></td><td>Namen aller [[env|geheimen Einstellungen]]</td><td>Nur Namen, keine Werte. [[public|NEXT_PUBLIC_]] heißt: Dieser Wert landet im Browser.</td></tr>
+            <tr data-k="new"><td><code>src/app/layout.tsx</code></td><td>Grundgerüst jeder Seite</td><td>Sprache Deutsch, Titel „Faden“, Schrift Geist.</td></tr>
+            <tr data-k="new"><td><code>src/app/page.tsx</code></td><td>Startseite</td><td>Ein Platzhalter. Das echte Design kommt in Schritt 5.</td></tr>
+            <tr data-k="new"><td><code>src/app/globals.css</code></td><td>Grundfarben und [[tailwind|Tailwind]]</td><td>Arial entfernt, damit wirklich Geist angezeigt wird.</td></tr>
+            <tr data-k="gen"><td><code>AGENTS.md</code></td><td>Hinweis für KI-Helfer</td><td>Von Next.js erzeugt. Verweist auf die mitgelieferte Doku.</td></tr>
+            <tr data-k="new"><td><code>README.md</code></td><td>Startseite des Repos</td><td>Beschreibt Werkzeuge und Befehle. Wird bis Schritt 7 vollständig.</td></tr>
+            <tr data-k="new"><td><code>CLAUDE.md</code> · <code>NOTIZEN.md</code></td><td>Regeln und Lerntagebuch</td><td>Befehle ergänzt, Schritt 1 abgehakt, sieben Fehler notiert.</td></tr>
           </tbody>
         </table>
       </div>
@@ -392,9 +404,9 @@
 
   <!-- Demo -->
   <section id="demo">
-    <div class="sec-head"><span class="sec-num">04b</span><h2>Mini-Demo: Was landet im Repo?</h2></div>
+    <div class="sec-head"><span class="sec-num">04b</span><h2>Mini-Demo: Was landet auf GitHub?</h2></div>
     <div class="card">
-      <p class="muted">Gib einen Dateipfad ein. Die Demo prüft ihn gegen die echten Regeln aus unserer <code>.gitignore</code>. Wie bei Git gewinnt die <strong>letzte</strong> passende Regel.</p>
+      <p class="muted" data-rich>Gib einen Dateinamen ein. Die Demo prüft ihn mit den echten Regeln aus unserer [[gitignore|.gitignore]]. Wie bei [[git|Git]] gilt die <strong>letzte</strong> passende Regel.</p>
       <div class="demo-grid">
         <div>
           <div class="field"><input id="pathIn" type="text" value=".env.local" spellcheck="false" autocomplete="off" aria-label="Dateipfad"></div>
@@ -411,26 +423,26 @@
   <!-- 5 -->
   <section id="entscheidungen">
     <div class="sec-head"><span class="sec-num">05</span><h2>Entscheidungen und Alternativen</h2></div>
-    <div class="decisions">
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Erzeugen im Unterordner, dann verschieben</h3><p><code>create-next-app</code> bricht in Ordnern mit Dateien ab. So bleiben <code>CLAUDE.md</code> und <code>NOTIZEN.md</code> unberührt.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Dateien kurz wegräumen und im Projektordner erzeugen. Risiko: etwas vergessen zurückzulegen.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Node 24 LTS, festgelegt an zwei Stellen</h3><p><code>.nvmrc</code> für lokal, <code>engines</code> für Vercel. Beide Umgebungen nutzen dieselbe Hauptversion.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Node 23 behalten. Das geht mit Next 16, ist aber keine LTS-Version und weicht von Vercel ab.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3><code>src/</code>-Ordner</h3><p>App-Code ist getrennt von Konfiguration, Migrationen und Doku.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Alles im Wurzelverzeichnis. Ein Ordner weniger, aber mehr Durcheinander ab Schritt 2.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Vercel über Git verbunden</h3><p>Push auf <code>main</code> erzeugt Production. Jeder andere Branch erzeugt eine Preview-URL.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Manuell mit <code>vercel deploy</code>. Mehr Kontrolle, aber leicht zu vergessen.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>shadcn/ui erst in Schritt 5</h3><p><code>shadcn init</code> schreibt <code>globals.css</code> neu. Das gehört zum Design-Schritt.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Jetzt einrichten. Dann müssten wir die Farben in Schritt 5 ein zweites Mal anfassen.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Offen bis Schritt 2</div><h3><code>cacheComponents</code> anlassen?</h3><p>Die Vorlage schaltet es ein. Seiten mit Login müssen dann den Cookie-Teil hinter <code>&lt;Suspense&gt;</code> legen.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Ausschalten. Dann rendert jede Seite mit Cookies einfach pro Anfrage. Einfacher zu erklären.</p></div></div>
+    <div class="decisions" data-rich>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Projekt in einem Unterordner erzeugt</h3><p>Das Startprogramm [[cna|create-next-app]] bricht ab, wenn der Ordner nicht leer ist. So blieben <code>CLAUDE.md</code> und <code>NOTIZEN.md</code> unberührt.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Die Dateien kurz wegräumen. Risiko: etwas vergessen zurückzulegen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Node 24, an zwei Stellen festgelegt</h3><p>Eine Datei für den eigenen Rechner, ein Eintrag für Vercel. Beide nutzen dieselbe Version.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Das vorhandene Node 23 behalten. Es ist aber keine [[lts|LTS-Version]] und weicht von Vercel ab.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Ein Ordner <code>src/</code> für den App-Code</h3><p>Der App-Code liegt getrennt von Einstellungen, Datenbank und Doku.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Alles im obersten Ordner. Ein Ordner weniger, aber unübersichtlicher.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Vercel mit GitHub verbunden</h3><p>Jeder Push auf <code>main</code> geht live. Jeder andere [[branch|Branch]] bekommt eine eigene Vorschau-Adresse.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Von Hand veröffentlichen. Mehr Kontrolle, aber leicht zu vergessen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>[[shadcn|shadcn/ui]] erst in Schritt 5</h3><p>Die Einrichtung überschreibt die Farb-Datei. Das gehört zum Design-Schritt.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Jetzt einrichten. Dann müssten wir die Farben in Schritt 5 ein zweites Mal anfassen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">In Schritt 2 entschieden</div><h3>[[cache|cacheComponents]] ausschalten</h3><p>Die Vorlage schaltet es ein. Bei Seiten mit Login bringt es wenig und macht viel Arbeit.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Anlassen. Dann braucht jede Seite mit Login zusätzlichen Code für Ladezustände.</p></div></div>
     </div>
   </section>
 
   <!-- 6 -->
   <section id="risiken">
     <div class="sec-head"><span class="sec-num">06</span><h2>Was schiefgehen kann</h2></div>
-    <div class="risks">
-      <div class="risk"><span class="chip err">Sicherheit</span><h3>Secret im Repo</h3><p>Eine <code>.env.local</code> mit echtem Key darf nie committet werden. Die <code>.gitignore</code> verhindert das. Wenn es doch passiert: Key sofort beim Anbieter widerrufen. Löschen aus Git reicht nicht.</p></div>
-      <div class="risk"><span class="chip err">Sicherheit</span><h3><code>NEXT_PUBLIC_</code> verwechselt</h3><p>Variablen mit diesem Präfix landen im Browser-Code. Ein Secret-Key darf dieses Präfix nie tragen.</p></div>
-      <div class="risk"><span class="chip warn">Abhängigkeiten</span><h3>5 Meldungen in <code>npm audit</code></h3><p>Alle betreffen nur ESLint, nicht den ausgelieferten Code. <code>npm audit fix --force</code> würde Next 16 kaputt machen. Wir warten auf ein Update.</p></div>
-      <div class="risk"><span class="chip warn">Umgebung</span><h3>Falsche Node-Version</h3><p>Ohne <code>nvm use</code> läuft lokal eventuell Node 23. npm warnt dann wegen <code>engines</code>, bricht aber nicht ab.</p></div>
-      <div class="risk"><span class="chip warn">Öffentlich</span><h3>Jeder Push ist live</h3><p>Ein kaputter Commit auf <code>main</code> wird sofort ausgeliefert. Darum laufen lint, typecheck, test und build vor jedem Commit.</p></div>
-      <div class="risk"><span class="chip">Hinweis</span><h3>Neue Next-Version</h3><p>Next 16.4 weicht von älteren Tutorials ab. Bei Zweifeln gilt die Doku in <code>node_modules/next/dist/docs/</code>.</p></div>
+    <div class="risks" data-rich>
+      <div class="risk"><span class="chip err">Sicherheit</span><h3>Geheimer Schlüssel im Repo</h3><p>Eine <code>.env.local</code> mit echtem Schlüssel darf nie auf GitHub. Die [[gitignore|.gitignore]] verhindert das. Passiert es doch: den Schlüssel sofort beim Anbieter sperren. Nur löschen reicht nicht.</p></div>
+      <div class="risk"><span class="chip err">Sicherheit</span><h3><code>NEXT_PUBLIC_</code> verwechselt</h3><p>Werte mit diesem Anfang landen im Browser. Ein [[apikey|geheimer Schlüssel]] darf ihn nie tragen.</p></div>
+      <div class="risk"><span class="chip warn">Pakete</span><h3>5 Warnungen bei <code>npm audit</code></h3><p>[[audit|npm audit]] meldet Lücken, aber nur in ESLint. Das läuft nur beim Entwickeln, nicht auf der Live-Seite. Die automatische Reparatur hätte Next 16 kaputt gemacht.</p></div>
+      <div class="risk"><span class="chip warn">Umgebung</span><h3>Falsche Node-Version</h3><p>Ohne <code>nvm use</code> läuft vielleicht Node 23. [[npm|npm]] warnt dann, bricht aber nicht ab.</p></div>
+      <div class="risk"><span class="chip warn">Öffentlich</span><h3>Jeder Push ist sofort live</h3><p>Ein kaputter Stand auf <code>main</code> geht direkt online. Darum laufen vor jedem [[commit|Commit]] alle vier Prüfungen.</p></div>
+      <div class="risk"><span class="chip">Hinweis</span><h3>Neue Next.js-Version</h3><p>Next 16.4 weicht von älteren Anleitungen ab. Im Zweifel gilt die Doku, die mit Next.js mitkommt.</p></div>
     </div>
   </section>
 
@@ -447,9 +459,83 @@
 
   <footer>
     <span>Faden · Erklärung zu Schritt 1</span>
-    <a href="index.html">Alle Schritte →</a>
+    <span><a href="index.html">Alle Schritte</a> · <a href="schritt-2-datenbank.html">Schritt 2 →</a></span>
   </footer>
 </div>
+
+<div class="pop" id="pop" role="dialog" aria-live="polite" hidden><b id="popT"></b><p id="popD"></p></div>
+
+<!-- Code samples as plain text: no escaping needed -->
+<script type="text/plain" id="src-package">{
+  "name": "faden",
+  "private": true,
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  }
+}</script>
+<script type="text/plain" id="src-next">import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  cacheComponents: true,
+  partialPrefetching: true,
+  turbopack: {
+    rules: {
+      "*.css": {
+        loaders: ["@tailwindcss/turbopack"],
+        as: "*.css",
+      },
+    },
+  },
+};
+
+export default nextConfig;</script>
+<script type="text/plain" id="src-vitest">import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  resolve: {
+    // Resolve the "@/*" alias from tsconfig.json, same as Next.js does.
+    tsconfigPaths: true,
+  },
+  test: {
+    // Core logic (chunking, RRF, citations) runs in Node, not in a browser.
+    environment: "node",
+    include: ["src/**/*.test.ts"],
+  },
+});</script>
+<script type="text/plain" id="src-ignore"># dependencies
+/node_modules
+
+# next.js
+/.next/
+
+# env files: never commit secrets, but keep the template
+.env*
+!.env.example
+
+# vercel
+.vercel</script>
+<script type="text/plain" id="src-layout">import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+export default function RootLayout({ children }: LayoutProps<"/">) {
+  return (
+    <html lang="de" className={`${geistSans.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col font-sans">{children}</body>
+    </html>
+  );
+}</script>
 
 <script>
 (function () {
@@ -459,7 +545,87 @@
   function store(key, val) {
     try { if (val === undefined) return localStorage.getItem(key); localStorage.setItem(key, val); } catch (e) { return null; }
   }
-  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* ---------- Begriffe ---------- */
+  var G = {
+    term: ["So funktioniert es", "Genau so: antippen, lesen, irgendwo anders hintippen. Die Erklärung verschwindet wieder."],
+    nextjs: ["Next.js", "Ein Baukasten für Webseiten mit React. Er kümmert sich um Seiten, Adressen und darum, was auf dem Server und was im Browser läuft."],
+    typescript: ["TypeScript", "JavaScript mit Typen. Man schreibt dazu, welche Art von Daten erwartet wird, etwa Text oder Zahl. Der Editor findet so viele Fehler, bevor das Programm läuft."],
+    tailwind: ["Tailwind CSS", "Ein Werkzeug für das Aussehen. Statt eigene CSS-Dateien zu schreiben, setzt man kurze Klassen wie „text-lg“ direkt an die Elemente."],
+    vitest: ["Vitest", "Ein Programm für automatische Tests. Es führt kleine Prüf-Programme aus und meldet, ob der Code das Richtige tut."],
+    eslint: ["ESLint", "Ein Prüfprogramm für Code. Es findet typische Fehler und unsaubere Stellen, ohne den Code auszuführen."],
+    lint: ["lint", "Der Befehl npm run lint. Er startet ESLint und meldet typische Fehler im Code."],
+    typecheck: ["typecheck", "Der Befehl npm run typecheck. TypeScript prüft, ob überall die richtige Art von Daten verwendet wird."],
+    test: ["test", "Der Befehl npm test. Er startet alle automatischen Tests mit Vitest."],
+    build: ["build", "Der Befehl npm run build. Er baut die fertige App, genau wie Vercel es online tut. Klappt das lokal, klappt es meist auch dort."],
+    git: ["Git", "Ein Programm, das jede Änderung am Code speichert. Man sieht jederzeit, was sich wann geändert hat, und kann zurückgehen."],
+    commit: ["Commit", "Ein gespeicherter Stand des Codes mit einer kurzen Beschreibung, zum Beispiel „Datenbank angelegt“. Wie ein Speicherpunkt im Spiel."],
+    push: ["git push", "Lädt die neuen Commits vom eigenen Rechner zu GitHub hoch."],
+    github: ["GitHub", "Eine Webseite, auf der Code mit Git gespeichert und geteilt wird. Unser Code liegt dort öffentlich."],
+    repo: ["Repo (Repository)", "Der Ordner mit dem ganzen Code und seiner Geschichte aus Commits. Unseres liegt auf GitHub."],
+    branch: ["Branch", "Ein Entwicklungszweig des Codes. main ist der Hauptzweig, der live geht. Auf anderen Zweigen kann man etwas ausprobieren, ohne main zu stören."],
+    vercel: ["Vercel", "Ein Dienst, der Webseiten baut und online stellt. Er holt den Code von GitHub und macht daraus die Live-Seite."],
+    webhook: ["Webhook", "Eine automatische Nachricht von einem Dienst an einen anderen. Hier sagt GitHub zu Vercel: „Es gibt neuen Code.“"],
+    cdn: ["CDN", "Ein Netz von Servern auf der ganzen Welt. Es liefert fertige Seiten vom nächstgelegenen Server aus. Das ist schnell."],
+    functions: ["Functions", "Kleine Programme bei Vercel, die nur bei einem Aufruf kurz laufen. Darin steckt der Server-Code unserer App."],
+    hydration: ["Hydration", "Der Browser bekommt zuerst fertiges HTML. Danach verbindet React die Knöpfe und Eingaben damit. Erst dann reagiert die Seite auf Klicks."],
+    gitignore: [".gitignore", "Eine Liste von Dateien, die Git nie speichern soll. Zum Beispiel geheime Schlüssel oder riesige Paket-Ordner."],
+    env: ["Umgebungsvariablen (.env)", "Einstellungen, die nicht im Code stehen, sondern daneben, zum Beispiel Schlüssel. Lokal in .env.local, online bei Vercel."],
+    public: ["NEXT_PUBLIC_", "Einstellungen mit diesem Anfang baut Next.js in den Browser-Code ein. Jeder kann sie dort lesen. Also nie für geheime Schlüssel verwenden."],
+    node: ["Node.js", "Ein Programm, das JavaScript außerhalb des Browsers ausführt. Next.js, npm und die Tests laufen damit."],
+    nvm: ["nvm", "Ein Werkzeug, das mehrere Node-Versionen verwaltet. Mit nvm use wechselt man zur Version aus der Datei .nvmrc."],
+    lts: ["LTS", "Long Term Support: eine Version, die lange gepflegt wird und Sicherheits-Updates bekommt. Gut für Projekte, die stabil laufen sollen."],
+    npm: ["npm", "Der Paket-Manager für JavaScript. Er installiert fertige Bausteine (Pakete) und startet die Befehle aus package.json."],
+    lockfile: ["package-lock.json", "Hält die genaue Version jedes Pakets fest. So bekommt jede Installation exakt dieselben Pakete."],
+    cache: ["cacheComponents", "Eine Funktion von Next.js. Sie baut Teile einer Seite vorab, damit sie schneller erscheinen. Bei Seiten mit Login bringt das wenig."],
+    supabase: ["Supabase", "Ein Online-Dienst. Er liefert eine fertige Datenbank, eine Dateiablage und ein Login-System. Wir müssen dafür keinen eigenen Server betreiben."],
+    openai: ["OpenAI", "Die Firma hinter ChatGPT. Wir nutzen ihre Dienste für die Suche, für Antworten und für die Stimmen im Podcast."],
+    apikey: ["Geheimer Schlüssel (API-Key)", "Damit meldet sich unsere App bei einem Dienst an. Wer ihn hat, kann den Dienst auf unsere Kosten benutzen. Darum bleibt er geheim."],
+    cna: ["create-next-app", "Ein Startprogramm, das ein neues Next.js-Projekt mit allen Grunddateien anlegt."],
+    shadcn: ["shadcn/ui", "Eine Sammlung fertiger Bausteine für die Oberfläche, etwa Knöpfe und Dialoge. Man kopiert sie ins Projekt und passt sie an."],
+    audit: ["npm audit", "Prüft alle installierten Pakete auf bekannte Sicherheitslücken."],
+    font: ["next/font", "Lädt Schriften beim Bauen herunter und liefert sie von unserer eigenen Adresse aus. Der Browser muss nicht bei Google nachfragen."]
+  };
+  function termTag(k, t) { return '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>'; }
+  // [[key|Text]] -> clickable term (input is escaped first)
+  function rich(s) { return esc(s).replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) { return G[k] ? termTag(k, t) : t; }); }
+  document.querySelectorAll("[data-rich]").forEach(function (el) {
+    el.innerHTML = el.innerHTML.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) { return G[k] ? termTag(k, t) : t; });
+  });
+  var pop = document.getElementById("pop"), openTerm = null;
+  function closePop() { if (openTerm) openTerm.setAttribute("aria-expanded", "false"); openTerm = null; pop.hidden = true; }
+  function openPop(el) {
+    var g = G[el.getAttribute("data-t")]; if (!g) return;
+    if (openTerm === el) { closePop(); return; }
+    closePop();
+    document.getElementById("popT").textContent = g[0];
+    document.getElementById("popD").textContent = g[1];
+    pop.hidden = false; openTerm = el; el.setAttribute("aria-expanded", "true");
+    place();
+  }
+  // Below the term, or above it if there is no room. Stays inside the screen.
+  function place() {
+    if (!openTerm) return;
+    var r = openTerm.getClientRects()[0] || openTerm.getBoundingClientRect();
+    var pw = pop.offsetWidth, ph = pop.offsetHeight, vw = document.documentElement.clientWidth;
+    if (r.bottom < 0 || r.top > window.innerHeight) { closePop(); return; }
+    var left = Math.min(Math.max(12, r.left + r.width / 2 - pw / 2), vw - pw - 12);
+    var top = r.bottom + 8; if (top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 8);
+    pop.style.left = left + "px"; pop.style.top = top + "px";
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest(".term");
+    if (t) { e.preventDefault(); e.stopPropagation(); openPop(t); return; }
+    if (!e.target.closest(".pop")) closePop();
+  }, true);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closePop(); return; }
+    var t = e.target.closest && e.target.closest(".term");
+    if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); openPop(t); }
+  }, true);
+  window.addEventListener("scroll", place, { passive: true });
+  window.addEventListener("resize", place);
 
   /* ---------- Theme ---------- */
   var root = document.documentElement, themeBtn = document.getElementById("themeBtn");
@@ -473,21 +639,21 @@
 
   /* ---------- Diagram ---------- */
   var steps = [
-    { id: "n1", tag: "1 · Rechner", title: "Du prüfst und committest lokal", text: "Vor jedem Commit laufen npm run lint, typecheck, test und build. Erst wenn alle grün sind, folgt git commit und git push." },
-    { id: "e1", tag: "2 · git push", title: "Der Commit geht zu GitHub", text: "git push schickt die neuen Commits über HTTPS an das Repo EldridgeJr/faden, Branch main. .env.local und node_modules bleiben lokal, die .gitignore filtert sie." },
-    { id: "n2", tag: "3 · GitHub", title: "GitHub speichert den Code", text: "Das Repo ist öffentlich. Es ist die eine Quelle der Wahrheit für den Code. Vercel hat über die GitHub-App Lesezugriff." },
-    { id: "e2", tag: "4 · Webhook", title: "GitHub meldet den Push an Vercel", text: "Bei jedem Push schickt GitHub ein Ereignis an Vercel. Vercel startet daraufhin einen Build. Push auf main heißt Production, jeder andere Branch heißt Preview." },
-    { id: "n3", tag: "5 · Build", title: "Vercel baut die App", text: "Vercel klont den Commit, führt npm install und next build aus, mit Node 24 aus engines. Schlägt der Build fehl, bleibt die alte Version live." },
-    { id: "e3", tag: "6 · Deploy", title: "Das Ergebnis wird ausgerollt", text: "Statische Seiten gehen ins CDN. Server-Code wird zu Vercel Functions. Die Production-Domain zeigt danach auf das neue Deployment." },
-    { id: "n4", tag: "7 · Hosting", title: "Vercel liefert aus", text: "Die Startseite ist im Moment statisch, also vorgerendert. Ab Schritt 2 rendern Seiten pro Anfrage, weil sie den Login lesen." },
-    { id: "e4", tag: "8 · Anfrage", title: "Der Browser holt die Seite", text: "Der Browser sendet GET /. Vercel antwortet mit HTML, CSS und JavaScript. React übernimmt danach im Browser (Hydration)." },
-    { id: "n5", tag: "9 · Browser", title: "Die Nutzerin sieht Faden", text: "Im Moment eine einfache Startseite in Geist auf dem Faden-Hintergrund. Das echte Design folgt in Schritt 5." }
+    { id: "n1", tag: "1 · Rechner", title: "Du prüfst und speicherst", text: "Vor jedem [[commit|Commit]] laufen vier Prüfungen: [[lint|lint]], [[typecheck|typecheck]], [[test|test]] und [[build|build]]. Erst wenn alle grün sind, geht der Code weiter." },
+    { id: "e1", tag: "2 · git push", title: "Der Code geht zu GitHub", text: "[[push|git push]] lädt die neuen Commits zu GitHub hoch. Geheime Dateien wie .env.local bleiben auf dem Rechner. Dafür sorgt die [[gitignore|.gitignore]]." },
+    { id: "n2", tag: "3 · GitHub", title: "GitHub bewahrt den Code auf", text: "Das [[repo|Repo]] ist öffentlich. Dort liegt immer die aktuelle Fassung des Codes. Vercel darf den Code lesen." },
+    { id: "e2", tag: "4 · Bescheid", title: "GitHub sagt Vercel Bescheid", text: "Bei jedem Push schickt GitHub eine kurze Nachricht an Vercel ([[webhook|Webhook]]). Vercel startet dann den Bau. Push auf [[branch|main]] heißt: live. Jeder andere Branch bekommt eine Vorschau-Adresse." },
+    { id: "n3", tag: "5 · Bauen", title: "Vercel baut die App", text: "[[vercel|Vercel]] lädt den Code, installiert die Pakete und baut die App mit [[node|Node]] 24. Geht dabei etwas schief, bleibt die alte Version online." },
+    { id: "e3", tag: "6 · online", title: "Die neue Version geht online", text: "Fertige Seiten kommen in ein weltweites Netz von Servern ([[cdn|CDN]]). Code, der bei jedem Aufruf laufen muss, wird zu kleinen [[functions|Functions]]. Die Adresse zeigt jetzt auf die neue Version." },
+    { id: "n4", tag: "7 · Online", title: "Vercel liefert die Seite aus", text: "Die Startseite ist im Moment fertig vorgebaut. Ab Schritt 2 wird sie bei jedem Aufruf neu gebaut, weil sie den Login lesen muss." },
+    { id: "e4", tag: "8 · Seite holen", title: "Der Browser holt die Seite", text: "Der Browser fragt nach der Seite. Vercel schickt HTML, CSS und JavaScript zurück. Danach wird die Seite im Browser bedienbar ([[hydration|Hydration]])." },
+    { id: "n5", tag: "9 · Browser", title: "Die Nutzerin sieht Faden", text: "Im Moment eine einfache Startseite in der Schrift Geist. Das richtige Design folgt in Schritt 5." }
   ];
   var extras = {
-    n6: { tag: "Später · Supabase", title: "Datenbank, Storage und Login", text: "Ab Schritt 2: Postgres mit pgvector, Row Level Security und Auth in der Region Frankfurt. Der Server spricht mit Supabase, der Browser nur mit dem Publishable Key." },
-    e5: { tag: "Später · SQL", title: "Server fragt Supabase", text: "Ab Schritt 2 liest und schreibt der Server Notebooks, Quellen und Abschnitte. RLS prüft dabei jede Zeile gegen den eingeloggten Nutzer." },
-    n7: { tag: "Später · OpenAI", title: "Embeddings, Chat, Sprache", text: "Ab Schritt 3: text-embedding-3-small für die Suche, später Chat-Antworten und Text-to-Speech für den Podcast. Der API-Key bleibt auf dem Server." },
-    e6: { tag: "Später · API", title: "Server ruft OpenAI auf", text: "Nur der Server ruft OpenAI auf. Der Browser sieht den Key nie." }
+    n6: { tag: "Später · Supabase", title: "Datenbank, Dateien und Login", text: "Ab Schritt 2: [[supabase|Supabase]] in Frankfurt speichert Notebooks, Quellen und Textabschnitte. Der Browser bekommt nur einen öffentlichen Schlüssel." },
+    e5: { tag: "Später · Daten", title: "Der Server fragt Supabase", text: "Ab Schritt 2 liest und speichert der Server Daten in Supabase. Regeln in der Datenbank prüfen dabei jede Zeile." },
+    n7: { tag: "Später · OpenAI", title: "KI für Suche, Antworten und Sprache", text: "Ab Schritt 3: [[openai|OpenAI]] hilft bei der Suche, schreibt später Antworten und spricht den Podcast. Der [[apikey|geheime Schlüssel]] bleibt auf dem Server." },
+    e6: { tag: "Später · OpenAI", title: "Nur der Server ruft OpenAI auf", text: "Der Browser spricht nie direkt mit OpenAI. So sieht er den geheimen Schlüssel nie." }
   };
   var diagram = document.getElementById("diagram"), detail = document.getElementById("detail"), dots = document.getElementById("dots");
   var current = -1, timer = null, playBtn = document.getElementById("playBtn");
@@ -498,13 +664,12 @@
     b.addEventListener("click", function () { stop(); show(i); });
     dots.appendChild(b);
   });
-
   function highlight(id) {
     diagram.querySelectorAll(".is-active").forEach(function (el) { el.classList.remove("is-active"); });
     var el = diagram.querySelector('[data-id="' + id + '"]'); if (el) el.classList.add("is-active");
   }
   function renderDetail(d) {
-    detail.innerHTML = '<span class="badge">' + esc(d.tag) + '</span><div><h3>' + esc(d.title) + '</h3><p>' + esc(d.text) + '</p></div>';
+    detail.innerHTML = '<span class="badge">' + esc(d.tag) + '</span><div><h3>' + esc(d.title) + '</h3><p>' + rich(d.text) + '</p></div>';
     detail.classList.remove("swap"); void detail.offsetWidth; detail.classList.add("swap");
   }
   function show(i) {
@@ -518,7 +683,7 @@
     playBtn.querySelector("span").textContent = "Pause";
     if (current >= steps.length - 1) current = -1;
     show(current + 1);
-    timer = setInterval(function () { if (current >= steps.length - 1) { stop(); return; } show(current + 1); }, reduce ? 2600 : 1800);
+    timer = setInterval(function () { if (current >= steps.length - 1) { stop(); return; } show(current + 1); }, reduce ? 3600 : 2800);
   }
   playBtn.addEventListener("click", play);
   document.getElementById("prevBtn").addEventListener("click", function () { stop(); show(current <= 0 ? steps.length - 1 : current - 1); });
@@ -546,22 +711,46 @@
   });
 
   /* ---------- Code ---------- */
+  function src(id) { return document.getElementById(id).textContent; }
   var snippets = [
-    { file: "package.json", lang: "json", why: "Skripte und Node-Version",
-      code: '{\n  "name": "faden",\n  "private": true,\n  "engines": {\n    "node": "24.x"\n  },\n  "scripts": {\n    "dev": "next dev",\n    "build": "next build",\n    "lint": "eslint",\n    "typecheck": "next typegen && tsc --noEmit",\n    "test": "vitest run --passWithNoTests"\n  }\n}',
-      notes: { 3: "private: true verhindert, dass das Projekt aus Versehen auf npm veröffentlicht wird.", 5: "Vercel liest engines.node und baut mit Node 24. npm warnt lokal, wenn eine andere Version läuft.", 10: "eslint ohne Pfad prüft das ganze Projekt mit den Regeln aus eslint.config.mjs.", 11: "next typegen erzeugt zuerst die Routen-Typen wie LayoutProps<\"/\">. tsc --noEmit prüft dann alle Typen, ohne Dateien zu schreiben.", 12: "vitest run läuft einmal statt im Watch-Modus. --passWithNoTests: Ohne Testdateien endet Vitest sonst mit Fehler. Die ersten Tests kommen in Schritt 3." } },
-    { file: "next.config.ts", lang: "ts", why: "Von create-next-app 16.4 erzeugt",
-      code: 'import type { NextConfig } from "next";\n\nconst nextConfig: NextConfig = {\n  cacheComponents: true,\n  partialPrefetching: true,\n  turbopack: {\n    rules: {\n      "*.css": {\n        loaders: ["@tailwindcss/turbopack"],\n        as: "*.css",\n      },\n    },\n  },\n};\n\nexport default nextConfig;',
-      notes: { 1: "import type importiert nur den Typ. Im ausgelieferten JavaScript bleibt davon nichts übrig.", 4: "Cache Components: Next rendert eine statische Hülle vor. Teile, die pro Anfrage Daten lesen (z. B. Cookies), streamen hinter <Suspense> nach. Ob wir das behalten, entscheiden wir in Schritt 2.", 5: "Partial Prefetching: Ein <Link> lädt vorab nur die Hülle der Zielseite, nicht die ganze Seite. Funktioniert nur zusammen mit Cache Components.", 9: "Tailwind 4 läuft als Turbopack-Loader für alle CSS-Dateien. Darum gibt es keine postcss.config." } },
-    { file: "vitest.config.ts", lang: "ts", why: "Unit-Tests für die Kernlogik",
-      code: 'import { defineConfig } from "vitest/config";\n\nexport default defineConfig({\n  resolve: {\n    // Resolve the "@/*" alias from tsconfig.json, same as Next.js does.\n    tsconfigPaths: true,\n  },\n  test: {\n    // Core logic (chunking, RRF, citations) runs in Node, not in a browser.\n    environment: "node",\n    include: ["src/**/*.test.ts"],\n  },\n});',
-      notes: { 3: "defineConfig gibt Autovervollständigung und Typprüfung für die Konfiguration.", 6: "Vite 8 kann Pfad-Aliase aus tsconfig.json selbst auflösen. Ein Import wie @/lib/chunk funktioniert im Test genauso wie in Next. Wir brauchen kein Zusatz-Plugin.", 10: "Chunking, RRF und Belegprüfung sind reine Logik ohne DOM. Node ist schneller als eine simulierte Browser-Umgebung.", 11: "Nur Dateien mit .test.ts unter src/ zählen als Tests. Playwright-Tests (Schritt 7) liegen woanders und laufen nicht aus Versehen mit." } },
-    { file: ".gitignore", lang: "ignore", why: "Ausschnitt: was nie ins Repo darf",
-      code: '# dependencies\n/node_modules\n\n# next.js\n/.next/\n\n# env files: never commit secrets, but keep the template\n.env*\n!.env.example\n\n# vercel\n.vercel',
-      notes: { 2: "Der führende / bindet die Regel an das Wurzelverzeichnis. node_modules ist groß und wird aus package-lock.json neu installiert.", 5: "Build-Ausgabe von Next. Wird bei jedem Build neu erzeugt.", 8: ".env* trifft .env, .env.local, .env.production und so weiter. Dort stehen echte Keys.", 9: "Das ! hebt die Regel davor wieder auf. Bei Git gewinnt die letzte passende Regel. So bleibt nur die Vorlage im Repo.", 12: ".vercel enthält die Projekt-ID aus vercel link. Sie ist lokal und gehört nicht ins Repo." } },
-    { file: "src/app/layout.tsx", lang: "ts", why: "HTML-Gerüst für jede Seite",
-      code: 'import { Geist, Geist_Mono } from "next/font/google";\nimport "./globals.css";\n\nconst geistSans = Geist({\n  variable: "--font-geist-sans",\n  subsets: ["latin"],\n});\n\nexport default function RootLayout({ children }: LayoutProps<"/">) {\n  return (\n    <html lang="de" className={`${geistSans.variable} h-full antialiased`}>\n      <body className="min-h-full flex flex-col font-sans">{children}</body>\n    </html>\n  );\n}',
-      notes: { 1: "next/font lädt die Schrift beim Build herunter und liefert sie von unserer eigenen Domain aus. Der Browser fragt Google nie direkt. Das ist gut für Datenschutz und Tempo.", 5: "Die Schrift wird als CSS-Variable bereitgestellt. globals.css verbindet sie mit der Tailwind-Klasse font-sans.", 9: "LayoutProps<\"/\"> ist ein globaler Typ, den Next selbst erzeugt. Deshalb läuft next typegen vor tsc.", 11: "lang=\"de\" sagt Screenreadern und Suchmaschinen, dass die Seite deutsch ist. Die Vorlage hatte \"en\".", 12: "font-sans nutzt Geist. Vorher hat globals.css mit Arial überschrieben." } }
+    { file: "package.json", lang: "json", why: "Befehle und Node-Version", code: src("src-package"),
+      notes: {
+        3: "Schützt davor, das Projekt aus Versehen öffentlich als Paket zu veröffentlichen.",
+        5: "Legt [[node|Node]] 24 fest. Vercel baut damit. Auf dem eigenen Rechner warnt npm, wenn eine andere Version läuft.",
+        10: "Startet [[eslint|ESLint]] für das ganze Projekt.",
+        11: "Zuerst erzeugt Next.js einige Typen selbst. Dann prüft [[typescript|TypeScript]] alle Typen, ohne Dateien zu schreiben.",
+        12: "Startet [[vitest|Vitest]] einmal. --passWithNoTests heißt: Ohne Tests ist das kein Fehler. Die ersten Tests kommen in Schritt 3."
+      } },
+    { file: "next.config.ts", lang: "ts", why: "So war es in Schritt 1. Seit Schritt 2 fehlen Zeile 4 und 5.", code: src("src-next"),
+      notes: {
+        1: "Importiert nur die Beschreibung (den Typ). Im fertigen Code bleibt davon nichts übrig.",
+        4: "[[cache|cacheComponents]]: Next.js baut Teile der Seite vorab. In Schritt 2 haben wir es ausgeschaltet, weil fast jede Seite den Login braucht.",
+        5: "Lädt beim Vorladen eines Links nur das Gerüst der Zielseite. Gehört zu cacheComponents und ist seit Schritt 2 auch aus.",
+        9: "Lässt [[tailwind|Tailwind]] alle CSS-Dateien verarbeiten. Darum braucht es keine eigene Einstellungs-Datei dafür."
+      } },
+    { file: "vitest.config.ts", lang: "ts", why: "Einstellungen für die Tests", code: src("src-vitest"),
+      notes: {
+        3: "defineConfig hilft dem Editor: Er schlägt Einstellungen vor und findet Tippfehler.",
+        6: "Versteht Abkürzungen wie @/lib/… im Test genauso wie Next.js. Ein Zusatz-Paket ist nicht nötig.",
+        10: "Unsere Tests prüfen reine Logik, zum Beispiel das Zerteilen von Text. Dafür braucht es keinen Browser. Ohne ist es schneller.",
+        11: "Nur Dateien mit .test.ts im Ordner src/ zählen als Tests."
+      } },
+    { file: ".gitignore", lang: "ignore", why: "Ausschnitt: was nie ins Repo darf", code: src("src-ignore"),
+      notes: {
+        2: "Der Ordner mit allen installierten Paketen. Er ist riesig und lässt sich jederzeit neu installieren.",
+        5: "Was Next.js beim Bauen erzeugt. Wird jedes Mal neu gemacht.",
+        8: "Alle Dateien, die mit .env anfangen. Dort stehen echte [[apikey|Schlüssel]].",
+        9: "Das ! macht eine Ausnahme. Bei Git gewinnt die letzte passende Zeile. So kommt nur die Vorlage ins Repo.",
+        12: "Die Verknüpfung mit Vercel. Sie gilt nur für diesen Rechner."
+      } },
+    { file: "src/app/layout.tsx", lang: "ts", why: "Grundgerüst jeder Seite", code: src("src-layout"),
+      notes: {
+        1: "[[font|next/font]] lädt die Schrift beim Bauen und liefert sie selbst aus. Der Browser fragt nie direkt bei Google. Gut für Datenschutz und Tempo.",
+        5: "Macht die Schrift als CSS-Variable verfügbar. Tailwind nutzt sie dann.",
+        9: "LayoutProps ist ein Typ, den Next.js selbst erzeugt. Darum läuft typegen vor der Typprüfung.",
+        11: "lang=\"de\": Screenreader und Suchmaschinen wissen so, dass die Seite deutsch ist.",
+        12: "font-sans nutzt Geist. Vorher hat Arial die Schrift überschrieben."
+      } }
   ];
   var KW = /^(import|from|export|default|const|function|return|type|true|false)$/;
   function hlLine(line, lang) {
@@ -603,7 +792,7 @@
   function selectLine(el) {
     pre.querySelectorAll(".sel").forEach(function (x) { x.classList.remove("sel"); });
     el.classList.add("sel"); var n = el.getAttribute("data-n");
-    note.innerHTML = '<b>Zeile ' + n + '</b> · ' + esc(snippets[active].notes[n]);
+    note.innerHTML = '<b>Zeile ' + n + '</b> · ' + rich(snippets[active].notes[n]);
   }
   pre.addEventListener("click", function (e) { var el = e.target.closest(".ln.has-note"); if (el) selectLine(el); });
   pre.addEventListener("keydown", function (e) { var el = e.target.closest(".ln.has-note"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectLine(el); } });
@@ -616,21 +805,21 @@
   copyBtn.addEventListener("click", function () {
     var text = snippets[active].code, label = copyBtn.querySelector("span");
     function done() { label.textContent = "Kopiert"; setTimeout(function () { label.textContent = "Kopieren"; }, 1400); }
-    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
     function fallback() { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
   });
 
   /* ---------- Demo: .gitignore ---------- */
   var rules = [
     { p: "/node_modules", hint: "Pakete" },
-    { p: "/.next/", hint: "Build" },
+    { p: "/.next/", hint: "Bau-Ergebnis" },
     { p: "/coverage", hint: "Testbericht" },
-    { p: ".DS_Store", hint: "macOS" },
-    { p: ".env*", hint: "Secrets" },
+    { p: ".DS_Store", hint: "macOS-Datei" },
+    { p: ".env*", hint: "Geheimnisse" },
     { p: "!.env.example", hint: "Ausnahme" },
     { p: ".vercel", hint: "Vercel-Link" },
-    { p: "*.tsbuildinfo", hint: "TS-Cache" },
-    { p: "next-env.d.ts", hint: "erzeugt" }
+    { p: "*.tsbuildinfo", hint: "Zwischenspeicher" },
+    { p: "next-env.d.ts", hint: "automatisch erzeugt" }
   ];
   function globToRe(g) { return new RegExp("^" + g.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^/]*") + "$"); }
   function matches(rule, path) {
@@ -658,15 +847,15 @@
       rulesEl.children[i].classList.remove("win");
       if (hit) win = i;
     });
-    if (!path) { verdict.className = "verdict"; verdict.innerHTML = '<small>Gib einen Pfad ein.</small>'; return; }
+    if (!path) { verdict.className = "verdict"; verdict.innerHTML = '<small>Gib einen Dateinamen ein.</small>'; return; }
     if (win >= 0) rulesEl.children[win].classList.add("win");
     var ignored = win >= 0 && rules[win].p.charAt(0) !== "!";
     if (ignored) {
       verdict.className = "verdict out";
-      verdict.innerHTML = "Ignoriert – bleibt lokal<small>Letzte passende Regel: <code>" + esc(rules[win].p) + "</code></small>";
+      verdict.innerHTML = "Bleibt auf deinem Rechner<small>Passende Regel: <code>" + esc(rules[win].p) + "</code></small>";
     } else {
       verdict.className = "verdict in";
-      verdict.innerHTML = "Wird committet – landet auf GitHub" + (win >= 0 ? "<small>Die Ausnahme <code>" + esc(rules[win].p) + "</code> hebt die Regel davor auf.</small>" : "<small>Keine Regel passt.</small>");
+      verdict.innerHTML = "Kommt auf GitHub" + (win >= 0 ? "<small>Die Ausnahme <code>" + esc(rules[win].p) + "</code> hebt die Regel davor auf.</small>" : "<small>Keine Regel passt.</small>");
     }
   }
   [".env.local", ".env.example", "src/app/page.tsx", "node_modules/react/index.js", ".vercel/project.json", "next-env.d.ts", "src/.DS_Store"].forEach(function (p) {
@@ -679,11 +868,11 @@
 
   /* ---------- Flashcards ---------- */
   var qa = [
-    { q: "Wie kommt eine Änderung von deinem Rechner auf die Live-URL?", a: ["Ich committe lokal und pushe auf main. GitHub schickt per Webhook ein Ereignis an Vercel. Vercel klont den Commit, führt npm install und next build aus und rollt das Ergebnis aus.", "Ein Push auf einen anderen Branch erzeugt eine Preview-URL. Schlägt der Build fehl, bleibt die alte Version live."] },
-    { q: "Warum steht !.env.example in der .gitignore?", a: ["Die Vorlage ignoriert .env*. Das trifft auch .env.example. Die Datei soll aber ins Repo, damit jeder sieht, welche Variablen nötig sind.", "Das ! hebt die Regel davor auf. Bei Git gewinnt die letzte passende Regel. Echte Werte stehen nur in .env.local und in den Vercel-Einstellungen."] },
-    { q: "npm audit meldet 5 Schwachstellen „high“. Warum hast du nicht npm audit fix --force ausgeführt?", a: ["Alle fünf liegen in der ESLint-Kette: braces, micromatch, fast-glob, eslint-config-next. ESLint läuft nur bei der Entwicklung. Nichts davon landet im ausgelieferten Code.", "Der Fix mit --force hätte eslint-config-next auf Version 14 zurückgestuft. Das passt nicht zu Next 16. Ich warte auf ein reguläres Update."] },
-    { q: "Was macht cacheComponents, und warum ist es noch an?", a: ["Next rendert eine statische Hülle vor. Teile, die pro Anfrage Daten lesen, etwa Cookies, streamen hinter einer <Suspense>-Grenze nach. Daten lassen sich gezielt mit „use cache“ zwischenspeichern.", "create-next-app 16.4 schaltet es standardmäßig ein. In Schritt 1 liest noch keine Seite Cookies. Die Entscheidung fällt in Schritt 2, wenn der Supabase-Login dazukommt."] },
-    { q: "Warum steht Node 24 an zwei Stellen, in .nvmrc und in engines?", a: [".nvmrc gilt lokal: nvm use wählt damit Node 24. engines in package.json liest Vercel und baut mit dieser Version.", "So laufen lokal und in Produktion dieselbe Hauptversion. Node 23 wäre keine LTS-Version gewesen und hätte von Vercel abgewichen."] }
+    { q: "Wie kommt eine Änderung von deinem Rechner auf die Live-Seite?", a: ["Ich speichere sie mit einem [[commit|Commit]] und lade sie mit git push zu GitHub hoch. GitHub sagt Vercel Bescheid. Vercel baut die App neu und stellt sie online.", "Ein Push auf einen anderen [[branch|Branch]] bekommt eine eigene Vorschau-Adresse. Schlägt der Bau fehl, bleibt die alte Version online."] },
+    { q: "Warum steht !.env.example in der .gitignore?", a: ["Die Regel .env* hält alle .env-Dateien vom Repo fern, also auch die Vorlage. Die Vorlage soll aber ins Repo. So sieht jeder, welche Einstellungen nötig sind.", "Das ! macht eine Ausnahme. Bei Git gewinnt die letzte passende Regel. Echte Werte stehen nur in .env.local und bei Vercel."] },
+    { q: "npm audit meldet 5 Lücken. Warum hast du sie nicht automatisch reparieren lassen?", a: ["Alle fünf liegen in [[eslint|ESLint]]. ESLint läuft nur beim Entwickeln. Nichts davon landet auf der Live-Seite.", "Die automatische Reparatur (--force) hätte ein Paket auf eine alte Version zurückgesetzt. Die passt nicht zu Next 16. Ich warte auf ein normales Update."] },
+    { q: "Was ist cacheComponents, und was ist damit passiert?", a: ["Next.js baut damit Teile einer Seite vorab. Teile, die den Login brauchen, kommen später nach. Die Vorlage hat es eingeschaltet.", "In Schritt 2 habe ich es ausgeschaltet. Fast jede Faden-Seite braucht den Login. Dort bringt das Vorab-Bauen wenig und macht viel zusätzlichen Code nötig."] },
+    { q: "Warum steht Node 24 an zwei Stellen?", a: [".nvmrc gilt für den eigenen Rechner: [[nvm|nvm]] use wählt damit Node 24. Der Eintrag engines in package.json gilt für Vercel.", "So laufen lokal und online dieselbe Version. Node 23 wäre keine [[lts|LTS-Version]] gewesen, also ohne lange Pflege."] }
   ];
   var known = {};
   try { known = JSON.parse(store("faden-doc-s1-quiz") || "{}") || {}; } catch (e) { known = {}; }
@@ -691,7 +880,7 @@
   var chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
   cardsEl.innerHTML = qa.map(function (c, i) {
     return '<div class="fc" data-i="' + i + '"><button class="fc-q" type="button" aria-expanded="false"><span class="num">0' + (i + 1) + '</span><span>' + esc(c.q) + '</span>' + chev + '</button>' +
-      '<div class="fc-a"><div><div class="inner">' + c.a.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("") +
+      '<div class="fc-a"><div><div class="inner">' + c.a.map(function (p) { return "<p>" + rich(p) + "</p>"; }).join("") +
       '<div class="fc-actions"><button class="btn accent" type="button" data-k="1">Gewusst</button><button class="btn ghost" type="button" data-k="0">Noch nicht</button></div></div></div></div></div>';
   }).join("");
   function paintQuiz() {
