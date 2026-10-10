@@ -19,6 +19,11 @@
 - **10.10.2026 · Login-Formular vergaß die E-Mail (3a).** Annahme: Bei einem Fehler bleiben die Felder gefüllt. Falsch: React 19 setzt ein Formular nach **jeder** Server Action zurück, auch nach einem Fehler. Gemerkt im Browser-Test mit falschem Passwort. Gelöst: Die Action gibt die E-Mail im Zustand zurück, das Feld nutzt sie als `defaultValue`. Das Passwort kommt bewusst nicht zurück.
 - **10.10.2026 · Next-Doku zeigt Zod-3-Code.** Das Formular-Beispiel in `node_modules/next/dist/docs` nutzt `error.flatten()` und `invalid_type_error`. Wir haben Zod 4: dort heißt es `z.flattenError()` bzw. `{ error: "…" }`. Gemerkt beim Nachschlagen in `node_modules/zod`. Lehre: auch offizielle Beispiele gegen die installierte Version prüfen.
 - **10.10.2026 · OpenAI-Key ging, Embeddings nicht.** `GET /v1/models` gab 200, das erste Embedding aber `credit_balance_exhausted`. Ein gültiger Key heißt nicht, dass Guthaben da ist. Ein ChatGPT-Abo enthält kein API-Guthaben.
+- **10.10.2026 · Falsche Token-Kodierung wäre fast durchgerutscht (3b).** Im Plan stand: `gpt-tokenizer` nutzt dieselbe Kodierung wie `text-embedding-3-small`. Falsch: Standard ist `o200k_base` (GPT-4o/5), das Embedding-Modell nutzt `cl100k_base`. Ein deutscher Testsatz: 18 statt 12 Tokens, also bis zu 50 % Unterschied. Gemerkt beim Lesen der README vor dem Code. Gelöst: Import aus `gpt-tokenizer/encoding/cl100k_base`.
+- **10.10.2026 · Tokenizer stürzt bei `<|endoftext|>` ab.** Standardmäßig wirft er bei Spezial-Tokens im Text einen Fehler. Eine präparierte PDF hätte das Einlesen abbrechen können. Gemerkt mit einem kurzen Test vor dem Code. Gelöst: `disallowedSpecial: new Set()`, Text zählt als normaler Text. Ein Test sichert das ab.
+- **10.10.2026 · `Intl.Segmenter` trennt nach „z. B.“ und „Dr.“.** Gemerkt beim Ausprobieren. Gelöst: Ein Stück, das auf ein kurzes Wort (1–3 Buchstaben) mit Punkt endet, wird an das nächste geklebt. Preis: Kurze Sätze wie „Das ist so.“ kleben auch am nächsten Satz. Das schadet nicht, sie bleiben nur zusammen.
+- **10.10.2026 · `pdf.destroy is not a function`.** Die KI hat aus dem Gedächtnis `getDocumentProxy()` + `destroy()` geschrieben. In dieser PDF.js-Version hat das Dokument kein `destroy()`. Gemerkt: 4 Tests rot. Gelöst: im Quellcode von `unpdf` nachgesehen. `extractText` mit Rohdaten öffnet und schließt das Dokument selbst. Code wurde dadurch kürzer.
+- **10.10.2026 · Test lag falsch, nicht der Code.** Der Absatz-Test nahm ca. 20 Tokens pro Satz an, echt sind es 27. Zwei Absätze passten dann nicht in 800 Tokens, der Code hat richtig früher geschlossen. Gemerkt: Zahlen im Test ausgegeben statt den Code zu „reparieren“. Gelöst: Testdaten angepasst (12 statt 16 Sätze pro Absatz).
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -53,6 +58,14 @@
 - **Ungültige Notebook-ID → 404, bevor die Datenbank gefragt wird.** Unbekannte und fremde IDs → ebenfalls 404 (RLS liefert `null`). Niemand erfährt, welche IDs es gibt.
 - **`refresh()` statt `revalidatePath()`** nach dem Anlegen. Neu in Next 16. Wir nutzen keinen Cache, also reicht es, die aktuelle Seite neu zu rendern.
 - **`.eq("owner_id", userId)` trotz RLS.** RLS filtert sowieso. Der explizite Filter hilft Postgres, den Index `(owner_id, created_at)` zu nutzen (Empfehlung von Supabase).
+- **Abschnitte aus ganzen Sätzen (3b).** Kleinste Einheit ist ein Satz, nie ein halber. Nur ein Satz, der allein über 800 Tokens hat (Tabellen, Listen), wird an Wortgrenzen geteilt. Alternative: feste Fenster aus Tokens. Einfacher, aber schneidet mitten im Wort, und bei `cl100k_base` sogar mitten in einem Umlaut (ein Umlaut kann auf zwei Tokens verteilt sein).
+- **Absatzregel: Ist ein Abschnitt zu 75 % voll und endet ein Absatz, endet auch der Abschnitt.** So enden Abschnitte möglichst an Absätzen, ohne viele Mini-Abschnitte zu erzeugen.
+- **Überlappung aus ganzen Sätzen, höchstens 120 Tokens (15 % von 800).** Passt Überlappung plus nächster Satz nicht mehr, fällt die Überlappung weg. Ein Abschnitt überschreitet nie 800 Tokens.
+- **Abschnitte überschreiten keine Seitengrenze** (von mir freigegeben am 10.10.). `page` stimmt immer, ein Beleg springt auf die richtige Seite. Preis: keine Überlappung an der Seitengrenze, letzter Abschnitt einer Seite oft kurz.
+- **Gescannte PDF = im Schnitt unter 20 sichtbare Zeichen pro Seite.** Grenze: Eine PDF mit vielen Textseiten und wenigen gescannten Seiten geht durch. Die gescannten Seiten fehlen dann still. OCR steht unter „Später“.
+- **Silbentrennung zusammenfügen nur zwischen Kleinbuchstaben.** „Verarbei-\ntung“ → „Verarbeitung“, aber „E-\nMail“ bleibt.
+- **Test-PDFs von Hand gebaut (`src/test/make-pdf.ts`).** Keine Binärdateien im Repo, keine Abhängigkeit wie `pdf-lib`. Eine „gescannte“ Seite ist dort eine graue Fläche ohne Text. Für die Erkennung reicht das, denn wir prüfen nur, ob Text da ist.
+- **`unpdf` statt `pdf-parse`.** Liefert Text pro Seite, läuft serverless, aktiv gepflegt. `pdf-parse` 1.x hatte den bekannten Fehler mit der Testdatei beim Import.
 
 ## Echte Zahlen
 - Kosten pro Frage:
