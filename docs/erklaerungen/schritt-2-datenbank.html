@@ -1,0 +1,971 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schritt 2 · Datenbank</title>
+<meta name="description" content="Faden, Schritt 2: Supabase mit pgvector, Row Level Security, Storage und Supabase-Clients – was funktioniert, wie es zusammenhängt und warum.">
+<style>
+  :root {
+    --bg: #E9EBEE; --surface: #F6F7F8; --card: #FFFFFF; --tile: #F3F4F6; --line: #E3E5E8;
+    --text: #111315; --muted: #6B7078; --accent: #D6EE57; --on-accent: #111315;
+    --ok: #6E9A1C; --warn-bg: #FDF0D5; --warn: #8A5A00; --err-bg: #FDE4DB; --err: #A3361A;
+    --primary: #111315; --on-primary: #FFFFFF;
+    --c-kw: #8B3FA8; --c-str: #3B7A12; --c-num: #B25A00; --c-com: #8A9099; --c-key: #1F5FA8;
+    --shadow: 0 1px 2px rgba(17,19,21,.04), 0 8px 24px rgba(17,19,21,.06);
+    --r-card: 28px; --r-tile: 18px; --r-pill: 999px;
+    --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+      --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+      --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+      --primary: #EDEFF1; --on-primary: #111315;
+      --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+    --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+    --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+    --primary: #EDEFF1; --on-primary: #111315;
+    --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  code, .mono { font-family: var(--mono); }
+  :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 6px; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 96px; }
+  .topbar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .topbar-in { max-width: 980px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; text-decoration: none; }
+  .brand-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+  .crumb { color: var(--muted); font-size: 14px; }
+  .spacer { flex: 1; }
+  .icon-btn { border: 1px solid var(--line); background: var(--card); color: var(--text); width: 36px; height: 36px; border-radius: var(--r-pill); display: grid; place-items: center; cursor: pointer; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .toc { display: flex; gap: 6px; overflow-x: auto; padding: 14px 0 4px; scrollbar-width: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc a { flex: none; text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); color: var(--muted); transition: color .2s, border-color .2s; }
+  .toc a:hover { color: var(--text); border-color: var(--muted); }
+
+  .hero { padding: 40px 0 8px; }
+  .eyebrow { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+  h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.05; letter-spacing: -0.03em; margin: 10px 0 14px; font-weight: 650; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 640px; margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); }
+  .chip.ok::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+  .chip.err { background: var(--err-bg); color: var(--err); border-color: transparent; }
+
+  section { margin-top: 56px; scroll-margin-top: 70px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .sec-num { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  h2 { font-size: 26px; letter-spacing: -0.02em; margin: 0; font-weight: 620; }
+  h3 { font-size: 17px; margin: 0 0 6px; font-weight: 600; }
+  p { margin: 0 0 12px; }
+  .card { background: var(--card); border-radius: var(--r-card); padding: 28px; box-shadow: var(--shadow); }
+  .tile { background: var(--tile); border-radius: var(--r-tile); padding: 18px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+
+  /* 1. Was funktioniert */
+  .facts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 20px; }
+  .fact .k { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .fact .v { font-weight: 600; margin-top: 2px; word-break: break-word; }
+
+  /* 2. Diagramm */
+  .diagram-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer; font: 500 14px var(--sans); padding: 10px 16px; border-radius: var(--r-pill); background: var(--primary); color: var(--on-primary); transition: transform .15s; }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: var(--tile); color: var(--text); }
+  .btn.accent { background: var(--accent); color: var(--on-accent); }
+  .btn svg { width: 16px; height: 16px; }
+  .scroll-x { overflow-x: auto; margin: 0 -8px; padding: 0 8px; }
+  .diagram { display: block; width: 100%; min-width: 760px; height: auto; }
+  .diagram .node rect { fill: var(--tile); stroke: var(--line); stroke-width: 1.5; transition: fill .25s, stroke .25s; }
+  .diagram .node text { fill: var(--text); font: 600 13px var(--sans); }
+  .diagram .node .sub { fill: var(--muted); font: 400 11px var(--mono); }
+  .diagram .node .ico { stroke: var(--text); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .diagram .node, .diagram .edge { cursor: pointer; }
+  .diagram .node.later rect { fill: none; stroke-dasharray: 5 5; }
+  .diagram .node.later text, .diagram .node.later .ico { opacity: .55; }
+  .diagram .edge path { stroke: var(--muted); stroke-width: 1.8; fill: none; transition: stroke .25s; }
+  .diagram .edge .hit { stroke: transparent; stroke-width: 18; }
+  .diagram .edge.later path { stroke-dasharray: 4 5; opacity: .6; }
+  .diagram .edge text { fill: var(--muted); font: 500 11px var(--mono); }
+  .diagram .edge .label-bg { fill: var(--surface); }
+  .diagram .arrowhead { fill: var(--muted); }
+  .diagram .is-active rect { fill: var(--accent); stroke: var(--accent); }
+  .diagram .is-active text, .diagram .is-active .sub { fill: #111315; }
+  .diagram .is-active .ico { stroke: #111315; }
+  .diagram .edge.is-active path:not(.hit) { stroke: var(--text); stroke-width: 2.4; stroke-dasharray: 7 6; animation: flow .8s linear infinite; }
+  .diagram .edge.is-active text { fill: var(--text); }
+  @keyframes flow { to { stroke-dashoffset: -13; } }
+  .detail { margin-top: 14px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; min-height: 92px; }
+  .detail .badge { font-family: var(--mono); font-size: 12px; background: var(--accent); color: var(--on-accent); padding: 4px 10px; border-radius: var(--r-pill); white-space: nowrap; }
+  .detail h3 { margin-bottom: 4px; }
+  .detail p { margin: 0; color: var(--muted); }
+  .detail.swap { animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .step-dots { display: flex; gap: 6px; margin-left: auto; }
+  .step-dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; transition: background .2s, transform .2s; }
+  .step-dots button.on { background: var(--text); transform: scale(1.25); }
+
+  /* 3. Dateien */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; font-size: 12px; font-weight: 500; color: var(--muted); font-family: var(--mono); padding: 0 12px 10px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { white-space: nowrap; }
+  td code { font-size: 13px; background: var(--tile); padding: 2px 7px; border-radius: 6px; }
+  .filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter button { font: 500 13px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 6px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .filter button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  tr.hidden { display: none; }
+
+  /* 4. Code */
+  .code-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .code-tabs button { font: 500 13px var(--mono); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 7px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .code-tabs button[aria-selected="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .code-card { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .code-head { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .code-head .file { font: 500 13px var(--mono); }
+  .code-head .why { color: var(--muted); font-size: 14px; flex: 1; min-width: 0; }
+  .copy { font: 500 12px var(--sans); border: 1px solid var(--line); background: var(--tile); color: var(--text); border-radius: var(--r-pill); padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .copy svg { width: 14px; height: 14px; }
+  pre { margin: 0; padding: 14px 0; overflow-x: auto; font: 13.5px/1.7 var(--mono); }
+  .ln { display: flex; padding: 0 20px 0 0; }
+  .ln .n { width: 44px; flex: none; text-align: right; padding-right: 16px; color: var(--c-com); user-select: none; }
+  .ln .t { white-space: pre; }
+  .ln.has-note { cursor: pointer; position: relative; }
+  .ln.has-note .n { color: var(--text); }
+  .ln.has-note .n::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 6px; vertical-align: middle; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .ln.has-note:hover { background: var(--tile); }
+  .ln.sel { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+  .note { margin: 0 20px 18px; padding: 14px 16px; border-radius: var(--r-tile); background: var(--tile); font-size: 15px; min-height: 52px; }
+  .note b { font-family: var(--mono); font-weight: 500; font-size: 13px; }
+  .tok-kw { color: var(--c-kw); } .tok-str { color: var(--c-str); } .tok-num { color: var(--c-num); }
+  .tok-com { color: var(--c-com); font-style: italic; } .tok-key { color: var(--c-key); } .tok-neg { color: var(--ok); font-weight: 600; }
+
+  /* Demo */
+  .demo-grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .demo-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; gap: 8px; }
+  .field input { flex: 1; min-width: 0; font: 15px var(--mono); padding: 12px 16px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); color: var(--text); }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .presets button { font: 12px var(--mono); border: 1px dashed var(--line); background: transparent; color: var(--muted); padding: 5px 10px; border-radius: var(--r-pill); cursor: pointer; }
+  .presets button:hover { color: var(--text); border-color: var(--muted); }
+  .verdict { margin-top: 16px; padding: 16px; border-radius: var(--r-tile); font-weight: 600; transition: background .25s, color .25s; }
+  .verdict.in { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+  .verdict.out { background: var(--err-bg); color: var(--err); }
+  .verdict small { display: block; font-weight: 400; color: var(--text); margin-top: 4px; font-size: 14px; }
+  .rules { list-style: none; margin: 0; padding: 0; font: 13.5px var(--mono); }
+  .rules li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 12px; border-radius: 10px; transition: background .2s; }
+  .rules li .hint { color: var(--muted); font-family: var(--sans); font-size: 12px; }
+  .rules li.hit { background: var(--tile); }
+  .rules li.win { background: var(--accent); color: #111315; }
+  .rules li.win .hint { color: #111315; }
+
+  /* Entscheidungen */
+  .decisions { display: grid; gap: 12px; }
+  .decision { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--card); border-radius: var(--r-card); overflow: hidden; box-shadow: var(--shadow); }
+  .decision > div { padding: 20px 24px; }
+  .decision .alt { background: var(--tile); }
+  .decision .lbl { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .decision .pick .lbl::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .decision p { margin: 0; font-size: 15px; }
+  @media (max-width: 640px) { .decision { grid-template-columns: 1fr; } }
+
+  /* Risiken */
+  .risks { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .risk { background: var(--card); border-radius: var(--r-tile); padding: 18px 20px; box-shadow: var(--shadow); }
+  .risk .chip { margin-bottom: 10px; }
+  .risk p { margin: 0; font-size: 15px; color: var(--muted); }
+
+  /* Lernkarten */
+  .quiz-top { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .progress { flex: 1; min-width: 160px; height: 10px; background: var(--card); border-radius: var(--r-pill); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+  .progress span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: var(--r-pill); transition: width .4s ease; }
+  .score { font: 500 14px var(--mono); }
+  .cards { display: grid; gap: 12px; }
+  .fc { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .fc-q { width: 100%; text-align: left; border: 0; background: transparent; color: var(--text); font: 600 17px/1.4 var(--sans); padding: 22px 24px; display: flex; gap: 14px; align-items: flex-start; cursor: pointer; }
+  .fc-q .num { font: 500 12px var(--mono); color: var(--muted); padding-top: 4px; }
+  .fc-q .chev { margin-left: auto; flex: none; width: 20px; height: 20px; transition: transform .3s; color: var(--muted); }
+  .fc.open .fc-q .chev { transform: rotate(180deg); }
+  .fc-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  .fc.open .fc-a { grid-template-rows: 1fr; }
+  .fc-a > div { overflow: hidden; }
+  .fc-a .inner { padding: 0 24px 22px 58px; }
+  .fc-a p { color: var(--text); }
+  .fc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .fc.known { box-shadow: var(--shadow), inset 0 0 0 2px var(--accent); }
+  .fc.known .num { color: var(--ok); }
+  @media (max-width: 520px) { .fc-a .inner { padding-left: 24px; } .card { padding: 22px; } }
+
+  footer { margin-top: 72px; color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+
+  /* Schritt 2: RLS-Demo */
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 8px 14px; border-radius: var(--r-pill); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .2s, color .2s, border-color .2s; }
+  .seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .seg .av { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 600 11px var(--sans); background: var(--tile); color: var(--text); }
+  .seg button[aria-pressed="true"] .av { background: var(--accent); color: #111315; }
+  .demo-label { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; }
+  .demo-label:first-child { margin-top: 0; }
+  .actions { display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .actions button { text-align: left; font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 10px 14px; border-radius: var(--r-tile); cursor: pointer; transition: border-color .2s, background .2s; }
+  .actions button small { display: block; color: var(--muted); font: 12px var(--mono); margin-top: 2px; }
+  .actions button[aria-pressed="true"] { border-color: var(--text); background: var(--tile); }
+  .uid { display: inline-flex; gap: 6px; align-items: center; font: 13px var(--mono); color: var(--muted); margin-top: 10px; }
+  .uid b { color: var(--text); font-weight: 500; }
+  .demo-sql { margin: 18px 0 0; padding: 14px 18px; background: var(--tile); border-radius: var(--r-tile); font: 13.5px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .gates { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; margin-top: 12px; }
+  @media (max-width: 640px) { .gates { grid-template-columns: 1fr; } }
+  .gate { border-radius: var(--r-tile); padding: 14px 16px; border: 1px solid var(--line); transition: background .25s, border-color .25s; }
+  .gate .gh { display: flex; align-items: center; gap: 8px; font: 500 12px var(--mono); color: var(--muted); }
+  .gate .st { margin-left: auto; font: 600 12px var(--mono); padding: 2px 9px; border-radius: var(--r-pill); background: var(--tile); color: var(--muted); }
+  .gate p { margin: 8px 0 0; font-size: 14.5px; }
+  .gate.ok { border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+  .gate.ok .st { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .gate.fail { border-color: color-mix(in srgb, var(--err) 45%, transparent); }
+  .gate.fail .st { background: var(--err-bg); color: var(--err); }
+  .gate.skip { opacity: .55; }
+  .rowtable { margin-top: 12px; }
+  .rowtable td, .rowtable th { font-size: 14px; }
+  .rowtable td:first-child { font-family: var(--mono); font-size: 13px; }
+  .rowtable tr { transition: opacity .25s; }
+  .rowtable tr.off td:not(:last-child) { opacity: .38; text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+  .state { font: 500 12px var(--mono); padding: 2px 9px; border-radius: var(--r-pill); white-space: nowrap; background: var(--tile); color: var(--muted); }
+  .state.on { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .state.hit { background: var(--accent); color: #111315; }
+  .state.bad { background: var(--err-bg); color: var(--err); }
+  .verdict.warn { background: var(--warn-bg); color: var(--warn); }
+  .result-swap { animation: fade .3s ease; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html" aria-label="Zur Übersicht aller Schritte">
+      <span class="brand-dot" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#111315" stroke-width="2.4" stroke-linecap="round"><path d="M4 12c4-8 12 8 16 0"/></svg></span>
+      Faden
+    </a>
+    <span class="crumb">/ Erklärungen / Schritt 2</span>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten"></button>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Abschnitte">
+    <a href="#funktioniert">Was funktioniert</a>
+    <a href="#ablauf">Ablauf</a>
+    <a href="#dateien">Dateien</a>
+    <a href="#code">Code</a>
+    <a href="#demo">Demo</a>
+    <a href="#entscheidungen">Entscheidungen</a>
+    <a href="#risiken">Was schiefgehen kann</a>
+    <a href="#interview">Interview-Check</a>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">SCHRITT 2 VON 7 · 10.10.2026</div>
+    <h1>Datenbank: Tabellen, Vektoren, Zugriffsschutz</h1>
+    <p class="lead">Supabase in Frankfurt mit fünf Tabellen, pgvector und Volltextsuche. Jede Zeile gehört genau einem Nutzer. Postgres prüft das selbst, nicht die App.</p>
+    <div class="chips">
+      <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test</span><span class="chip ok">build</span><span class="chip ok">RLS-Check 18/18</span><span class="chip ok">Advisor 0 Warnungen</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section id="funktioniert">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Was jetzt funktioniert</h2></div>
+    <div class="card">
+      <p>Faden hat eine Datenbank im Supabase-Projekt <code>faden</code> in Frankfurt. Fünf Tabellen speichern Notebooks, Quellen, Abschnitte mit Embeddings, Chat-Nachrichten und Studio-Inhalte. Jede Tabelle hat zwei Schutzschichten: <code>GRANT</code> legt fest, welche Rolle sie benutzen darf. Row Level Security legt fest, welche Zeilen. Ein Testskript mit zwei Nutzern beweist, dass niemand fremde Daten sieht oder ändert. Die App spricht über Supabase-Clients für Browser und Server mit der Datenbank, und ein Proxy hält den Login frisch.</p>
+      <p class="muted small" style="margin:0">Es gibt noch keine Login-Seite und keine Oberfläche für Daten. Das Einlesen von Quellen folgt in Schritt 3.</p>
+      <div class="facts">
+        <div class="tile fact"><div class="k">PROJEKT</div><div class="v mono small">faden · eu-central-1 · Postgres 17</div></div>
+        <div class="tile fact"><div class="k">SCHEMA</div><div class="v mono small">5 Tabellen · 8 Indizes · 21 Policies</div></div>
+        <div class="tile fact"><div class="k">RLS-CHECK</div><div class="v mono small">18 von 18 Prüfungen bestanden</div></div>
+        <div class="tile fact"><div class="k">GAST-ZUGRIFF</div><div class="v mono small">HTTP 401 · permission denied</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="ablauf">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Ablauf: eine Abfrage mit Login</h2></div>
+    <div class="card">
+      <div class="diagram-tools">
+        <button class="btn" id="playBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg><span>Abspielen</span></button>
+        <button class="btn ghost" id="prevBtn" type="button" aria-label="Vorheriger Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button class="btn ghost" id="nextBtn" type="button" aria-label="Nächster Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        <div class="step-dots" id="dots" role="tablist" aria-label="Schritte im Ablauf"></div>
+      </div>
+      <div class="scroll-x">
+        <svg class="diagram" id="diagram" viewBox="0 0 900 320" role="img" aria-label="Datenfluss: Browser mit Cookie, Proxy prüft Token bei Supabase Auth, Server fragt die Data API, Postgres prüft GRANT und RLS und gibt nur eigene Zeilen zurück.">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0 0 10 5 0 10z"/></marker>
+          </defs>
+
+          <!-- edges -->
+          <g class="edge" data-id="e1"><path class="hit" d="M130 106 H200"/><path d="M130 106 H198" marker-end="url(#ah)"/><rect class="label-bg" x="139" y="80" width="52" height="18" rx="9"/><text x="165" y="93" text-anchor="middle">Cookie</text></g>
+          <g class="edge" data-id="e5"><path class="hit" d="M260 142 V230"/><path d="M252 144 V228" marker-end="url(#ah)"/><path d="M268 228 V144" marker-end="url(#ah)"/><rect class="label-bg" x="276" y="176" width="86" height="18" rx="9"/><text x="319" y="189" text-anchor="middle">getClaims()</text></g>
+          <g class="edge" data-id="e2"><path class="hit" d="M320 106 H390"/><path d="M320 106 H388" marker-end="url(#ah)"/><rect class="label-bg" x="325" y="80" width="60" height="18" rx="9"/><text x="355" y="93" text-anchor="middle">Request</text></g>
+          <g class="edge" data-id="e3"><path class="hit" d="M510 106 H580"/><path d="M510 106 H578" marker-end="url(#ah)"/><rect class="label-bg" x="515" y="80" width="60" height="18" rx="9"/><text x="545" y="93" text-anchor="middle">JWT+SQL</text></g>
+          <g class="edge" data-id="e4"><path class="hit" d="M700 106 H770"/><path d="M700 106 H768" marker-end="url(#ah)"/><rect class="label-bg" x="702" y="80" width="66" height="18" rx="9"/><text x="735" y="93" text-anchor="middle">role+uid</text></g>
+          <g class="edge" data-id="e6"><path class="hit" d="M830 70 C830 18, 70 18, 70 70"/><path d="M830 68 C830 18, 70 18, 70 66" marker-end="url(#ah)"/><rect class="label-bg" x="370" y="21" width="160" height="18" rx="9"/><text x="450" y="34" text-anchor="middle">nur eigene Zeilen → HTML</text></g>
+          <g class="edge" data-id="e7"><path class="hit" d="M830 142 V230"/><path d="M830 144 V228" marker-end="url(#ah)"/><rect class="label-bg" x="720" y="176" width="104" height="18" rx="9"/><text x="772" y="189" text-anchor="middle">storage.objects</text></g>
+
+          <!-- nodes -->
+          <g class="node" data-id="n1" tabindex="0" role="button" aria-label="Browser">
+            <rect x="10" y="70" width="120" height="72" rx="18"/>
+            <circle class="ico" cx="35" cy="94" r="9"/><path class="ico" d="M26 94h18M35 85c-4 5-4 13 0 18M35 85c4 5 4 13 0 18"/>
+            <text x="54" y="98">Browser</text><text class="sub" x="26" y="126">Cookie sb-…</text>
+          </g>
+          <g class="node" data-id="n2" tabindex="0" role="button" aria-label="Proxy">
+            <rect x="200" y="70" width="120" height="72" rx="18"/>
+            <path class="ico" d="M225 84l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9v-6z"/>
+            <text x="244" y="98">Proxy</text><text class="sub" x="216" y="126">src/proxy.ts</text>
+          </g>
+          <g class="node" data-id="n3" tabindex="0" role="button" aria-label="Server">
+            <rect x="390" y="70" width="120" height="72" rx="18"/>
+            <path class="ico" d="M406 85h18v8h-18zM406 97h18v8h-18z"/>
+            <text x="434" y="98">Server</text><text class="sub" x="406" y="126">server.ts</text>
+          </g>
+          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="Data API">
+            <rect x="580" y="70" width="120" height="72" rx="18"/>
+            <path class="ico" d="M600 86c-3 0-3 2-3 4s-1 4-3 4c2 0 3 2 3 4s0 4 3 4M608 86c3 0 3 2 3 4s1 4 3 4c-2 0-3 2-3 4s0 4-3 4"/>
+            <text x="624" y="98">Data API</text><text class="sub" x="596" y="126">PostgREST</text>
+          </g>
+          <g class="node" data-id="n5" tabindex="0" role="button" aria-label="Postgres">
+            <rect x="770" y="70" width="120" height="72" rx="18"/>
+            <ellipse class="ico" cx="795" cy="88" rx="9" ry="4"/><path class="ico" d="M786 88v12c0 2 4 4 9 4s9-2 9-4v-12"/>
+            <text x="814" y="98">Postgres</text><text class="sub" x="786" y="126">GRANT · RLS</text>
+          </g>
+          <g class="node" data-id="n6" tabindex="0" role="button" aria-label="Supabase Auth">
+            <rect x="200" y="230" width="120" height="72" rx="18"/>
+            <circle class="ico" cx="221" cy="254" r="4"/><path class="ico" d="M225 254h10M231 254v4M235 254v3"/>
+            <text x="244" y="258">Auth</text><text class="sub" x="216" y="286">Tokens</text>
+          </g>
+          <g class="node" data-id="n7" tabindex="0" role="button" aria-label="Storage">
+            <rect x="770" y="230" width="120" height="72" rx="18"/>
+            <path class="ico" d="M786 249a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-16a2 2 0 0 1-2-2z"/>
+            <text x="814" y="258">Storage</text><text class="sub" x="786" y="286">Bucket sources</text>
+          </g>
+        </svg>
+      </div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="dateien">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Geänderte Dateien</h2></div>
+    <div class="card">
+      <div class="filter" role="group" aria-label="Dateien filtern">
+        <button type="button" data-f="all" aria-pressed="true">Alle</button>
+        <button type="button" data-f="db" aria-pressed="false">Datenbank</button>
+        <button type="button" data-f="app" aria-pressed="false">App-Code</button>
+        <button type="button" data-f="conf" aria-pressed="false">Konfiguration und Doku</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>DATEI</th><th>AUFGABE</th><th>WARUM SO</th></tr></thead>
+          <tbody id="fileRows">
+            <tr data-k="db"><td><code>supabase/migrations/<br>20261010143751_init.sql</code></td><td>Komplettes Schema: Tabellen, Indizes, Rechte, RLS, Bucket</td><td>Eine Datei, von oben nach unten lesbar. Der Dateiname ist die Versionsnummer in der Datenbank. So passen Repo und Projekt zusammen.</td></tr>
+            <tr data-k="db"><td><code>supabase/migrations/<br>20261010143823_revoke_…sql</code></td><td>Entzieht Gästen das Ausführungsrecht für <code>rls_auto_enable()</code></td><td>Supabase hat die Funktion selbst angelegt. Der Security-Advisor hat sie gemeldet. Eine Zeile SQL, danach 0 Warnungen.</td></tr>
+            <tr data-k="db"><td><code>supabase/checks/rls.sql</code></td><td>Prüft mit zwei Testnutzern 18 Regeln</td><td>Läuft in einer Transaktion und endet mit <code>rollback</code>. Die Datenbank bleibt sauber. Ohne Docker gibt es kein <code>supabase test db</code>.</td></tr>
+            <tr data-k="app"><td><code>src/lib/supabase/client.ts</code></td><td>Supabase-Client für den Browser</td><td>Nur Publishable Key. Der Client ist ein Singleton. RLS entscheidet, was sichtbar ist.</td></tr>
+            <tr data-k="app"><td><code>src/lib/supabase/server.ts</code></td><td>Supabase-Client für Server Components, Actions, Routes</td><td>Liest die Session aus den Cookies. Abfragen laufen als eingeloggter Nutzer. <code>server-only</code> verhindert den Import im Browser.</td></tr>
+            <tr data-k="app"><td><code>src/lib/supabase/proxy.ts</code></td><td>Session erneuern</td><td>Muster aus der offiziellen Supabase-Doku. Schreibt neue Cookies in Anfrage und Antwort.</td></tr>
+            <tr data-k="app"><td><code>src/proxy.ts</code></td><td>Next.js-Proxy, läuft vor jeder Anfrage</td><td>Seit Next 16 heißt <code>middleware.ts</code> jetzt <code>proxy.ts</code>. Der Matcher lässt statische Dateien aus.</td></tr>
+            <tr data-k="app"><td><code>src/lib/supabase/<br>database.types.ts</code></td><td>TypeScript-Typen aller Tabellen</td><td>Vom Schema erzeugt, nie von Hand bearbeitet. <code>npm run db:types</code> erzeugt sie neu.</td></tr>
+            <tr data-k="conf"><td><code>next.config.ts</code></td><td><code>cacheComponents</code> und <code>partialPrefetching</code> entfernt</td><td>Fast jede Seite liest den Login-Cookie. Rendern pro Anfrage ist hier einfacher und genauso schnell.</td></tr>
+            <tr data-k="conf"><td><code>package.json</code></td><td>Drei neue Pakete, Skript <code>db:types</code></td><td><code>@supabase/supabase-js</code>, <code>@supabase/ssr</code> für Cookies und <code>server-only</code> als Schutz.</td></tr>
+            <tr data-k="conf"><td><code>.env.local</code> (nicht im Repo)</td><td>URL, Publishable Key, Secret Key</td><td>Die öffentlichen Werte stehen auch in Vercel. Den Secret Key trägst du selbst ein, er ist erst ab Schritt 3 nötig.</td></tr>
+            <tr data-k="conf"><td><code>README.md</code> · <code>NOTIZEN.md</code></td><td>Abschnitt „Datenbank“, sechs Fehler, zwölf Entscheidungen</td><td>Fürs Interview: Was lief schief, was haben wir warum gewählt?</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="code">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Wichtigster Code</h2></div>
+    <p class="muted">Zeilen mit Punkt sind anklickbar. Ein Klick zeigt, was die Zeile tut.</p>
+    <div class="code-tabs" role="tablist" id="codeTabs"></div>
+    <div class="code-card">
+      <div class="code-head">
+        <span class="file" id="codeFile"></span>
+        <span class="why" id="codeWhy"></span>
+        <button class="copy" id="copyBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Kopieren</span></button>
+      </div>
+      <pre id="codePre" role="tabpanel"></pre>
+      <div class="note" id="codeNote" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo">
+    <div class="sec-head"><span class="sec-num">04b</span><h2>Mini-Demo: Wer sieht was?</h2></div>
+    <div class="card">
+      <p class="muted">Wähle eine Person und eine Aktion. Die Demo spielt nach, was Postgres mit unseren echten Regeln tut. Lea besitzt zwei Notebooks, Tom eines.</p>
+      <div class="demo-label">Ich bin</div>
+      <div class="seg" id="who" role="group" aria-label="Person wählen"></div>
+      <div class="uid" id="uid"></div>
+      <div class="demo-label">Aktion</div>
+      <div class="actions" id="acts" role="group" aria-label="Aktion wählen"></div>
+      <div id="result" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="entscheidungen">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Entscheidungen und Alternativen</h2></div>
+    <div class="decisions">
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Zwei Schichten: <code>GRANT</code> + RLS</h3><p>„Automatically expose new tables“ ist aus. Jede Tabelle bekommt nur die Rechte, die sie braucht. <code>anon</code> bekommt nichts.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Nur RLS, alle Tabellen automatisch freigegeben. Ein vergessenes <code>enable row level security</code> würde dann alles öffnen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Eine Policy pro Operation, Teilabfrage direkt im SQL</h3><p><code>notebook_id in (select id from notebooks where owner_id = …)</code>. Jede Regel ist dort lesbar, wo sie gilt.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Eine Hilfsfunktion wie <code>is_notebook_owner()</code> als <code>security definer</code>. Kürzer, aber eine zusätzliche Funktion, die man absichern muss.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3><code>text</code> + <code>check</code> für Status und Typ</h3><p>Neue Werte sind eine Zeile Migration. Werte lassen sich auch wieder entfernen.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Postgres-Enum. Die erzeugten Typen wären genauer (<code>'ready' | …</code>), aber Enum-Werte lassen sich kaum entfernen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Zusammengesetzter Fremdschlüssel in <code>chunks</code></h3><p><code>(source_id, notebook_id)</code> muss in <code>sources</code> existieren. Die kopierte <code>notebook_id</code> kann nicht falsch sein.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Ein Trigger, der <code>notebook_id</code> setzt. Oder der App vertrauen. Beides ist unsichtbarer als eine Regel im Schema.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Migrationen per MCP auf das Cloud-Projekt</h3><p>Das SQL liegt trotzdem im Repo, mit derselben Versionsnummer wie in der Datenbank.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Lokale Supabase mit Docker und <code>supabase db push</code>. Sauberer zum Testen, aber Docker ist nicht installiert.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3><code>cacheComponents</code> aus</h3><p>Seiten mit Login rendern pro Anfrage. Das ist das Muster aus dem offiziellen Supabase-Beispiel.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Anlassen. Dann muss jeder Cookie-Zugriff hinter <code>&lt;Suspense&gt;</code>. Der Gewinn ist eine statische Hülle, die bei einer Login-App kaum etwas bringt.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3><code>getClaims()</code> im Proxy</h3><p>Prüft die Signatur des JWT mit den öffentlichen Schlüsseln des Projekts. Erneuert abgelaufene Tokens.</p></div><div class="alt"><div class="lbl">Alternative</div><p><code>getSession()</code>. Liest nur den Cookie und prüft ihn nicht. Den Cookie kann jeder fälschen.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="risiken">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Was schiefgehen kann</h2></div>
+    <div class="risks">
+      <div class="risk"><span class="chip err">Sicherheit</span><h3>Secret Key umgeht RLS</h3><p>Die Rolle <code>service_role</code> ignoriert alle Policies. Der Key darf nur auf dem Server stehen und nie ein <code>NEXT_PUBLIC_</code>-Präfix tragen. Jede Abfrage mit ihm muss den Nutzer selbst prüfen.</p></div>
+      <div class="risk"><span class="chip err">Sicherheit</span><h3>Der Proxy ist kein Schutz</h3><p>Er erneuert nur das Token. Der Matcher kann Pfade auslassen. Jede Seite und jede Route prüft den Login darum selbst.</p></div>
+      <div class="risk"><span class="chip err">Sicherheit</span><h3>Storage-Pfad vom Client</h3><p>Die Policy prüft nur den ersten Ordner. Der Server muss den Pfad <code>&lt;notebook_id&gt;/&lt;source_id&gt;</code> selbst bauen und darf keinen Pfad aus dem Browser übernehmen.</p></div>
+      <div class="risk"><span class="chip warn">Stille Fehler</span><h3><code>update</code> auf fremde Zeilen meldet Erfolg</h3><p>RLS filtert die Zeile weg. Postgres meldet „0 Zeilen geändert“, aber keinen Fehler. Die App muss prüfen, ob eine Zeile zurückkam, und sonst 404 zeigen.</p></div>
+      <div class="risk"><span class="chip warn">Suche</span><h3>Der Stemmer kennt nicht jede Form</h3><p>„Quellen“ und „Quelle“ werden beide zu <code>quell</code>. „verbindet“ bleibt aber <code>verbindet</code> und passt nicht zu „verbinden“. Die Vektorsuche gleicht das aus.</p></div>
+      <div class="risk"><span class="chip warn">Betrieb</span><h3>Free-Plan pausiert</h3><p>Nach etwa einer Woche ohne Aktivität pausiert Supabase das Projekt. Vor dem Loom-Video und dem Interview prüfen, ob es läuft.</p></div>
+      <div class="risk"><span class="chip">Typen</span><h3><code>string</code> statt fester Werte</h3><p>Der Typ-Generator kennt keine <code>check</code>-Bedingungen. <code>status</code> ist darum nur <code>string</code>. Ab Schritt 3 grenzt Zod die Werte ein.</p></div>
+      <div class="risk"><span class="chip">Disziplin</span><h3>Nie im Dashboard klicken</h3><p>Jede Schemaänderung kommt als neue Migration ins Repo. Eine Änderung per Klick im Dashboard fehlt im Repo, und dann weichen Repo und Datenbank voneinander ab.</p></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="interview">
+    <div class="sec-head"><span class="sec-num">07</span><h2>Interview-Check</h2></div>
+    <div class="quiz-top">
+      <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+      <span class="score" id="score">0 von 5 gewusst</span>
+      <button class="btn ghost" id="resetQuiz" type="button">Zurücksetzen</button>
+    </div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <footer>
+    <span>Faden · Erklärung zu Schritt 2</span>
+    <span><a href="schritt-1-setup.html">← Schritt 1</a> · <a href="index.html">Alle Schritte →</a></span>
+  </footer>
+</div>
+
+<!-- Code samples as plain text: no escaping needed -->
+<script type="text/plain" id="src-chunks">create table public.chunks (
+  id bigint generated always as identity primary key,
+  source_id uuid not null,
+  notebook_id uuid not null,
+  content text not null,
+  page integer check (page > 0),
+  position integer not null check (position >= 0),
+  token_count integer not null check (token_count > 0),
+  embedding extensions.vector(1536) not null,
+  fts tsvector generated always as (to_tsvector('german', content)) stored,
+  foreign key (source_id, notebook_id)
+    references public.sources (id, notebook_id) on delete cascade,
+  unique (source_id, position)
+);
+
+create index chunks_embedding_idx on public.chunks
+  using hnsw (embedding extensions.vector_cosine_ops);
+create index chunks_fts_idx on public.chunks using gin (fts);</script>
+<script type="text/plain" id="src-rls">revoke all on public.notebooks, public.sources, public.chunks,
+  public.messages, public.studio_items from anon, authenticated;
+
+grant select, insert, update, delete
+  on public.notebooks, public.sources, public.studio_items to authenticated;
+grant select, insert, delete on public.chunks, public.messages to authenticated;
+
+alter table public.notebooks enable row level security;
+
+create policy "notebooks: owner can update" on public.notebooks
+  for update to authenticated
+  using (owner_id = (select auth.uid()))
+  with check (owner_id = (select auth.uid()));
+
+create policy "chunks: owner can select" on public.chunks
+  for select to authenticated
+  using (notebook_id in (select id from public.notebooks where owner_id = (select auth.uid())));</script>
+<script type="text/plain" id="src-storage">insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('sources', 'sources', false, 20971520, array['application/pdf', 'text/plain']);
+
+create policy "sources bucket: owner can select" on storage.objects
+  for select to authenticated
+  using (
+    bucket_id = 'sources'
+    and (storage.foldername(name))[1] in (
+      select id::text from public.notebooks where owner_id = (select auth.uid())
+    )
+  );</script>
+<script type="text/plain" id="src-proxy">export async function updateSession(request: NextRequest) {
+  let response = NextResponse.next({ request });
+
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet, headers) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value),
+          );
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options),
+          );
+          Object.entries(headers).forEach(([key, value]) =>
+            response.headers.set(key, value),
+          );
+        },
+      },
+    },
+  );
+
+  await supabase.auth.getClaims();
+
+  return response;
+}</script>
+<script type="text/plain" id="src-check">perform set_config('role', 'authenticated', true);
+perform set_config('request.jwt.claims',
+  json_build_object('sub', user_b, 'role', 'authenticated')::text, true);
+
+select count(*) into n from public.notebooks;
+assert n = 0, 'B sees A''s notebooks';
+
+update public.notebooks set title = 'gehackt' where id = nb_a;
+get diagnostics n = row_count;
+assert n = 0, 'B could rename A''s notebook';
+
+failed := false;
+begin
+  insert into public.sources (notebook_id, type, title) values (nb_a, 'text', 'B: fremd');
+exception when insufficient_privilege then failed := true;
+end;
+assert failed, 'B could add a source to A''s notebook';</script>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function store(key, val) {
+    try { if (val === undefined) return localStorage.getItem(key); localStorage.setItem(key, val); } catch (e) { return null; }
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* ---------- Theme ---------- */
+  var root = document.documentElement, themeBtn = document.getElementById("themeBtn");
+  var sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var moon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
+  function isDark() { var t = root.getAttribute("data-theme"); return t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches; }
+  function paintThemeBtn() { themeBtn.innerHTML = isDark() ? sun : moon; }
+  var saved = store("faden-doc-theme"); if (saved) root.setAttribute("data-theme", saved);
+  paintThemeBtn();
+  themeBtn.addEventListener("click", function () { var next = isDark() ? "light" : "dark"; root.setAttribute("data-theme", next); store("faden-doc-theme", next); paintThemeBtn(); });
+
+  /* ---------- Diagram ---------- */
+  var steps = [
+    { id: "n1", tag: "1 · Browser", title: "Der Browser schickt den Login-Cookie mit", text: "Jede Anfrage trägt den Cookie sb-<projekt>-auth-token. Darin stehen ein Access Token (ein JWT) und ein Refresh Token. Ohne Cookie ist der Besucher ein Gast, also die Rolle anon." },
+    { id: "e1", tag: "2 · Cookie", title: "Die Anfrage erreicht zuerst den Proxy", text: "src/proxy.ts läuft vor jeder Seite. Der Matcher lässt nur statische Dateien und Bilder aus, denn die brauchen keinen Login." },
+    { id: "n2", tag: "3 · Proxy", title: "Der Proxy prüft das Token", text: "createServerClient liest die Cookies aus der Anfrage. Direkt danach ruft der Proxy getClaims() auf. Zwischen diesen beiden Aufrufen darf kein anderer Code stehen." },
+    { id: "e5", tag: "4 · getClaims()", title: "Bei Bedarf: neues Token von Supabase Auth", text: "getClaims() prüft die Signatur des JWT mit den öffentlichen Schlüsseln des Projekts. Ist das Token abgelaufen, holt der Client mit dem Refresh Token ein neues. setAll schreibt es danach in die Cookies." },
+    { id: "e2", tag: "5 · Request", title: "Frische Cookies gehen an Server und Browser", text: "setAll setzt das neue Token in die Anfrage (für Server Components) und in die Antwort (für den Browser). Dazu kommen Cache-Header, damit kein CDN eine Antwort mit Session-Cookie für andere speichert." },
+    { id: "n3", tag: "6 · Server", title: "Eine Server Component fragt Daten ab", text: "createClient() aus server.ts liest die Cookies. Eine Abfrage wie from(\"notebooks\").select() wird zu einer HTTP-Anfrage an die Data API von Supabase." },
+    { id: "e3", tag: "7 · JWT+SQL", title: "Das JWT des Nutzers reist mit", text: "Der Server schickt den Publishable Key und das JWT des Nutzers. Er nutzt nicht den Secret Key. Darum gilt RLS auch für Abfragen vom Server." },
+    { id: "n4", tag: "8 · Data API", title: "PostgREST übersetzt in SQL", text: "Die Data API prüft das JWT. Sie setzt die Rolle (authenticated oder anon) und legt die Claims in request.jwt.claims ab. Dort liest auth.uid() später die Nutzer-ID." },
+    { id: "e4", tag: "9 · role+uid", title: "Postgres läuft als dieser Nutzer", text: "Jede Abfrage läuft in einer Transaktion mit der Rolle des Nutzers. Genau das macht auch unser Testskript rls.sql mit set_config." },
+    { id: "n5", tag: "10 · Postgres", title: "Zwei Prüfungen: GRANT, dann RLS", text: "Schicht 1: Hat die Rolle ein Recht auf die Tabelle? anon hat keins und bekommt HTTP 401. Schicht 2: Die RLS-Policy filtert die Zeilen, zum Beispiel mit owner_id = auth.uid()." },
+    { id: "e6", tag: "11 · Antwort", title: "Nur eigene Zeilen kommen zurück", text: "Fremde Zeilen existieren für den Nutzer nicht. Darum zeigt Faden bei einem fremden Notebook 404 und nicht 403. So verrät die App nicht einmal, dass es das Notebook gibt." }
+  ];
+  var extras = {
+    n6: { tag: "Supabase Auth", title: "Stellt Tokens aus und erneuert sie", text: "Auth verwaltet Nutzer und Sitzungen. Später meldet sich ein Nutzer mit E-Mail und Passwort an. Das Access Token läuft nach einer Stunde ab, das Refresh Token holt ein neues." },
+    n7: { tag: "Storage", title: "Privater Bucket „sources“", text: "Hier landen ab Schritt 3 die PDFs. Max. 20 MB, nur PDF und Text. Jede Datei ist eine Zeile in storage.objects. Unsere Policies prüfen den ersten Ordner im Pfad: Er muss ein eigenes Notebook sein." },
+    e7: { tag: "storage.objects", title: "Storage nutzt dieselbe RLS", text: "Die Dateiliste ist eine Postgres-Tabelle. Darum gelten dort dieselben Mechanismen: GRANT, Policy, auth.uid(). Ein Gast oder ein fremder Nutzer bekommt „Object not found“." }
+  };
+  var diagram = document.getElementById("diagram"), detail = document.getElementById("detail"), dots = document.getElementById("dots");
+  var current = -1, timer = null, playBtn = document.getElementById("playBtn");
+
+  steps.forEach(function (s, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.setAttribute("aria-label", "Schritt " + (i + 1) + ": " + s.title);
+    b.addEventListener("click", function () { stop(); show(i); });
+    dots.appendChild(b);
+  });
+  function highlight(id) {
+    diagram.querySelectorAll(".is-active").forEach(function (el) { el.classList.remove("is-active"); });
+    var el = diagram.querySelector('[data-id="' + id + '"]'); if (el) el.classList.add("is-active");
+  }
+  function renderDetail(d) {
+    detail.innerHTML = '<span class="badge">' + esc(d.tag) + '</span><div><h3>' + esc(d.title) + '</h3><p>' + esc(d.text) + '</p></div>';
+    detail.classList.remove("swap"); void detail.offsetWidth; detail.classList.add("swap");
+  }
+  function show(i) {
+    current = (i + steps.length) % steps.length;
+    highlight(steps[current].id); renderDetail(steps[current]);
+    Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle("on", k === current); d.setAttribute("aria-current", k === current ? "step" : "false"); });
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } playBtn.querySelector("span").textContent = "Abspielen"; }
+  function play() {
+    if (timer) { stop(); return; }
+    playBtn.querySelector("span").textContent = "Pause";
+    if (current >= steps.length - 1) current = -1;
+    show(current + 1);
+    timer = setInterval(function () { if (current >= steps.length - 1) { stop(); return; } show(current + 1); }, reduce ? 3200 : 2400);
+  }
+  playBtn.addEventListener("click", play);
+  document.getElementById("prevBtn").addEventListener("click", function () { stop(); show(current <= 0 ? steps.length - 1 : current - 1); });
+  document.getElementById("nextBtn").addEventListener("click", function () { stop(); show(current + 1); });
+  function pick(id) {
+    stop();
+    var idx = steps.findIndex(function (s) { return s.id === id; });
+    if (idx >= 0) { show(idx); return; }
+    current = -1; highlight(id); renderDetail(extras[id]);
+    Array.prototype.forEach.call(dots.children, function (d) { d.classList.remove("on"); });
+  }
+  diagram.querySelectorAll(".node, .edge").forEach(function (el) {
+    el.addEventListener("click", function () { pick(el.getAttribute("data-id")); });
+    el.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(el.getAttribute("data-id")); } });
+  });
+  show(0);
+
+  /* ---------- File filter ---------- */
+  document.querySelectorAll(".filter button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".filter button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      var f = b.getAttribute("data-f");
+      document.querySelectorAll("#fileRows tr").forEach(function (tr) { tr.classList.toggle("hidden", f !== "all" && tr.getAttribute("data-k") !== f); });
+    });
+  });
+
+  /* ---------- Code ---------- */
+  function src(id) { return document.getElementById(id).textContent; }
+  var snippets = [
+    { file: "init.sql · chunks", lang: "sql", why: "Die Tabelle für Abschnitte und Embeddings", code: src("src-chunks"),
+      notes: {
+        2: "bigint statt UUID: Abschnitte gibt es viele, und ihre ID erscheint nie in einer URL. 8 Byte statt 16 machen den Index kleiner. „generated always“ heißt: Nur Postgres vergibt die Nummer.",
+        4: "notebook_id steht absichtlich doppelt da, in sources und hier. So filtern Suche und RLS direkt nach Notebook, ohne Join über sources.",
+        6: "Die Seite ist bei Text und Webseiten leer (null). check (page > 0) verhindert Seite 0 oder negative Seiten.",
+        9: "vector(1536) passt genau zu text-embedding-3-small. Ein Vektor mit anderer Länge wird abgelehnt.",
+        10: "Eine generierte Spalte: Postgres berechnet den tsvector bei jedem Insert selbst, mit deutscher Wortstammbildung („Quellen“ wird zu „quell“). Ein Trigger ist nicht nötig.",
+        11: "Der zusammengesetzte Fremdschlüssel: Das Paar (source_id, notebook_id) muss genau so in sources existieren. Damit kann die kopierte notebook_id nie falsch sein. Der RLS-Test prüft das.",
+        12: "on delete cascade: Wird eine Quelle gelöscht, löscht Postgres ihre Abschnitte und Embeddings mit. Das verlangt die Muss-Liste.",
+        13: "Jede Position kommt pro Quelle nur einmal vor. Ein doppeltes Einlesen fällt so sofort auf.",
+        17: "HNSW ist ein Graph-Index für schnelle Näherungssuche. vector_cosine_ops passt zum Operator <=> (Kosinus-Abstand), den wir in Schritt 4 benutzen.",
+        18: "GIN-Index für die Volltextsuche mit websearch_to_tsquery. Ohne Index müsste Postgres jeden Abschnitt durchsuchen."
+      } },
+    { file: "init.sql · Rechte", lang: "sql", why: "Schicht 1 (GRANT) und Schicht 2 (RLS)", code: src("src-rls"),
+      notes: {
+        1: "Neue Tabellen bekommen in diesem Projekt Standardrechte wie TRUNCATE. revoke all räumt sie ab. Danach geben wir genau das, was die App braucht.",
+        4: "Eingeloggte Nutzer (authenticated) dürfen Notebooks, Quellen und Studio-Inhalte lesen, anlegen, ändern und löschen. Welche Zeilen, entscheidet erst RLS.",
+        6: "chunks und messages haben kein update. Abschnitte werden neu erzeugt, Nachrichten nie bearbeitet. Ein Recht, das es nicht gibt, kann man nicht missbrauchen.",
+        8: "Das Projekt schaltet RLS zwar automatisch ein. Die Migration tut es trotzdem selbst, damit sie auch ohne diese Projekt-Option richtig ist.",
+        11: "„to authenticated“: Die Policy gilt nur für eingeloggte Nutzer. Für anon gibt es keine Policy, und ohne Policy sieht RLS keine einzige Zeile.",
+        12: "using filtert, welche bestehenden Zeilen der Nutzer überhaupt sieht. (select auth.uid()) in Klammern: Postgres ruft die Funktion einmal pro Abfrage auf, nicht einmal pro Zeile.",
+        13: "with check prüft die neue Version der Zeile. Ohne diese Bedingung könnte Lea ihr Notebook per update an Tom übertragen, indem sie owner_id ändert.",
+        17: "Kindtabellen prüfen das Notebook. „notebook_id in (Teilabfrage)“ berechnet die Liste der eigenen Notebooks einmal und vergleicht dann jede Zeile damit."
+      } },
+    { file: "init.sql · Storage", lang: "sql", why: "Privater Bucket mit Ordner-Regel", code: src("src-storage"),
+      notes: {
+        2: "public = false: Ohne Login und ohne signierte URL kommt niemand an eine Datei. 20971520 Byte sind 20 MB. Nur PDF und Text sind erlaubt.",
+        4: "Storage speichert jede Datei als Zeile in storage.objects. Darum schützen wir Dateien mit derselben RLS wie Tabellen.",
+        7: "Die Policy gilt nur für unseren Bucket. Andere Buckets (später für den Podcast) bekommen eigene Regeln.",
+        8: "storage.foldername zerlegt den Pfad in Ordner. [1] ist der erste Ordner, bei uns die notebook_id.",
+        9: "id::text, weil der Pfad Text ist. Ein ungültiger Pfad wird nie zu einer UUID umgewandelt, darum kann er auch keinen Fehler auslösen."
+      } },
+    { file: "src/lib/supabase/proxy.ts", lang: "ts", why: "Hält den Login frisch (gekürzt, ohne Kommentare)", code: src("src-proxy"),
+      notes: {
+        2: "Die Antwort startet als „weiter zur Seite“. Sie bekommt die Anfrage mit, damit geänderte Cookies bei der Seite ankommen.",
+        6: "Der Publishable Key ist öffentlich. Er sagt Supabase nur, welches Projekt gemeint ist. Rechte gibt erst das JWT des Nutzers.",
+        10: "Der Client liest die Session aus den Cookies der Anfrage.",
+        12: "setAll ruft der Client nur auf, wenn sich Cookies ändern, etwa nach einem neuen Token.",
+        14: "Das neue Token geht in die Anfrage. So sieht die Server Component danach schon das frische Token und erneuert es nicht ein zweites Mal.",
+        16: "Eine neue Antwort, die die geänderte Anfrage mitnimmt.",
+        18: "Das neue Token geht auch in die Antwort. Der Browser speichert es und schickt es beim nächsten Mal mit.",
+        21: "Neu in @supabase/ssr: Cache-Header wie Cache-Control: private. Ein CDN darf eine Antwort mit Session-Cookie nie für andere Nutzer speichern.",
+        28: "getClaims() prüft die JWT-Signatur und erneuert ein abgelaufenes Token. getSession() wäre falsch: Es liest den Cookie, ohne ihn zu prüfen.",
+        30: "Genau dieses Objekt zurückgeben. Eine neue Antwort ohne die Cookies würde Nutzer scheinbar zufällig ausloggen."
+      } },
+    { file: "supabase/checks/rls.sql", lang: "sql", why: "Ausschnitt: Tom versucht, an Leas Daten zu kommen", code: src("src-check"),
+      notes: {
+        1: "Das Skript wechselt in die Rolle authenticated. Ab hier gelten GRANT und RLS, genau wie bei einer Anfrage über die Data API.",
+        2: "Die Claims sagen, wer wir sind. auth.uid() liest „sub“. So spielt das Skript Nutzer B, ohne echten Login.",
+        5: "B zählt alle Notebooks. RLS blendet die Zeilen von A aus, also kommt 0 heraus.",
+        6: "assert bricht das ganze Skript mit genau dieser Meldung ab, falls die Bedingung falsch ist. Beim ersten Lauf ist so ein Fehler im Test selbst aufgefallen.",
+        8: "B versucht, das Notebook von A umzubenennen. Postgres meldet keinen Fehler.",
+        9: "row_count zeigt, wie viele Zeilen das update wirklich geändert hat: 0. RLS hat die Zeile vorher weggefiltert.",
+        14: "Ein Insert in ein fremdes Notebook. Hier greift with check und wirft einen echten Fehler.",
+        15: "insufficient_privilege ist SQLSTATE 42501: „new row violates row-level security policy“. Fangen wir ihn ab, hat die Regel funktioniert."
+      } }
+  ];
+  var KW_TS = /^(import|from|export|default|const|let|function|async|await|return|type|true|false)$/;
+  var KW_SQL = /^(create|table|index|on|using|primary|key|not|null|check|references|delete|cascade|unique|foreign|generated|always|as|stored|default|revoke|all|from|grant|select|insert|update|to|alter|enable|row|level|security|policy|for|with|in|where|and|into|values|array|false|true|perform|assert|begin|end|exception|when|then|get|diagnostics|set|count|identity)$/i;
+  function hlLine(line, lang) {
+    var out = "", last = 0, m, re;
+    if (lang === "sql") {
+      re = /(--.*$)|('(?:''|[^'])*')|("[^"]*")|(\b\d+\b)|([A-Za-z_][\w]*)/g;
+      while ((m = re.exec(line))) {
+        out += esc(line.slice(last, m.index));
+        if (m[1]) out += '<span class="tok-com">' + esc(m[1]) + '</span>';
+        else if (m[2] || m[3]) out += '<span class="tok-str">' + esc(m[2] || m[3]) + '</span>';
+        else if (m[4]) out += '<span class="tok-num">' + m[4] + '</span>';
+        else if (m[5]) out += KW_SQL.test(m[5]) ? '<span class="tok-kw">' + m[5] + '</span>' : esc(m[5]);
+        last = re.lastIndex;
+      }
+      return out + esc(line.slice(last));
+    }
+    re = /(\/\/.*$)|("(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(\s*:)?/g;
+    while ((m = re.exec(line))) {
+      out += esc(line.slice(last, m.index));
+      if (m[1]) out += '<span class="tok-com">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="tok-str">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="tok-num">' + m[3] + '</span>';
+      else if (m[4]) {
+        if (KW_TS.test(m[4])) out += '<span class="tok-kw">' + m[4] + '</span>' + esc(m[5] || "");
+        else if (m[5]) out += '<span class="tok-key">' + m[4] + '</span>' + esc(m[5]);
+        else out += esc(m[4]);
+      }
+      last = re.lastIndex;
+    }
+    return out + esc(line.slice(last));
+  }
+  var tabs = document.getElementById("codeTabs"), pre = document.getElementById("codePre"), note = document.getElementById("codeNote");
+  var active = 0;
+  function defaultNote() { note.innerHTML = '<span class="muted">Klick auf eine Zeile mit Punkt.</span>'; }
+  function renderCode(i) {
+    active = i; var s = snippets[i];
+    Array.prototype.forEach.call(tabs.children, function (t, k) { t.setAttribute("aria-selected", String(k === i)); });
+    document.getElementById("codeFile").textContent = s.file;
+    document.getElementById("codeWhy").textContent = s.why;
+    pre.innerHTML = s.code.split("\n").map(function (l, k) {
+      var n = k + 1, has = s.notes[n] ? " has-note" : "";
+      return '<div class="ln' + has + '" data-n="' + n + '"' + (has ? ' role="button" tabindex="0"' : "") + '><span class="n">' + n + '</span><span class="t">' + (hlLine(l, s.lang) || " ") + '</span></div>';
+    }).join("");
+    defaultNote();
+  }
+  function selectLine(el) {
+    pre.querySelectorAll(".sel").forEach(function (x) { x.classList.remove("sel"); });
+    el.classList.add("sel"); var n = el.getAttribute("data-n");
+    note.innerHTML = '<b>Zeile ' + n + '</b> · ' + esc(snippets[active].notes[n]);
+  }
+  pre.addEventListener("click", function (e) { var el = e.target.closest(".ln.has-note"); if (el) selectLine(el); });
+  pre.addEventListener("keydown", function (e) { var el = e.target.closest(".ln.has-note"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectLine(el); } });
+  snippets.forEach(function (s, i) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = s.file;
+    b.addEventListener("click", function () { renderCode(i); }); tabs.appendChild(b);
+  });
+  renderCode(0);
+  var copyBtn = document.getElementById("copyBtn");
+  copyBtn.addEventListener("click", function () {
+    var text = snippets[active].code, label = copyBtn.querySelector("span");
+    function done() { label.textContent = "Kopiert"; setTimeout(function () { label.textContent = "Kopieren"; }, 1400); }
+    function fallback() { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+  });
+
+  /* ---------- Demo: RLS ---------- */
+  var people = {
+    anon: { label: "Gast", av: "?", role: "anon", uid: null },
+    lea: { label: "Lea", av: "L", role: "authenticated", uid: "a1f3…" },
+    tom: { label: "Tom", av: "T", role: "authenticated", uid: "b7c2…" }
+  };
+  var notebooks = [
+    { id: "nb-lea-1", title: "Klimabericht", owner: "lea" },
+    { id: "nb-lea-2", title: "Bewerbung", owner: "lea" },
+    { id: "nb-tom-1", title: "Rezepte", owner: "tom" }
+  ];
+  var chunks = [
+    { id: 1, nb: "nb-lea-1", text: "Die Temperatur stieg um 1,2 °C …" },
+    { id: 2, nb: "nb-lea-1", text: "Der Meeresspiegel steigt …" },
+    { id: 3, nb: "nb-lea-2", text: "Hiermit bewerbe ich mich …" },
+    { id: 4, nb: "nb-tom-1", text: "200 g Mehl, 2 Eier …" }
+  ];
+  var files = [
+    { path: "nb-lea-1/src-7.pdf" },
+    { path: "nb-tom-1/src-9.pdf" }
+  ];
+  function ownerOf(nb) { var n = notebooks.filter(function (x) { return x.id === nb; })[0]; return n && n.owner; }
+  function mine(who) { return notebooks.filter(function (n) { return n.owner === who; }).map(function (n) { return n.id; }); }
+  function noGrant(table, op) { return { state: "fail", text: "Die Rolle anon hat kein " + op.toUpperCase() + " auf " + table + ". Postgres bricht sofort ab." }; }
+  var SKIP = { state: "skip", text: "Wird nicht geprüft, weil Schicht 1 schon abgelehnt hat." };
+  function denied(table) { return { cls: "out", title: "Fehler 42501: permission denied for table " + table, small: "Die Data API antwortet mit HTTP 401. Genau das hat curl gegen unser Projekt gezeigt." }; }
+
+  var actions = [
+    { id: "nb-read", label: "Notebooks lesen", sub: "select", run: function (w) {
+      var r = { sql: "select id, title from notebooks;", head: ["id", "title", "Besitzer", ""] };
+      r.rows = notebooks.map(function (n) { var on = w !== "anon" && n.owner === w; return { cells: [n.id, n.title, people[n.owner].label], on: on, state: w === "anon" ? "" : (on ? "sichtbar" : "ausgeblendet"), cls: on ? "on" : "" }; });
+      if (w === "anon") { r.g1 = noGrant("notebooks", "select"); r.g2 = SKIP; r.v = denied("notebooks"); return r; }
+      var n = mine(w).length;
+      r.g1 = { state: "ok", text: "authenticated hat SELECT auf notebooks." };
+      r.g2 = { state: "ok", text: "Policy „owner can select“ behält nur Zeilen mit owner_id = auth.uid()." };
+      r.v = { cls: "in", title: n + (n === 1 ? " Zeile" : " Zeilen"), small: "Die anderen Notebooks existieren, tauchen aber nicht auf. Für " + people[w].label + " gibt es sie nicht. Darum zeigt Faden bei fremden Notebooks 404." };
+      return r; } },
+    { id: "ch-read", label: "Abschnitte lesen", sub: "select", run: function (w) {
+      var my = mine(w);
+      var r = { sql: "select id, notebook_id, content from chunks;", head: ["id", "notebook_id", "content", ""] };
+      r.rows = chunks.map(function (c) { var on = w !== "anon" && my.indexOf(c.nb) >= 0; return { cells: [String(c.id), c.nb, c.text], on: on, state: w === "anon" ? "" : (on ? "sichtbar" : "ausgeblendet"), cls: on ? "on" : "" }; });
+      if (w === "anon") { r.g1 = noGrant("chunks", "select"); r.g2 = SKIP; r.v = denied("chunks"); return r; }
+      var n = r.rows.filter(function (x) { return x.on; }).length;
+      r.g1 = { state: "ok", text: "authenticated hat SELECT auf chunks." };
+      r.g2 = { state: "ok", text: "Teilabfrage liefert die eigenen Notebooks: " + my.join(", ") + ". Nur Abschnitte mit notebook_id in dieser Liste bleiben." };
+      r.v = { cls: "in", title: n + " Zeilen", small: "Kein Join über sources nötig, weil notebook_id direkt in chunks steht." };
+      return r; } },
+    { id: "nb-rename", label: "Leas „Klimabericht“ umbenennen", sub: "update", run: function (w) {
+      var r = { sql: "update notebooks set title = 'gehackt'\nwhere id = 'nb-lea-1';", head: ["id", "title", "Besitzer", ""] };
+      var ok = w === "lea";
+      r.rows = [{ cells: ["nb-lea-1", ok ? "gehackt" : "Klimabericht", "Lea"], on: w !== "anon" && ok, state: w === "anon" ? "" : (ok ? "geändert" : "unsichtbar"), cls: ok ? "hit" : "" }];
+      if (w === "anon") { r.g1 = noGrant("notebooks", "update"); r.g2 = SKIP; r.v = denied("notebooks"); return r; }
+      r.g1 = { state: "ok", text: "authenticated hat UPDATE auf notebooks." };
+      if (ok) { r.g2 = { state: "ok", text: "using: Zeile gehört Lea ✓ · with check: neue Zeile gehört weiter Lea ✓" }; r.v = { cls: "in", title: "1 Zeile geändert", small: "Lea darf ihr eigenes Notebook umbenennen." }; }
+      else { r.g2 = { state: "fail", text: "using blendet die Zeile aus, bevor das update sie überhaupt sieht." }; r.v = { cls: "warn", title: "0 Zeilen geändert – und kein Fehler", small: "Postgres meldet Erfolg. Die App muss prüfen, ob eine Zeile zurückkam, und sonst 404 zeigen. Der RLS-Test prüft genau das mit row_count." }; }
+      return r; } },
+    { id: "src-add", label: "Quelle in „Klimabericht“ anlegen", sub: "insert", run: function (w) {
+      var r = { sql: "insert into sources (notebook_id, type, title)\nvalues ('nb-lea-1', 'pdf', 'Studie.pdf');", head: ["notebook_id", "type", "title", ""] };
+      var ok = w === "lea";
+      r.rows = [{ cells: ["nb-lea-1", "pdf", "Studie.pdf"], on: ok, state: w === "anon" ? "" : (ok ? "neu" : "abgelehnt"), cls: ok ? "hit" : "bad" }];
+      if (w === "anon") { r.g1 = noGrant("sources", "insert"); r.g2 = SKIP; r.v = denied("sources"); return r; }
+      r.g1 = { state: "ok", text: "authenticated hat INSERT auf sources." };
+      if (ok) { r.g2 = { state: "ok", text: "with check: nb-lea-1 ist in Leas Notebooks ✓" }; r.v = { cls: "in", title: "1 Zeile eingefügt", small: "status steht automatisch auf 'pending'. Ab Schritt 3 startet dann die Verarbeitung." }; }
+      else { r.g2 = { state: "fail", text: "with check: nb-lea-1 gehört nicht " + people[w].label + " ✗" }; r.v = { cls: "out", title: "Fehler 42501: new row violates row-level security policy", small: "Bei insert gibt es keine Zeile zum Ausblenden. Darum wirft with check einen echten Fehler." }; }
+      return r; } },
+    { id: "ch-edit", label: "Abschnitt bearbeiten", sub: "update", run: function (w) {
+      var r = { sql: "update chunks set content = '…'\nwhere id = 1;", head: ["id", "notebook_id", "content", ""] };
+      r.rows = [{ cells: ["1", "nb-lea-1", chunks[0].text], on: false, state: w === "anon" ? "" : "abgelehnt", cls: "bad" }];
+      r.g1 = { state: "fail", text: (w === "anon" ? "anon" : "Auch authenticated") + " hat kein UPDATE auf chunks. Abschnitte ändert niemand, sie werden nur neu erzeugt." };
+      r.g2 = SKIP;
+      r.v = { cls: "out", title: "Fehler 42501: permission denied for table chunks", small: w === "lea" ? "Sogar Lea scheitert, obwohl es ihr Abschnitt ist. Schicht 1 verbietet das für alle." : "Schicht 1 verbietet das für alle, auch für die Besitzerin." };
+      return r; } },
+    { id: "file-read", label: "PDF aus „Klimabericht“ laden", sub: "storage", run: function (w) {
+      var my = mine(w);
+      var r = { sql: "storage.from('sources')\n  .download('nb-lea-1/src-7.pdf');", head: ["Pfad", "erster Ordner", "", ""] };
+      r.rows = files.map(function (f) { var folder = f.path.split("/")[0]; var on = w !== "anon" && my.indexOf(folder) >= 0; return { cells: [f.path, folder, ""], on: on, state: on ? "sichtbar" : "ausgeblendet", cls: on ? "on" : "" }; });
+      r.g1 = { state: "ok", text: "Supabase gibt " + people[w].role + " Grundrechte auf storage.objects. Der Schutz liegt hier ganz bei RLS." };
+      if (w === "anon") { r.g2 = { state: "fail", text: "Unsere Policies gelten nur „to authenticated“. Für anon gibt es keine Policy, und ohne Policy sieht RLS keine Zeile." }; r.v = { cls: "out", title: "Object not found", small: "Storage sagt nicht „verboten“, sondern „nicht gefunden“. So verrät es nicht einmal, dass die Datei existiert." }; return r; }
+      if (w === "lea") { r.g2 = { state: "ok", text: "Erster Ordner nb-lea-1 ist in Leas Notebooks ✓" }; r.v = { cls: "in", title: "Download startet", small: "Später lädt der Browser so die PDF für die Beleg-Ansicht." }; return r; }
+      r.g2 = { state: "fail", text: "Erster Ordner nb-lea-1 ist nicht in Toms Notebooks (" + my.join(", ") + ")." };
+      r.v = { cls: "out", title: "Object not found", small: "Tom erfährt nicht einmal, dass die Datei existiert." };
+      return r; } }
+  ];
+
+  var whoEl = document.getElementById("who"), actsEl = document.getElementById("acts"), resEl = document.getElementById("result"), uidEl = document.getElementById("uid");
+  var who = "tom", act = "nb-rename";
+  Object.keys(people).forEach(function (k) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("data-k", k);
+    b.innerHTML = '<span class="av">' + people[k].av + '</span>' + esc(people[k].label);
+    b.addEventListener("click", function () { who = k; runDemo(); });
+    whoEl.appendChild(b);
+  });
+  actions.forEach(function (a) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("data-k", a.id);
+    b.innerHTML = esc(a.label) + "<small>" + esc(a.sub) + "</small>";
+    b.addEventListener("click", function () { act = a.id; runDemo(); });
+    actsEl.appendChild(b);
+  });
+  function gateHtml(n, name, g) {
+    var st = g.state === "ok" ? "erlaubt" : g.state === "fail" ? "abgelehnt" : "–";
+    return '<div class="gate ' + g.state + '"><div class="gh">Schicht ' + n + ' · ' + name + '<span class="st">' + st + '</span></div><p>' + esc(g.text) + '</p></div>';
+  }
+  function runDemo() {
+    Array.prototype.forEach.call(whoEl.children, function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-k") === who)); });
+    Array.prototype.forEach.call(actsEl.children, function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-k") === act)); });
+    var p = people[who];
+    uidEl.innerHTML = "Rolle <b>" + p.role + "</b> · auth.uid() = <b>" + (p.uid ? p.uid : "null") + "</b>";
+    var a = actions.filter(function (x) { return x.id === act; })[0];
+    var r = a.run(who);
+    var html = '<div class="demo-sql">' + r.sql.split("\n").map(function (l) { return hlLine(l, "sql"); }).join("\n") + '</div>';
+    html += '<div class="gates">' + gateHtml(1, "GRANT", r.g1) + gateHtml(2, "RLS-Policy", r.g2) + '</div>';
+    html += '<div class="table-wrap rowtable"><table><thead><tr>' + r.head.map(function (h) { return "<th>" + esc(h.toUpperCase()) + "</th>"; }).join("") + '</tr></thead><tbody>' +
+      r.rows.map(function (row) {
+        return '<tr class="' + (row.on || row.cls === "hit" ? "" : "off") + '">' + row.cells.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") +
+          '<td>' + (row.state ? '<span class="state ' + row.cls + '">' + esc(row.state) + '</span>' : "") + '</td></tr>';
+      }).join("") + '</tbody></table></div>';
+    html += '<div class="verdict ' + r.v.cls + '">' + esc(r.v.title) + '<small>' + esc(r.v.small) + '</small></div>';
+    resEl.innerHTML = html;
+    resEl.classList.remove("result-swap"); void resEl.offsetWidth; resEl.classList.add("result-swap");
+  }
+  runDemo();
+
+  /* ---------- Flashcards ---------- */
+  var qa = [
+    { q: "Warum schützt du jede Tabelle zweimal, mit GRANT und mit RLS?", a: ["GRANT entscheidet, ob eine Rolle eine Tabelle überhaupt benutzen darf. RLS entscheidet danach, welche Zeilen. anon hat bei uns kein einziges Recht. Die Data API antwortet Gästen darum mit 401, bevor eine Policy gefragt wird.", "Die zwei Schichten fangen Fehler gegenseitig ab. Vergisst jemand RLS auf einer neuen Tabelle, kommt anon trotzdem nicht heran. Und chunks hat gar kein UPDATE-Recht, das kann auch keine Policy versehentlich erlauben."] },
+    { q: "Tom versucht, Leas Notebook umzubenennen. Was passiert genau?", a: ["Schicht 1 erlaubt es, denn authenticated hat UPDATE auf notebooks. Dann filtert die using-Bedingung der Policy alle Zeilen weg, die nicht Tom gehören. Das update findet also keine Zeile.", "Postgres meldet „0 Zeilen geändert“, aber keinen Fehler. Die App muss das erkennen und 404 zeigen. Bei einem insert in Leas Notebook wäre es anders: with check wirft dann Fehler 42501."] },
+    { q: "Warum steht notebook_id auch in chunks, und wie verhinderst du, dass der Wert falsch ist?", a: ["Suche und RLS filtern direkt nach Notebook, ohne Join über sources. Bei vielen Abschnitten spart das Arbeit bei jeder Frage.", "Ein zusammengesetzter Fremdschlüssel (source_id, notebook_id) → sources(id, notebook_id) sorgt dafür, dass das Paar genau so in sources existiert. Ein Abschnitt mit falscher notebook_id wird abgelehnt. Der RLS-Test prüft das mit foreign_key_violation."] },
+    { q: "Warum schreibst du (select auth.uid()) und nicht einfach auth.uid()?", a: ["auth.uid() ist eine Funktion. Ohne select ruft Postgres sie unter Umständen für jede Zeile neu auf. In Klammern als Teilabfrage wird sie einmal pro Abfrage berechnet und dann wiederverwendet.", "Supabase empfiehlt das in der RLS-Doku. Der Performance-Advisor meldet sonst eine Warnung. Bei uns meldet er keine."] },
+    { q: "Was macht der Proxy, und warum getClaims() statt getSession()?", a: ["Server Components dürfen keine Cookies schreiben. Der Proxy läuft vor jeder Anfrage, erneuert ein abgelaufenes Token und schreibt es in Anfrage und Antwort. Er schützt aber keine Seite, das macht jede Seite selbst.", "getClaims() prüft die Signatur des JWT mit den öffentlichen Schlüsseln des Projekts. getSession() liest nur den Cookie, den jeder fälschen kann. Auf dem Server darf man dem nie vertrauen."] }
+  ];
+  var known = {};
+  try { known = JSON.parse(store("faden-doc-s2-quiz") || "{}") || {}; } catch (e) { known = {}; }
+  var cardsEl = document.getElementById("cards");
+  var chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  cardsEl.innerHTML = qa.map(function (c, i) {
+    return '<div class="fc" data-i="' + i + '"><button class="fc-q" type="button" aria-expanded="false"><span class="num">0' + (i + 1) + '</span><span>' + esc(c.q) + '</span>' + chev + '</button>' +
+      '<div class="fc-a"><div><div class="inner">' + c.a.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("") +
+      '<div class="fc-actions"><button class="btn accent" type="button" data-k="1">Gewusst</button><button class="btn ghost" type="button" data-k="0">Noch nicht</button></div></div></div></div></div>';
+  }).join("");
+  function paintQuiz() {
+    var n = 0;
+    Array.prototype.forEach.call(cardsEl.children, function (el, i) { var k = !!known[i]; el.classList.toggle("known", k); if (k) n++; });
+    document.getElementById("score").textContent = n + " von " + qa.length + " gewusst";
+    document.getElementById("bar").style.width = (n / qa.length * 100) + "%";
+  }
+  cardsEl.addEventListener("click", function (e) {
+    var card = e.target.closest(".fc"); if (!card) return;
+    var i = card.getAttribute("data-i");
+    if (e.target.closest(".fc-q")) {
+      var open = card.classList.toggle("open");
+      card.querySelector(".fc-q").setAttribute("aria-expanded", String(open));
+      return;
+    }
+    var a = e.target.closest("[data-k]");
+    if (a) {
+      if (a.getAttribute("data-k") === "1") known[i] = true; else delete known[i];
+      store("faden-doc-s2-quiz", JSON.stringify(known));
+      card.classList.remove("open"); card.querySelector(".fc-q").setAttribute("aria-expanded", "false");
+      paintQuiz();
+    }
+  });
+  document.getElementById("resetQuiz").addEventListener("click", function () { known = {}; store("faden-doc-s2-quiz", "{}"); paintQuiz(); });
+  paintQuiz();
+})();
+</script>
+</body>
+</html>
