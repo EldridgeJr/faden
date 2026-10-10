@@ -16,6 +16,9 @@
 - **10.10.2026 · Falsche Annahme über den deutschen Stemmer.** Der RLS-Test erwartete, dass die Suche nach „verbinden“ den Text „verbindet“ findet. Falsch: Snowball macht aus „verbinden“ `verbind`, lässt „verbindet“ aber unverändert. Gemerkt: der Test schlug fehl (gut, dass es ihn gibt). Gelöst: Test prüft jetzt „Quelle“ ↔ „Quellen“ (beide `quell`). Lehre: Volltextsuche allein verpasst Wortformen – genau dafür gibt es die Vektorsuche in der hybriden Suche.
 - **10.10.2026 · Vercel-Connector hat keinen Zugriff auf das Team `eldridge1`.** Umgebungsvariablen per MCP setzen ergab 403. Gelöst: Vercel-CLI (ist mit dem Team angemeldet).
 - **10.10.2026 · Vercel-CLI hängt bei Preview-Variablen in einer Schleife.** `vercel env add NAME preview --value … --yes` antwortet „Branch angeben oder weglassen“ und schlägt genau denselben Befehl erneut vor. Gelöst: leerer Branch als drittes Argument (`preview ''`) = alle Preview-Branches. Gemerkt, weil `vercel env ls` danach keine Preview-Zeile zeigte – Ergebnis immer nachprüfen.
+- **10.10.2026 · Login-Formular vergaß die E-Mail (3a).** Annahme: Bei einem Fehler bleiben die Felder gefüllt. Falsch: React 19 setzt ein Formular nach **jeder** Server Action zurück, auch nach einem Fehler. Gemerkt im Browser-Test mit falschem Passwort. Gelöst: Die Action gibt die E-Mail im Zustand zurück, das Feld nutzt sie als `defaultValue`. Das Passwort kommt bewusst nicht zurück.
+- **10.10.2026 · Next-Doku zeigt Zod-3-Code.** Das Formular-Beispiel in `node_modules/next/dist/docs` nutzt `error.flatten()` und `invalid_type_error`. Wir haben Zod 4: dort heißt es `z.flattenError()` bzw. `{ error: "…" }`. Gemerkt beim Nachschlagen in `node_modules/zod`. Lehre: auch offizielle Beispiele gegen die installierte Version prüfen.
+- **10.10.2026 · OpenAI-Key ging, Embeddings nicht.** `GET /v1/models` gab 200, das erste Embedding aber `credit_balance_exhausted`. Ein gültiger Key heißt nicht, dass Guthaben da ist. Ein ChatGPT-Abo enthält kein API-Guthaben.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -41,6 +44,15 @@
 - **Supabase-Clients nach offiziellem Muster** (`@supabase/ssr`): Browser-Client, Server-Client pro Request, Proxy erneuert das Token mit `getClaims()` (prüft die JWT-Signatur). Nie `getSession()` auf dem Server – das prüft das Token nicht. Der Proxy leitet noch nicht auf eine Login-Seite um, die gibt es noch nicht; jede Seite prüft den Login sowieso selbst.
 - **Publishable Key statt Legacy-`anon`-Key.** Neue Supabase-Projekte haben beide. Der neue lässt sich unabhängig rotieren.
 - **Erzeugte Typen haben `string` statt Union für `status`, `type`, `role`.** Der Generator kennt keine `check`-Bedingungen. Preis der Entscheidung „text + check statt Enum“. Ab Schritt 3 grenzen Zod-Schemas die Werte ein.
+- **Minimaler Login und Notebook-Liste schon in Schritt 3a.** Ohne angemeldeten Nutzer lässt RLS keinen Upload zu. Design, Umbenennen und Löschen kommen in Schritt 5.
+- **Testnutzer per Supabase-Admin-API** (`email_confirm: true`), Passwort zufällig erzeugt, nur in `.env.local`. Der Auto-Modus von Claude hat das Auslesen des Passworts blockiert. Getestet wurde deshalb mit einem Skript, das sich anmeldet, ohne den Wert auszugeben.
+- **`requireUser()` in `src/lib/auth.ts`.** Eine Stelle für „angemeldet? sonst `/login`“. Jede Seite **und** jede Server Action ruft sie auf: Eine Server Action ist ein öffentlicher POST-Endpunkt.
+- **Eine Fehlermeldung für „E-Mail unbekannt“ und „Passwort falsch“.** Sonst könnte man herausfinden, welche E-Mails ein Konto haben (User Enumeration).
+- **Festes Weiterleitungsziel nach dem Login (`/notebooks`).** Kein `?next=`-Parameter, also kein Open Redirect. Alternative: `next` erlauben, aber nur relative Pfade.
+- **Zod-Schemas in `src/lib/schemas.ts`**, getrennt von den Server Actions. So testet Vitest sie ohne Next.js.
+- **Ungültige Notebook-ID → 404, bevor die Datenbank gefragt wird.** Unbekannte und fremde IDs → ebenfalls 404 (RLS liefert `null`). Niemand erfährt, welche IDs es gibt.
+- **`refresh()` statt `revalidatePath()`** nach dem Anlegen. Neu in Next 16. Wir nutzen keinen Cache, also reicht es, die aktuelle Seite neu zu rendern.
+- **`.eq("owner_id", userId)` trotz RLS.** RLS filtert sowieso. Der explizite Filter hilft Postgres, den Index `(owner_id, created_at)` zu nutzen (Empfehlung von Supabase).
 
 ## Echte Zahlen
 - Kosten pro Frage:

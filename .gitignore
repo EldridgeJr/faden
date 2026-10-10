@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local preview config for the Claude app (machine-specific Node path)
+.claude/launch.json
