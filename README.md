@@ -36,6 +36,17 @@ Dann <http://localhost:3000> öffnen.
 | `npm run lint` | ESLint ausführen |
 | `npm run typecheck` | Routen-Typen erzeugen und TypeScript prüfen |
 | `npm test` | Unit-Tests mit Vitest |
+| `npm run db:types` | TypeScript-Typen aus dem Datenbankschema neu erzeugen (braucht `supabase login`) |
+
+## Datenbank
+
+Supabase-Projekt `faden` in Frankfurt (eu-central-1).
+
+- `supabase/migrations/` – das komplette Schema als SQL. Dateiname = Versionsnummer in der Datenbank.
+- `supabase/checks/rls.sql` – prüft mit zwei Testnutzern, dass niemand fremde Daten sieht oder ändert. Läuft im SQL-Editor, endet mit `rollback`.
+- `src/lib/supabase/` – Clients für Browser (`client.ts`) und Server (`server.ts`), Session-Erneuerung (`proxy.ts`), erzeugte Typen.
+
+Zugriff ist doppelt geschützt: `grant` legt fest, welche Rolle eine Tabelle überhaupt benutzen darf (`anon` gar nicht), Row Level Security legt fest, welche Zeilen.
 
 ## Dokumentation
 

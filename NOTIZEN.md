@@ -14,6 +14,8 @@
 - **10.10.2026 · Rat zur Projekterstellung geändert.** Zuerst hieß es „Projekt per MCP anlegen“. Der Dashboard-Dialog bietet aber Sicherheitsoptionen, die das MCP-Tool nicht hat („Automatically expose new tables“ aus, „Enable automatic RLS“ an). Gelöst: im Dashboard angelegt.
 - **10.10.2026 · Supabase-Option erzeugt selbst eine Sicherheitswarnung.** „Enable automatic RLS“ legt `public.rls_auto_enable()` als `SECURITY DEFINER` im öffentlichen Schema an. Der Security-Advisor meldet: aufrufbar für `anon` über `/rest/v1/rpc/…`. Echtes Risiko fast null (Funktion gibt `event_trigger` zurück, direkter Aufruf geht nicht). Gelöst: zweite Migration entzieht `EXECUTE`. Advisor danach: 0 Warnungen.
 - **10.10.2026 · Falsche Annahme über den deutschen Stemmer.** Der RLS-Test erwartete, dass die Suche nach „verbinden“ den Text „verbindet“ findet. Falsch: Snowball macht aus „verbinden“ `verbind`, lässt „verbindet“ aber unverändert. Gemerkt: der Test schlug fehl (gut, dass es ihn gibt). Gelöst: Test prüft jetzt „Quelle“ ↔ „Quellen“ (beide `quell`). Lehre: Volltextsuche allein verpasst Wortformen – genau dafür gibt es die Vektorsuche in der hybriden Suche.
+- **10.10.2026 · Vercel-Connector hat keinen Zugriff auf das Team `eldridge1`.** Umgebungsvariablen per MCP setzen ergab 403. Gelöst: Vercel-CLI (ist mit dem Team angemeldet).
+- **10.10.2026 · Vercel-CLI hängt bei Preview-Variablen in einer Schleife.** `vercel env add NAME preview --value … --yes` antwortet „Branch angeben oder weglassen“ und schlägt genau denselben Befehl erneut vor. Gelöst: leerer Branch als drittes Argument (`preview ''`) = alle Preview-Branches. Gemerkt, weil `vercel env ls` danach keine Preview-Zeile zeigte – Ergebnis immer nachprüfen.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -35,7 +37,10 @@
 - **Storage-Pfad `<notebook_id>/<source_id>.<ext>`**, Policy prüft den ersten Ordner. Bucket privat, max. 20 MB, nur PDF und Text.
 - **RLS-Test als SQL-Skript** (`supabase/checks/rls.sql`): zwei Testnutzer, `assert` pro Regel, am Ende `rollback`. Alternative: pgTAP mit `supabase test db` (braucht Docker).
 - **Login später per E-Mail + Passwort.** Am einfachsten für Playwright und das Demo. Alternative: Magic Link (Postfach nötig, Mail-Limit).
-- **Offen für Schritt 2: `cacheComponents`.** Mit Cache Components muss jede Seite, die Cookies liest (Login), diesen Teil hinter `<Suspense>` legen oder mit `instant = false` aussteigen. Fast alle Faden-Seiten sind nutzerbezogen. Prüfen, ob der Mehraufwand sich lohnt oder ob wir es ausschalten.
+- **`cacheComponents` ausgeschaltet** (Schritt 2). Fast jede Faden-Seite liest den Login-Cookie. Mit Cache Components müsste jede dieser Stellen hinter `<Suspense>` oder `instant = false` stehen. Der Vorteil (statische Hülle) ist bei einer nutzerbezogenen App klein. Ohne Cache Components rendern Seiten mit Cookies einfach pro Request – wie im offiziellen Supabase-Beispiel. `partialPrefetching` gehört dazu und ist mit raus.
+- **Supabase-Clients nach offiziellem Muster** (`@supabase/ssr`): Browser-Client, Server-Client pro Request, Proxy erneuert das Token mit `getClaims()` (prüft die JWT-Signatur). Nie `getSession()` auf dem Server – das prüft das Token nicht. Der Proxy leitet noch nicht auf eine Login-Seite um, die gibt es noch nicht; jede Seite prüft den Login sowieso selbst.
+- **Publishable Key statt Legacy-`anon`-Key.** Neue Supabase-Projekte haben beide. Der neue lässt sich unabhängig rotieren.
+- **Erzeugte Typen haben `string` statt Union für `status`, `type`, `role`.** Der Generator kennt keine `check`-Bedingungen. Preis der Entscheidung „text + check statt Enum“. Ab Schritt 3 grenzen Zod-Schemas die Werte ein.
 
 ## Echte Zahlen
 - Kosten pro Frage:
