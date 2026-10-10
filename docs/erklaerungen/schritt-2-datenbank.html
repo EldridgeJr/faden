@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Schritt 2 · Datenbank</title>
-<meta name="description" content="Faden, Schritt 2: Supabase mit pgvector, Row Level Security, Storage und Supabase-Clients – was funktioniert, wie es zusammenhängt und warum.">
+<meta name="description" content="Faden, Schritt 2: Wie Faden Daten speichert und schützt – einfach erklärt, mit Begriffen zum Antippen.">
 <style>
   :root {
     --bg: #E9EBEE; --surface: #F6F7F8; --card: #FFFFFF; --tile: #F3F4F6; --line: #E3E5E8;
@@ -261,6 +261,16 @@
   .state.bad { background: var(--err-bg); color: var(--err); }
   .verdict.warn { background: var(--warn-bg); color: var(--warn); }
   .result-swap { animation: fade .3s ease; }
+
+  /* Begriffe zum Antippen */
+  .term { display: inline; cursor: help; padding: 0 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; text-decoration: underline dotted; text-decoration-color: var(--muted); text-decoration-thickness: 1.5px; text-underline-offset: 3px; border-radius: 4px; transition: background .2s; }
+  .term:hover, .term[aria-expanded="true"] { background: color-mix(in srgb, var(--accent) 45%, transparent); text-decoration-color: transparent; }
+  .detail .badge .term, .lbl .term { text-decoration: none; }
+  .pop { position: fixed; z-index: 50; width: max-content; max-width: min(320px, calc(100vw - 24px)); background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: var(--r-tile); box-shadow: 0 12px 32px rgba(17,19,21,.18); padding: 12px 14px; font: 14.5px/1.5 var(--sans); text-align: left; animation: fade .18s ease; }
+  .pop[hidden] { display: none; }
+  .pop b { display: block; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 4px; letter-spacing: .02em; }
+  .pop p { margin: 0; color: var(--text); }
+  .hint { font-size: 14px; color: var(--muted); margin-top: 14px; }
 </style>
 </head>
 <body>
@@ -290,31 +300,32 @@
 
   <header class="hero">
     <div class="eyebrow">SCHRITT 2 VON 7 · 10.10.2026</div>
-    <h1>Datenbank: Tabellen, Vektoren, Zugriffsschutz</h1>
-    <p class="lead">Supabase in Frankfurt mit fünf Tabellen, pgvector und Volltextsuche. Jede Zeile gehört genau einem Nutzer. Postgres prüft das selbst, nicht die App.</p>
+    <h1>Datenbank: Daten speichern und schützen</h1>
+    <p class="lead" data-rich>Faden hat jetzt einen Ort für alle Daten. Dazu gibt es eine klare Regel: Jede Person sieht nur ihre eigenen Notebooks. Diese Regel prüft die [[postgres|Datenbank]] selbst, nicht die App.</p>
     <div class="chips">
-      <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test</span><span class="chip ok">build</span><span class="chip ok">RLS-Check 18/18</span><span class="chip ok">Advisor 0 Warnungen</span>
+      <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test</span><span class="chip ok">build</span><span class="chip ok">Sicherheitstest 18/18</span><span class="chip ok">0 Warnungen</span>
     </div>
+    <div class="hint" data-rich>Tipp: [[term|Gepunktet unterstrichene Wörter]] antippen. Dann erscheint eine kurze Erklärung.</div>
   </header>
 
   <!-- 1 -->
   <section id="funktioniert">
     <div class="sec-head"><span class="sec-num">01</span><h2>Was jetzt funktioniert</h2></div>
-    <div class="card">
-      <p>Faden hat eine Datenbank im Supabase-Projekt <code>faden</code> in Frankfurt. Fünf Tabellen speichern Notebooks, Quellen, Abschnitte mit Embeddings, Chat-Nachrichten und Studio-Inhalte. Jede Tabelle hat zwei Schutzschichten: <code>GRANT</code> legt fest, welche Rolle sie benutzen darf. Row Level Security legt fest, welche Zeilen. Ein Testskript mit zwei Nutzern beweist, dass niemand fremde Daten sieht oder ändert. Die App spricht über Supabase-Clients für Browser und Server mit der Datenbank, und ein Proxy hält den Login frisch.</p>
-      <p class="muted small" style="margin:0">Es gibt noch keine Login-Seite und keine Oberfläche für Daten. Das Einlesen von Quellen folgt in Schritt 3.</p>
+    <div class="card" data-rich>
+      <p>Faden hat eine Datenbank bei [[supabase|Supabase]] in Frankfurt. Sie hat fünf Tabellen: Notebooks, Quellen, Textabschnitte, Chat-Nachrichten und Studio-Inhalte. Jede Tabelle ist doppelt gesichert. Ein [[grant|Recht (GRANT)]] entscheidet, wer die Tabelle überhaupt öffnen darf. Eine [[rls|Zeilen-Regel (RLS)]] entscheidet, welche Zeilen man darin sieht. Ein Test mit zwei erfundenen Personen zeigt: Niemand sieht oder ändert fremde Daten.</p>
+      <p class="muted small" style="margin:0">Noch fehlen die Login-Seite und eine Oberfläche, die Daten anzeigt. Beides kommt in den nächsten Schritten.</p>
       <div class="facts">
-        <div class="tile fact"><div class="k">PROJEKT</div><div class="v mono small">faden · eu-central-1 · Postgres 17</div></div>
-        <div class="tile fact"><div class="k">SCHEMA</div><div class="v mono small">5 Tabellen · 8 Indizes · 21 Policies</div></div>
-        <div class="tile fact"><div class="k">RLS-CHECK</div><div class="v mono small">18 von 18 Prüfungen bestanden</div></div>
-        <div class="tile fact"><div class="k">GAST-ZUGRIFF</div><div class="v mono small">HTTP 401 · permission denied</div></div>
+        <div class="tile fact"><div class="k">ORT</div><div class="v mono small">Supabase · Frankfurt</div></div>
+        <div class="tile fact"><div class="k">INHALT</div><div class="v mono small">5 Tabellen · 1 Dateiordner</div></div>
+        <div class="tile fact"><div class="k">SICHERHEITSTEST</div><div class="v mono small">18 von 18 Regeln halten</div></div>
+        <div class="tile fact"><div class="k">OHNE LOGIN</div><div class="v mono small">kein Zugriff (Fehler 401)</div></div>
       </div>
     </div>
   </section>
 
   <!-- 2 -->
   <section id="ablauf">
-    <div class="sec-head"><span class="sec-num">02</span><h2>Ablauf: eine Abfrage mit Login</h2></div>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Ablauf: So kommen Daten auf die Seite</h2></div>
     <div class="card">
       <div class="diagram-tools">
         <button class="btn" id="playBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg><span>Abspielen</span></button>
@@ -323,55 +334,55 @@
         <div class="step-dots" id="dots" role="tablist" aria-label="Schritte im Ablauf"></div>
       </div>
       <div class="scroll-x">
-        <svg class="diagram" id="diagram" viewBox="0 0 900 320" role="img" aria-label="Datenfluss: Browser mit Cookie, Proxy prüft Token bei Supabase Auth, Server fragt die Data API, Postgres prüft GRANT und RLS und gibt nur eigene Zeilen zurück.">
+        <svg class="diagram" id="diagram" viewBox="0 0 900 320" role="img" aria-label="Datenfluss: Der Browser schickt den Login-Ausweis, der Proxy prüft und erneuert ihn bei Supabase Auth, der Server fragt die Data API, die Datenbank prüft Recht und Zeilen-Regel und gibt nur eigene Daten zurück.">
           <defs>
             <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0 0 10 5 0 10z"/></marker>
           </defs>
 
           <!-- edges -->
-          <g class="edge" data-id="e1"><path class="hit" d="M130 106 H200"/><path d="M130 106 H198" marker-end="url(#ah)"/><rect class="label-bg" x="139" y="80" width="52" height="18" rx="9"/><text x="165" y="93" text-anchor="middle">Cookie</text></g>
-          <g class="edge" data-id="e5"><path class="hit" d="M260 142 V230"/><path d="M252 144 V228" marker-end="url(#ah)"/><path d="M268 228 V144" marker-end="url(#ah)"/><rect class="label-bg" x="276" y="176" width="86" height="18" rx="9"/><text x="319" y="189" text-anchor="middle">getClaims()</text></g>
-          <g class="edge" data-id="e2"><path class="hit" d="M320 106 H390"/><path d="M320 106 H388" marker-end="url(#ah)"/><rect class="label-bg" x="325" y="80" width="60" height="18" rx="9"/><text x="355" y="93" text-anchor="middle">Request</text></g>
-          <g class="edge" data-id="e3"><path class="hit" d="M510 106 H580"/><path d="M510 106 H578" marker-end="url(#ah)"/><rect class="label-bg" x="515" y="80" width="60" height="18" rx="9"/><text x="545" y="93" text-anchor="middle">JWT+SQL</text></g>
-          <g class="edge" data-id="e4"><path class="hit" d="M700 106 H770"/><path d="M700 106 H768" marker-end="url(#ah)"/><rect class="label-bg" x="702" y="80" width="66" height="18" rx="9"/><text x="735" y="93" text-anchor="middle">role+uid</text></g>
-          <g class="edge" data-id="e6"><path class="hit" d="M830 70 C830 18, 70 18, 70 70"/><path d="M830 68 C830 18, 70 18, 70 66" marker-end="url(#ah)"/><rect class="label-bg" x="370" y="21" width="160" height="18" rx="9"/><text x="450" y="34" text-anchor="middle">nur eigene Zeilen → HTML</text></g>
-          <g class="edge" data-id="e7"><path class="hit" d="M830 142 V230"/><path d="M830 144 V228" marker-end="url(#ah)"/><rect class="label-bg" x="720" y="176" width="104" height="18" rx="9"/><text x="772" y="189" text-anchor="middle">storage.objects</text></g>
+          <g class="edge" data-id="e1"><path class="hit" d="M130 106 H200"/><path d="M130 106 H198" marker-end="url(#ah)"/><rect class="label-bg" x="137" y="80" width="56" height="18" rx="9"/><text x="165" y="93" text-anchor="middle">Ausweis</text></g>
+          <g class="edge" data-id="e5"><path class="hit" d="M260 142 V230"/><path d="M252 144 V228" marker-end="url(#ah)"/><path d="M268 228 V144" marker-end="url(#ah)"/><rect class="label-bg" x="276" y="176" width="96" height="18" rx="9"/><text x="324" y="189" text-anchor="middle">neuer Ausweis</text></g>
+          <g class="edge" data-id="e2"><path class="hit" d="M320 106 H390"/><path d="M320 106 H388" marker-end="url(#ah)"/><rect class="label-bg" x="329" y="80" width="52" height="18" rx="9"/><text x="355" y="93" text-anchor="middle">weiter</text></g>
+          <g class="edge" data-id="e3"><path class="hit" d="M510 106 H580"/><path d="M510 106 H578" marker-end="url(#ah)"/><rect class="label-bg" x="515" y="80" width="60" height="18" rx="9"/><text x="545" y="93" text-anchor="middle">Anfrage</text></g>
+          <g class="edge" data-id="e4"><path class="hit" d="M700 106 H770"/><path d="M700 106 H768" marker-end="url(#ah)"/><rect class="label-bg" x="699" y="80" width="72" height="18" rx="9"/><text x="735" y="93" text-anchor="middle">Wer fragt?</text></g>
+          <g class="edge" data-id="e6"><path class="hit" d="M830 70 C830 18, 70 18, 70 70"/><path d="M830 68 C830 18, 70 18, 70 66" marker-end="url(#ah)"/><rect class="label-bg" x="390" y="21" width="120" height="18" rx="9"/><text x="450" y="34" text-anchor="middle">nur eigene Daten</text></g>
+          <g class="edge" data-id="e7"><path class="hit" d="M830 142 V230"/><path d="M830 144 V228" marker-end="url(#ah)"/><rect class="label-bg" x="722" y="176" width="100" height="18" rx="9"/><text x="772" y="189" text-anchor="middle">gleiche Regeln</text></g>
 
           <!-- nodes -->
           <g class="node" data-id="n1" tabindex="0" role="button" aria-label="Browser">
             <rect x="10" y="70" width="120" height="72" rx="18"/>
             <circle class="ico" cx="35" cy="94" r="9"/><path class="ico" d="M26 94h18M35 85c-4 5-4 13 0 18M35 85c4 5 4 13 0 18"/>
-            <text x="54" y="98">Browser</text><text class="sub" x="26" y="126">Cookie sb-…</text>
+            <text x="54" y="98">Browser</text><text class="sub" x="26" y="126">mit Cookie</text>
           </g>
-          <g class="node" data-id="n2" tabindex="0" role="button" aria-label="Proxy">
+          <g class="node" data-id="n2" tabindex="0" role="button" aria-label="Proxy, der Pförtner">
             <rect x="200" y="70" width="120" height="72" rx="18"/>
             <path class="ico" d="M225 84l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9v-6z"/>
-            <text x="244" y="98">Proxy</text><text class="sub" x="216" y="126">src/proxy.ts</text>
+            <text x="244" y="98">Proxy</text><text class="sub" x="216" y="126">Pförtner</text>
           </g>
           <g class="node" data-id="n3" tabindex="0" role="button" aria-label="Server">
             <rect x="390" y="70" width="120" height="72" rx="18"/>
             <path class="ico" d="M406 85h18v8h-18zM406 97h18v8h-18z"/>
-            <text x="434" y="98">Server</text><text class="sub" x="406" y="126">server.ts</text>
+            <text x="434" y="98">Server</text><text class="sub" x="406" y="126">baut die Seite</text>
           </g>
-          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="Data API">
+          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="Data API, der Übersetzer">
             <rect x="580" y="70" width="120" height="72" rx="18"/>
             <path class="ico" d="M600 86c-3 0-3 2-3 4s-1 4-3 4c2 0 3 2 3 4s0 4 3 4M608 86c3 0 3 2 3 4s1 4 3 4c-2 0-3 2-3 4s0 4-3 4"/>
-            <text x="624" y="98">Data API</text><text class="sub" x="596" y="126">PostgREST</text>
+            <text x="624" y="98">Data API</text><text class="sub" x="596" y="126">Übersetzer</text>
           </g>
-          <g class="node" data-id="n5" tabindex="0" role="button" aria-label="Postgres">
+          <g class="node" data-id="n5" tabindex="0" role="button" aria-label="Postgres, die Datenbank">
             <rect x="770" y="70" width="120" height="72" rx="18"/>
             <ellipse class="ico" cx="795" cy="88" rx="9" ry="4"/><path class="ico" d="M786 88v12c0 2 4 4 9 4s9-2 9-4v-12"/>
-            <text x="814" y="98">Postgres</text><text class="sub" x="786" y="126">GRANT · RLS</text>
+            <text x="814" y="98">Postgres</text><text class="sub" x="786" y="126">Datenbank</text>
           </g>
-          <g class="node" data-id="n6" tabindex="0" role="button" aria-label="Supabase Auth">
+          <g class="node" data-id="n6" tabindex="0" role="button" aria-label="Supabase Auth, das Login-System">
             <rect x="200" y="230" width="120" height="72" rx="18"/>
             <circle class="ico" cx="221" cy="254" r="4"/><path class="ico" d="M225 254h10M231 254v4M235 254v3"/>
-            <text x="244" y="258">Auth</text><text class="sub" x="216" y="286">Tokens</text>
+            <text x="244" y="258">Auth</text><text class="sub" x="216" y="286">stellt Ausweise aus</text>
           </g>
-          <g class="node" data-id="n7" tabindex="0" role="button" aria-label="Storage">
+          <g class="node" data-id="n7" tabindex="0" role="button" aria-label="Storage, die Dateiablage">
             <rect x="770" y="230" width="120" height="72" rx="18"/>
             <path class="ico" d="M786 249a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-16a2 2 0 0 1-2-2z"/>
-            <text x="814" y="258">Storage</text><text class="sub" x="786" y="286">Bucket sources</text>
+            <text x="814" y="258">Storage</text><text class="sub" x="786" y="286">Dateiablage</text>
           </g>
         </svg>
       </div>
@@ -387,24 +398,24 @@
         <button type="button" data-f="all" aria-pressed="true">Alle</button>
         <button type="button" data-f="db" aria-pressed="false">Datenbank</button>
         <button type="button" data-f="app" aria-pressed="false">App-Code</button>
-        <button type="button" data-f="conf" aria-pressed="false">Konfiguration und Doku</button>
+        <button type="button" data-f="conf" aria-pressed="false">Einstellungen und Doku</button>
       </div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>DATEI</th><th>AUFGABE</th><th>WARUM SO</th></tr></thead>
-          <tbody id="fileRows">
-            <tr data-k="db"><td><code>supabase/migrations/<br>20261010143751_init.sql</code></td><td>Komplettes Schema: Tabellen, Indizes, Rechte, RLS, Bucket</td><td>Eine Datei, von oben nach unten lesbar. Der Dateiname ist die Versionsnummer in der Datenbank. So passen Repo und Projekt zusammen.</td></tr>
-            <tr data-k="db"><td><code>supabase/migrations/<br>20261010143823_revoke_…sql</code></td><td>Entzieht Gästen das Ausführungsrecht für <code>rls_auto_enable()</code></td><td>Supabase hat die Funktion selbst angelegt. Der Security-Advisor hat sie gemeldet. Eine Zeile SQL, danach 0 Warnungen.</td></tr>
-            <tr data-k="db"><td><code>supabase/checks/rls.sql</code></td><td>Prüft mit zwei Testnutzern 18 Regeln</td><td>Läuft in einer Transaktion und endet mit <code>rollback</code>. Die Datenbank bleibt sauber. Ohne Docker gibt es kein <code>supabase test db</code>.</td></tr>
-            <tr data-k="app"><td><code>src/lib/supabase/client.ts</code></td><td>Supabase-Client für den Browser</td><td>Nur Publishable Key. Der Client ist ein Singleton. RLS entscheidet, was sichtbar ist.</td></tr>
-            <tr data-k="app"><td><code>src/lib/supabase/server.ts</code></td><td>Supabase-Client für Server Components, Actions, Routes</td><td>Liest die Session aus den Cookies. Abfragen laufen als eingeloggter Nutzer. <code>server-only</code> verhindert den Import im Browser.</td></tr>
-            <tr data-k="app"><td><code>src/lib/supabase/proxy.ts</code></td><td>Session erneuern</td><td>Muster aus der offiziellen Supabase-Doku. Schreibt neue Cookies in Anfrage und Antwort.</td></tr>
-            <tr data-k="app"><td><code>src/proxy.ts</code></td><td>Next.js-Proxy, läuft vor jeder Anfrage</td><td>Seit Next 16 heißt <code>middleware.ts</code> jetzt <code>proxy.ts</code>. Der Matcher lässt statische Dateien aus.</td></tr>
-            <tr data-k="app"><td><code>src/lib/supabase/<br>database.types.ts</code></td><td>TypeScript-Typen aller Tabellen</td><td>Vom Schema erzeugt, nie von Hand bearbeitet. <code>npm run db:types</code> erzeugt sie neu.</td></tr>
-            <tr data-k="conf"><td><code>next.config.ts</code></td><td><code>cacheComponents</code> und <code>partialPrefetching</code> entfernt</td><td>Fast jede Seite liest den Login-Cookie. Rendern pro Anfrage ist hier einfacher und genauso schnell.</td></tr>
-            <tr data-k="conf"><td><code>package.json</code></td><td>Drei neue Pakete, Skript <code>db:types</code></td><td><code>@supabase/supabase-js</code>, <code>@supabase/ssr</code> für Cookies und <code>server-only</code> als Schutz.</td></tr>
-            <tr data-k="conf"><td><code>.env.local</code> (nicht im Repo)</td><td>URL, Publishable Key, Secret Key</td><td>Die öffentlichen Werte stehen auch in Vercel. Den Secret Key trägst du selbst ein, er ist erst ab Schritt 3 nötig.</td></tr>
-            <tr data-k="conf"><td><code>README.md</code> · <code>NOTIZEN.md</code></td><td>Abschnitt „Datenbank“, sechs Fehler, zwölf Entscheidungen</td><td>Fürs Interview: Was lief schief, was haben wir warum gewählt?</td></tr>
+          <tbody id="fileRows" data-rich>
+            <tr data-k="db"><td><code>supabase/migrations/<br>…_init.sql</code></td><td>Bauplan der Datenbank: Tabellen, Rechte, Regeln, Dateiordner</td><td>Eine [[migration|Migration]], von oben nach unten lesbar. Der Name beginnt mit Datum und Uhrzeit, genau so steht er auch in Supabase.</td></tr>
+            <tr data-k="db"><td><code>supabase/migrations/<br>…_revoke_…sql</code></td><td>Schließt eine kleine Lücke, die Supabase selbst angelegt hat</td><td>Die [[advisor|Supabase-Prüfung]] hat sie gemeldet. Eine Zeile behebt sie.</td></tr>
+            <tr data-k="db"><td><code>supabase/checks/rls.sql</code></td><td>Test: Zwei erfundene Personen versuchen, an fremde Daten zu kommen</td><td>Am Ende macht der Test alles rückgängig ([[rollback|Rollback]]). Die Datenbank bleibt leer.</td></tr>
+            <tr data-k="app"><td><code>src/lib/supabase/client.ts</code></td><td>Verbindung zu Supabase aus dem Browser</td><td>Benutzt nur den [[publishable|öffentlichen Schlüssel]]. Die Regeln in der Datenbank schützen die Daten.</td></tr>
+            <tr data-k="app"><td><code>src/lib/supabase/server.ts</code></td><td>Verbindung zu Supabase vom [[server|Server]]</td><td>Liest den Login aus dem [[cookie|Cookie]]. So fragt der Server immer als die angemeldete Person.</td></tr>
+            <tr data-k="app"><td><code>src/lib/supabase/proxy.ts</code></td><td>Erneuert den Login-Ausweis</td><td>Genau nach der offiziellen Anleitung von Supabase gebaut.</td></tr>
+            <tr data-k="app"><td><code>src/proxy.ts</code></td><td>Startet den [[proxy|Pförtner]] vor jeder Seite</td><td>So heißt die Datei seit Next.js 16. Früher hieß sie <code>middleware.ts</code>.</td></tr>
+            <tr data-k="app"><td><code>src/lib/supabase/<br>database.types.ts</code></td><td>Beschreibt jede Tabelle für TypeScript</td><td>Wird automatisch erzeugt. Die [[types|Typen]] lassen den Editor bei Tippfehlern in Spaltennamen warnen.</td></tr>
+            <tr data-k="conf"><td><code>next.config.ts</code></td><td>Eine Next.js-Funktion abgeschaltet</td><td>[[cache|cacheComponents]] hilft vor allem bei Seiten ohne Login. Faden hat fast nur Seiten mit Login.</td></tr>
+            <tr data-k="conf"><td><code>package.json</code></td><td>Drei neue Pakete</td><td>Supabase-Verbindung, Login per Cookie und ein Schutz, damit Server-Code nie im Browser landet.</td></tr>
+            <tr data-k="conf"><td><code>.env.local</code> (nicht im Repo)</td><td>Adresse und Schlüssel von Supabase</td><td>Der [[secret|geheime Schlüssel]] steht nur hier und in Vercel, nie auf GitHub.</td></tr>
+            <tr data-k="conf"><td><code>README.md</code> · <code>NOTIZEN.md</code></td><td>Kurzbeschreibung und Lerntagebuch</td><td>Fürs Interview: Was ging schief? Was haben wir warum entschieden?</td></tr>
           </tbody>
         </table>
       </div>
@@ -431,7 +442,7 @@
   <section id="demo">
     <div class="sec-head"><span class="sec-num">04b</span><h2>Mini-Demo: Wer sieht was?</h2></div>
     <div class="card">
-      <p class="muted">Wähle eine Person und eine Aktion. Die Demo spielt nach, was Postgres mit unseren echten Regeln tut. Lea besitzt zwei Notebooks, Tom eines.</p>
+      <p class="muted" data-rich>Wähle eine Person und eine Aktion. Du siehst, welche der zwei Kontrollen greift: das [[grant|Recht]] oder die [[rls|Zeilen-Regel]]. Lea hat zwei Notebooks, Tom hat eins.</p>
       <div class="demo-label">Ich bin</div>
       <div class="seg" id="who" role="group" aria-label="Person wählen"></div>
       <div class="uid" id="uid"></div>
@@ -444,29 +455,29 @@
   <!-- 5 -->
   <section id="entscheidungen">
     <div class="sec-head"><span class="sec-num">05</span><h2>Entscheidungen und Alternativen</h2></div>
-    <div class="decisions">
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Zwei Schichten: <code>GRANT</code> + RLS</h3><p>„Automatically expose new tables“ ist aus. Jede Tabelle bekommt nur die Rechte, die sie braucht. <code>anon</code> bekommt nichts.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Nur RLS, alle Tabellen automatisch freigegeben. Ein vergessenes <code>enable row level security</code> würde dann alles öffnen.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Eine Policy pro Operation, Teilabfrage direkt im SQL</h3><p><code>notebook_id in (select id from notebooks where owner_id = …)</code>. Jede Regel ist dort lesbar, wo sie gilt.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Eine Hilfsfunktion wie <code>is_notebook_owner()</code> als <code>security definer</code>. Kürzer, aber eine zusätzliche Funktion, die man absichern muss.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3><code>text</code> + <code>check</code> für Status und Typ</h3><p>Neue Werte sind eine Zeile Migration. Werte lassen sich auch wieder entfernen.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Postgres-Enum. Die erzeugten Typen wären genauer (<code>'ready' | …</code>), aber Enum-Werte lassen sich kaum entfernen.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Zusammengesetzter Fremdschlüssel in <code>chunks</code></h3><p><code>(source_id, notebook_id)</code> muss in <code>sources</code> existieren. Die kopierte <code>notebook_id</code> kann nicht falsch sein.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Ein Trigger, der <code>notebook_id</code> setzt. Oder der App vertrauen. Beides ist unsichtbarer als eine Regel im Schema.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Migrationen per MCP auf das Cloud-Projekt</h3><p>Das SQL liegt trotzdem im Repo, mit derselben Versionsnummer wie in der Datenbank.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Lokale Supabase mit Docker und <code>supabase db push</code>. Sauberer zum Testen, aber Docker ist nicht installiert.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3><code>cacheComponents</code> aus</h3><p>Seiten mit Login rendern pro Anfrage. Das ist das Muster aus dem offiziellen Supabase-Beispiel.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Anlassen. Dann muss jeder Cookie-Zugriff hinter <code>&lt;Suspense&gt;</code>. Der Gewinn ist eine statische Hülle, die bei einer Login-App kaum etwas bringt.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3><code>getClaims()</code> im Proxy</h3><p>Prüft die Signatur des JWT mit den öffentlichen Schlüsseln des Projekts. Erneuert abgelaufene Tokens.</p></div><div class="alt"><div class="lbl">Alternative</div><p><code>getSession()</code>. Liest nur den Cookie und prüft ihn nicht. Den Cookie kann jeder fälschen.</p></div></div>
+    <div class="decisions" data-rich>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Zwei Kontrollen statt einer</h3><p>Jede Tabelle hat ein [[grant|Recht]] und eine [[rls|Zeilen-Regel]]. Gäste haben gar keine Rechte.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Nur Zeilen-Regeln. Vergisst man sie bei einer neuen Tabelle, steht diese Tabelle für alle offen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Jede Regel steht bei ihrer Tabelle</h3><p>Man liest eine [[policy|Regel]] genau dort, wo sie gilt. Nichts ist versteckt.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Eine gemeinsame Hilfsfunktion für alle Regeln. Kürzer, aber eine Stelle mehr, die man absichern muss.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Status als Text mit Prüfung</h3><p>Nur bestimmte Werte sind erlaubt, etwa „wartet“ oder „bereit“. Neue Werte sind leicht hinzuzufügen.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Ein fester Werte-Typ ([[enum|Enum]]). Genauer für TypeScript, aber Werte lassen sich kaum wieder entfernen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Die Datenbank prüft, ob alles zusammenpasst</h3><p>Die Notebook-ID steht beim Abschnitt und bei der Quelle. Ein [[fk|Fremdschlüssel]] sorgt dafür, dass beide gleich sind.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Der App vertrauen. Ein Fehler im Code würde dann still falsche Daten erzeugen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Änderungen direkt im Online-Projekt</h3><p>Claude spielt die SQL-Dateien über eine [[mcp|MCP-Verbindung]] ein. Die Dateien liegen trotzdem im Repo.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Eine Kopie von Supabase auf dem eigenen Rechner. Besser zum Testen, braucht aber [[docker|Docker]].</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>[[cache|cacheComponents]] aus</h3><p>Die Funktion baut Seitenteile vorab. Bei Seiten mit Login bringt das wenig.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Anlassen. Dann braucht jede Seite mit Login zusätzlichen Code für Ladezustände.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Den Ausweis immer echt prüfen</h3><p><code>getClaims()</code> prüft die Unterschrift des [[token|Ausweises]]. Fälschungen fallen auf.</p></div><div class="alt"><div class="lbl">Alternative</div><p><code>getSession()</code> liest den Ausweis nur, ohne Prüfung. Einen gefälschten würde es glauben.</p></div></div>
     </div>
   </section>
 
   <!-- 6 -->
   <section id="risiken">
     <div class="sec-head"><span class="sec-num">06</span><h2>Was schiefgehen kann</h2></div>
-    <div class="risks">
-      <div class="risk"><span class="chip err">Sicherheit</span><h3>Secret Key umgeht RLS</h3><p>Die Rolle <code>service_role</code> ignoriert alle Policies. Der Key darf nur auf dem Server stehen und nie ein <code>NEXT_PUBLIC_</code>-Präfix tragen. Jede Abfrage mit ihm muss den Nutzer selbst prüfen.</p></div>
-      <div class="risk"><span class="chip err">Sicherheit</span><h3>Der Proxy ist kein Schutz</h3><p>Er erneuert nur das Token. Der Matcher kann Pfade auslassen. Jede Seite und jede Route prüft den Login darum selbst.</p></div>
-      <div class="risk"><span class="chip err">Sicherheit</span><h3>Storage-Pfad vom Client</h3><p>Die Policy prüft nur den ersten Ordner. Der Server muss den Pfad <code>&lt;notebook_id&gt;/&lt;source_id&gt;</code> selbst bauen und darf keinen Pfad aus dem Browser übernehmen.</p></div>
-      <div class="risk"><span class="chip warn">Stille Fehler</span><h3><code>update</code> auf fremde Zeilen meldet Erfolg</h3><p>RLS filtert die Zeile weg. Postgres meldet „0 Zeilen geändert“, aber keinen Fehler. Die App muss prüfen, ob eine Zeile zurückkam, und sonst 404 zeigen.</p></div>
-      <div class="risk"><span class="chip warn">Suche</span><h3>Der Stemmer kennt nicht jede Form</h3><p>„Quellen“ und „Quelle“ werden beide zu <code>quell</code>. „verbindet“ bleibt aber <code>verbindet</code> und passt nicht zu „verbinden“. Die Vektorsuche gleicht das aus.</p></div>
-      <div class="risk"><span class="chip warn">Betrieb</span><h3>Free-Plan pausiert</h3><p>Nach etwa einer Woche ohne Aktivität pausiert Supabase das Projekt. Vor dem Loom-Video und dem Interview prüfen, ob es läuft.</p></div>
-      <div class="risk"><span class="chip">Typen</span><h3><code>string</code> statt fester Werte</h3><p>Der Typ-Generator kennt keine <code>check</code>-Bedingungen. <code>status</code> ist darum nur <code>string</code>. Ab Schritt 3 grenzt Zod die Werte ein.</p></div>
-      <div class="risk"><span class="chip">Disziplin</span><h3>Nie im Dashboard klicken</h3><p>Jede Schemaänderung kommt als neue Migration ins Repo. Eine Änderung per Klick im Dashboard fehlt im Repo, und dann weichen Repo und Datenbank voneinander ab.</p></div>
+    <div class="risks" data-rich>
+      <div class="risk"><span class="chip err">Sicherheit</span><h3>Der geheime Schlüssel</h3><p>Der [[secret|Secret Key]] umgeht alle Regeln. Er darf nur auf dem Server liegen. Nie im Browser, nie auf GitHub.</p></div>
+      <div class="risk"><span class="chip err">Sicherheit</span><h3>Der Pförtner schützt keine Seite</h3><p>Der [[proxy|Proxy]] erneuert nur den Ausweis. Jede Seite muss selbst prüfen, ob jemand angemeldet ist.</p></div>
+      <div class="risk"><span class="chip err">Sicherheit</span><h3>Dateipfad vom Browser</h3><p>Die Regel prüft nur den ersten Ordner im Pfad. Darum baut der Server den Pfad selbst und übernimmt ihn nie vom Browser.</p></div>
+      <div class="risk"><span class="chip warn">Stille Fehler</span><h3>Ändern ohne Fehlermeldung</h3><p>Will jemand fremde Daten ändern, passiert nichts. Es kommt aber auch keine Fehlermeldung. Die App muss das selbst merken.</p></div>
+      <div class="risk"><span class="chip warn">Suche</span><h3>Die Wortsuche kennt nicht jede Form</h3><p>„Quelle“ findet „Quellen“. „verbinden“ findet „verbindet“ aber nicht. Die Bedeutungssuche mit [[embedding|Embeddings]] gleicht das aus.</p></div>
+      <div class="risk"><span class="chip warn">Betrieb</span><h3>Das Gratis-Projekt schläft ein</h3><p>Nach etwa einer Woche ohne Nutzung pausiert Supabase das Projekt. Vor dem Video und dem Interview prüfen.</p></div>
+      <div class="risk"><span class="chip">Typen</span><h3>Status ist nur „irgendein Text“</h3><p>TypeScript weiß nicht, welche Werte erlaubt sind. Ab Schritt 3 prüft [[zod|Zod]] das.</p></div>
+      <div class="risk"><span class="chip">Disziplin</span><h3>Nie im Dashboard klicken</h3><p>Jede Änderung kommt als SQL-Datei ins Repo. Sonst passen Repo und Datenbank nicht mehr zusammen.</p></div>
     </div>
   </section>
 
@@ -486,6 +497,8 @@
     <span><a href="schritt-1-setup.html">← Schritt 1</a> · <a href="index.html">Alle Schritte →</a></span>
   </footer>
 </div>
+
+<div class="pop" id="pop" role="dialog" aria-live="polite" hidden><b id="popT"></b><p id="popD"></p></div>
 
 <!-- Code samples as plain text: no escaping needed -->
 <script type="text/plain" id="src-chunks">create table public.chunks (
@@ -593,6 +606,90 @@ assert failed, 'B could add a source to A''s notebook';</script>
   }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
+  /* ---------- Begriffe ---------- */
+  var G = {
+    term: ["So funktioniert es", "Genau so: antippen, lesen, irgendwo anders hintippen. Die Erklärung verschwindet wieder."],
+    supabase: ["Supabase", "Ein Online-Dienst. Er liefert eine fertige Datenbank, eine Dateiablage und ein Login-System. Wir müssen dafür keinen eigenen Server betreiben."],
+    postgres: ["Datenbank (Postgres)", "Postgres ist die Datenbank in Supabase. Sie speichert Daten in Tabellen mit Zeilen und Spalten, ähnlich wie Excel. Sie ist aber viel schneller und kann Regeln prüfen."],
+    sql: ["SQL", "Die Sprache für Datenbanken. Mit ihr sagt man zum Beispiel: „Zeig mir alle Notebooks“ oder „Lösche diese Quelle“."],
+    migration: ["Migration", "Eine SQL-Datei, die die Datenbank verändert, zum Beispiel Tabellen anlegt. Wie ein Bauplan: Wer alle Migrationen ausführt, bekommt genau dieselbe Datenbank."],
+    rls: ["Zeilen-Regel (RLS)", "RLS heißt Row Level Security. Die Datenbank prüft für jede einzelne Zeile: Darf diese Person sie sehen oder ändern? Wie ein Türsteher, der jeden Gast einzeln anschaut."],
+    policy: ["Policy", "Eine einzelne Zeilen-Regel. Zum Beispiel: „Man sieht nur Notebooks, die einem selbst gehören.“"],
+    grant: ["Recht (GRANT)", "Ein Recht für eine ganze Tabelle, zum Beispiel „darf lesen“. Wie ein Schlüssel für einen Raum: Ohne Schlüssel kommt man gar nicht erst hinein."],
+    rolle: ["Rolle", "Die Datenbank kennt Gruppen statt Personen. anon heißt „nicht angemeldet“ (Gast). authenticated heißt „angemeldet“. Rechte gibt man einer Rolle."],
+    embedding: ["Embedding", "Eine lange Liste von Zahlen (bei uns 1.536), die die Bedeutung eines Textes beschreibt. Texte mit ähnlicher Bedeutung bekommen ähnliche Zahlen. So findet Faden passende Stellen, auch bei anderen Wörtern."],
+    index: ["Index", "Ein Verzeichnis, mit dem die Datenbank schneller sucht. Wie das Stichwortverzeichnis in einem Buch: Man muss nicht jede Seite lesen."],
+    fts: ["Wortsuche (Volltextsuche)", "Sucht nach Wörtern im Text. Postgres kürzt die Wörter dabei auf ihren Stamm. So findet „Quelle“ auch „Quellen“."],
+    abschnitt: ["Abschnitt (Chunk)", "Ein Stück Text aus einer Quelle, etwa eine halbe Seite. Faden sucht in Abschnitten statt in ganzen Dokumenten. So zeigt es genau die passende Stelle."],
+    fk: ["Fremdschlüssel", "Eine Verbindung zwischen zwei Tabellen, zum Beispiel: „Dieser Abschnitt gehört zu dieser Quelle.“ Die Datenbank erlaubt keine Verbindung zu etwas, das es nicht gibt."],
+    cascade: ["on delete cascade", "Wird etwas gelöscht, löscht die Datenbank alles mit, was daran hängt. Löscht man eine Quelle, verschwinden auch ihre Abschnitte."],
+    storage: ["Storage", "Die Dateiablage von Supabase, ähnlich wie ein Online-Laufwerk. Dort liegen später die hochgeladenen PDFs."],
+    bucket: ["Bucket", "Ein Ordner in der Dateiablage. Unserer heißt „sources“. Er ist privat: Ohne Erlaubnis kommt niemand an die Dateien."],
+    cookie: ["Cookie", "Ein kleiner Text, den der Browser für eine Webseite speichert. Er schickt ihn bei jedem Aufruf dieser Seite mit. Bei uns steht darin der Login."],
+    token: ["Ausweis (Token, JWT)", "Nach dem Login bekommt man einen digitalen Ausweis. Er ist unterschrieben, darum kann ihn niemand fälschen. Er gilt eine Stunde, dann gibt es einen neuen."],
+    proxy: ["Proxy", "Code, der vor jeder Seite läuft, wie ein Pförtner am Eingang. Bei uns erneuert er den Login-Ausweis, bevor die Seite gebaut wird."],
+    auth: ["Supabase Auth", "Das Login-System von Supabase. Es verwaltet die Konten und stellt die Ausweise (Tokens) aus."],
+    server: ["Server", "Ein Rechner bei Vercel, auf dem unser Code läuft. Er baut die Seite fertig, bevor sie zum Browser geht."],
+    client: ["Client", "Ein Stück Code, über das unsere App mit Supabase spricht. Es gibt einen für den Browser und einen für den Server."],
+    api: ["Data API", "Die Eingangstür von Supabase für Anfragen aus der App. Sie prüft den Ausweis und übersetzt die Anfrage in SQL."],
+    publishable: ["Öffentlicher Schlüssel (Publishable Key)", "Er sagt Supabase nur, welches Projekt gemeint ist. Er gibt keine Rechte. Darum darf er im Browser stehen."],
+    secret: ["Geheimer Schlüssel (Secret Key)", "Ein Schlüssel mit allen Rechten. Er umgeht alle Regeln. Darum darf er nur auf dem Server liegen."],
+    uid: ["auth.uid()", "Eine Funktion in der Datenbank. Sie liefert die ID der Person, die gerade fragt. Diese ID liest sie aus dem Ausweis."],
+    advisor: ["Supabase-Prüfung (Advisor)", "Ein Prüfprogramm in Supabase. Es meldet Sicherheitslücken und Dinge, die die Datenbank langsam machen."],
+    mcp: ["MCP", "Eine Verbindung, über die Claude direkt mit Supabase oder Vercel arbeiten kann, ohne Umweg über das Dashboard."],
+    types: ["Typen (TypeScript)", "Sie beschreiben, wie Daten aussehen, etwa: „title ist Text“. Der Editor warnt dann sofort, wenn man sich bei einem Spaltennamen vertippt."],
+    http: ["HTTP-Statuscode", "Eine Zahl in jeder Antwort aus dem Netz. 200 heißt „alles gut“, 401 „nicht angemeldet“, 404 „nicht gefunden“."],
+    rollback: ["Rollback", "Macht alle Änderungen seit dem Start rückgängig, als wäre nichts passiert. Unser Test endet damit, die Datenbank bleibt also leer."],
+    cache: ["cacheComponents", "Eine Funktion von Next.js. Sie baut Teile einer Seite vorab, damit sie schneller erscheinen. Bei Seiten mit Login bringt das wenig."],
+    zod: ["Zod", "Eine Bibliothek, die Daten prüft. Zum Beispiel: „Ist status wirklich einer der erlaubten Werte?“"],
+    docker: ["Docker", "Ein Programm, das andere Programme in abgeschlossenen Kisten laufen lässt. Damit könnte man Supabase auf dem eigenen Rechner starten. Es ist hier nicht installiert."],
+    enum: ["Enum", "Ein fester Datentyp mit einer Liste erlaubter Werte, etwa „wartet, in Arbeit, bereit, Fehler“."]
+  };
+  // [[key|Text]] in already escaped text -> clickable term
+  function rich(s) {
+    return esc(s).replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) {
+      return G[k] ? '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>' : t;
+    });
+  }
+  document.querySelectorAll("[data-rich]").forEach(function (el) {
+    el.innerHTML = el.innerHTML.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) {
+      return G[k] ? '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>' : t;
+    });
+  });
+  var pop = document.getElementById("pop"), openTerm = null;
+  function closePop() { if (openTerm) openTerm.setAttribute("aria-expanded", "false"); openTerm = null; pop.hidden = true; }
+  function openPop(btn) {
+    var g = G[btn.getAttribute("data-t")]; if (!g) return;
+    if (openTerm === btn) { closePop(); return; }
+    closePop();
+    document.getElementById("popT").textContent = g[0];
+    document.getElementById("popD").textContent = g[1];
+    pop.hidden = false; openTerm = btn; btn.setAttribute("aria-expanded", "true");
+    place();
+  }
+  // Below the term, or above it if there is no room. Stays inside the screen.
+  function place() {
+    if (!openTerm) return;
+    var r = openTerm.getClientRects()[0] || openTerm.getBoundingClientRect();
+    var pw = pop.offsetWidth, ph = pop.offsetHeight, vw = document.documentElement.clientWidth;
+    if (r.bottom < 0 || r.top > window.innerHeight) { closePop(); return; }
+    var left = Math.min(Math.max(12, r.left + r.width / 2 - pw / 2), vw - pw - 12);
+    var top = r.bottom + 8; if (top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 8);
+    pop.style.left = left + "px"; pop.style.top = top + "px";
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest(".term");
+    if (t) { e.preventDefault(); e.stopPropagation(); openPop(t); return; }
+    if (!e.target.closest(".pop")) closePop();
+  }, true);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closePop(); return; }
+    var t = e.target.closest && e.target.closest(".term");
+    if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); openPop(t); }
+  }, true);
+  window.addEventListener("scroll", place, { passive: true });
+  window.addEventListener("resize", place);
+
   /* ---------- Theme ---------- */
   var root = document.documentElement, themeBtn = document.getElementById("themeBtn");
   var sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
@@ -605,22 +702,22 @@ assert failed, 'B could add a source to A''s notebook';</script>
 
   /* ---------- Diagram ---------- */
   var steps = [
-    { id: "n1", tag: "1 · Browser", title: "Der Browser schickt den Login-Cookie mit", text: "Jede Anfrage trägt den Cookie sb-<projekt>-auth-token. Darin stehen ein Access Token (ein JWT) und ein Refresh Token. Ohne Cookie ist der Besucher ein Gast, also die Rolle anon." },
-    { id: "e1", tag: "2 · Cookie", title: "Die Anfrage erreicht zuerst den Proxy", text: "src/proxy.ts läuft vor jeder Seite. Der Matcher lässt nur statische Dateien und Bilder aus, denn die brauchen keinen Login." },
-    { id: "n2", tag: "3 · Proxy", title: "Der Proxy prüft das Token", text: "createServerClient liest die Cookies aus der Anfrage. Direkt danach ruft der Proxy getClaims() auf. Zwischen diesen beiden Aufrufen darf kein anderer Code stehen." },
-    { id: "e5", tag: "4 · getClaims()", title: "Bei Bedarf: neues Token von Supabase Auth", text: "getClaims() prüft die Signatur des JWT mit den öffentlichen Schlüsseln des Projekts. Ist das Token abgelaufen, holt der Client mit dem Refresh Token ein neues. setAll schreibt es danach in die Cookies." },
-    { id: "e2", tag: "5 · Request", title: "Frische Cookies gehen an Server und Browser", text: "setAll setzt das neue Token in die Anfrage (für Server Components) und in die Antwort (für den Browser). Dazu kommen Cache-Header, damit kein CDN eine Antwort mit Session-Cookie für andere speichert." },
-    { id: "n3", tag: "6 · Server", title: "Eine Server Component fragt Daten ab", text: "createClient() aus server.ts liest die Cookies. Eine Abfrage wie from(\"notebooks\").select() wird zu einer HTTP-Anfrage an die Data API von Supabase." },
-    { id: "e3", tag: "7 · JWT+SQL", title: "Das JWT des Nutzers reist mit", text: "Der Server schickt den Publishable Key und das JWT des Nutzers. Er nutzt nicht den Secret Key. Darum gilt RLS auch für Abfragen vom Server." },
-    { id: "n4", tag: "8 · Data API", title: "PostgREST übersetzt in SQL", text: "Die Data API prüft das JWT. Sie setzt die Rolle (authenticated oder anon) und legt die Claims in request.jwt.claims ab. Dort liest auth.uid() später die Nutzer-ID." },
-    { id: "e4", tag: "9 · role+uid", title: "Postgres läuft als dieser Nutzer", text: "Jede Abfrage läuft in einer Transaktion mit der Rolle des Nutzers. Genau das macht auch unser Testskript rls.sql mit set_config." },
-    { id: "n5", tag: "10 · Postgres", title: "Zwei Prüfungen: GRANT, dann RLS", text: "Schicht 1: Hat die Rolle ein Recht auf die Tabelle? anon hat keins und bekommt HTTP 401. Schicht 2: Die RLS-Policy filtert die Zeilen, zum Beispiel mit owner_id = auth.uid()." },
-    { id: "e6", tag: "11 · Antwort", title: "Nur eigene Zeilen kommen zurück", text: "Fremde Zeilen existieren für den Nutzer nicht. Darum zeigt Faden bei einem fremden Notebook 404 und nicht 403. So verrät die App nicht einmal, dass es das Notebook gibt." }
+    { id: "n1", tag: "1 · Browser", title: "Der Browser zeigt seinen Ausweis", text: "Nach dem Login speichert der Browser einen [[cookie|Cookie]]. Darin liegt ein [[token|digitaler Ausweis]]. Der Browser schickt ihn bei jedem Seitenaufruf mit. Ohne Ausweis gilt man als Gast." },
+    { id: "e1", tag: "2 · Ausweis", title: "Zuerst kommt der Pförtner", text: "Jeder Aufruf geht zuerst durch den [[proxy|Proxy]]. Nur Bilder und feste Dateien gehen direkt durch. Sie brauchen keinen Login." },
+    { id: "n2", tag: "3 · Proxy", title: "Der Pförtner prüft den Ausweis", text: "Der Proxy liest den Ausweis aus dem Cookie. Er prüft, ob die Unterschrift echt ist. So kann niemand mit einem gefälschten Ausweis hinein." },
+    { id: "e5", tag: "4 · Auth", title: "Abgelaufen? Dann gibt es einen neuen", text: "Ein Ausweis gilt eine Stunde. Ist er abgelaufen, holt der Proxy bei [[auth|Supabase Auth]] einen neuen. Der Nutzer merkt davon nichts." },
+    { id: "e2", tag: "5 · weiter", title: "Der neue Ausweis geht in beide Richtungen", text: "Der Proxy gibt den neuen Ausweis an den [[server|Server]] weiter. Er schickt ihn auch zurück an den Browser. Dazu kommt ein Hinweis: Diese Antwort nicht zwischenspeichern. Sonst könnte ein Fremder den Login bekommen." },
+    { id: "n3", tag: "6 · Server", title: "Der Server braucht Daten", text: "Der Server baut die Seite. Dafür braucht er zum Beispiel die Notebooks. Er fragt sie über einen Supabase-[[client|Client]] ab." },
+    { id: "e3", tag: "7 · Anfrage", title: "Der Ausweis reist mit", text: "Der Server schickt den Ausweis des Nutzers mit. Er benutzt nicht den [[secret|geheimen Schlüssel]]. Darum gelten die Regeln auch hier." },
+    { id: "n4", tag: "8 · Data API", title: "Supabase übersetzt die Anfrage", text: "Die [[api|Data API]] prüft den Ausweis noch einmal. Dann übersetzt sie die Anfrage in [[sql|SQL]]. Und sie sagt der Datenbank, wer fragt." },
+    { id: "e4", tag: "9 · Wer fragt?", title: "Die Datenbank weiß, wer fragt", text: "Die Datenbank bekommt zwei Angaben: die [[rolle|Rolle]] (Gast oder angemeldet) und die Nutzer-ID. Unser Test macht genau das nach." },
+    { id: "n5", tag: "10 · Postgres", title: "Zwei Kontrollen", text: "Kontrolle 1, das [[grant|Recht]]: Darf diese Rolle die Tabelle überhaupt öffnen? Gäste dürfen das nie. Kontrolle 2, die [[rls|Zeilen-Regel]]: Welche Zeilen gehören dieser Person? Nur die bleiben übrig." },
+    { id: "e6", tag: "11 · Antwort", title: "Zurück kommen nur eigene Daten", text: "Fremde Notebooks tauchen gar nicht auf. Für den Nutzer gibt es sie nicht. Darum zeigt Faden dort später „nicht gefunden“ ([[http|404]]) statt „verboten“." }
   ];
   var extras = {
-    n6: { tag: "Supabase Auth", title: "Stellt Tokens aus und erneuert sie", text: "Auth verwaltet Nutzer und Sitzungen. Später meldet sich ein Nutzer mit E-Mail und Passwort an. Das Access Token läuft nach einer Stunde ab, das Refresh Token holt ein neues." },
-    n7: { tag: "Storage", title: "Privater Bucket „sources“", text: "Hier landen ab Schritt 3 die PDFs. Max. 20 MB, nur PDF und Text. Jede Datei ist eine Zeile in storage.objects. Unsere Policies prüfen den ersten Ordner im Pfad: Er muss ein eigenes Notebook sein." },
-    e7: { tag: "storage.objects", title: "Storage nutzt dieselbe RLS", text: "Die Dateiliste ist eine Postgres-Tabelle. Darum gelten dort dieselben Mechanismen: GRANT, Policy, auth.uid(). Ein Gast oder ein fremder Nutzer bekommt „Object not found“." }
+    n6: { tag: "Auth", title: "Das Login-System", text: "[[auth|Supabase Auth]] verwaltet die Konten und stellt die Ausweise aus. Später melden sich Nutzer mit E-Mail und Passwort an." },
+    n7: { tag: "Storage", title: "Die Dateiablage", text: "Hier landen ab Schritt 3 die PDFs. Der Ordner ([[bucket|Bucket]]) „sources“ ist privat. Erlaubt sind nur PDF und Text bis 20 MB." },
+    e7: { tag: "gleiche Regeln", title: "Dateien haben dieselben Regeln", text: "Für jede Datei gibt es eine Zeile in einer Tabelle. Darum schützen dieselben [[rls|Zeilen-Regeln]] auch die Dateien. Fremde bekommen „Datei nicht gefunden“." }
   };
   var diagram = document.getElementById("diagram"), detail = document.getElementById("detail"), dots = document.getElementById("dots");
   var current = -1, timer = null, playBtn = document.getElementById("playBtn");
@@ -636,7 +733,7 @@ assert failed, 'B could add a source to A''s notebook';</script>
     var el = diagram.querySelector('[data-id="' + id + '"]'); if (el) el.classList.add("is-active");
   }
   function renderDetail(d) {
-    detail.innerHTML = '<span class="badge">' + esc(d.tag) + '</span><div><h3>' + esc(d.title) + '</h3><p>' + esc(d.text) + '</p></div>';
+    detail.innerHTML = '<span class="badge">' + esc(d.tag) + '</span><div><h3>' + esc(d.title) + '</h3><p>' + rich(d.text) + '</p></div>';
     detail.classList.remove("swap"); void detail.offsetWidth; detail.classList.add("swap");
   }
   function show(i) {
@@ -650,7 +747,7 @@ assert failed, 'B could add a source to A''s notebook';</script>
     playBtn.querySelector("span").textContent = "Pause";
     if (current >= steps.length - 1) current = -1;
     show(current + 1);
-    timer = setInterval(function () { if (current >= steps.length - 1) { stop(); return; } show(current + 1); }, reduce ? 3200 : 2400);
+    timer = setInterval(function () { if (current >= steps.length - 1) { stop(); return; } show(current + 1); }, reduce ? 3600 : 2800);
   }
   playBtn.addEventListener("click", play);
   document.getElementById("prevBtn").addEventListener("click", function () { stop(); show(current <= 0 ? steps.length - 1 : current - 1); });
@@ -680,61 +777,61 @@ assert failed, 'B could add a source to A''s notebook';</script>
   /* ---------- Code ---------- */
   function src(id) { return document.getElementById(id).textContent; }
   var snippets = [
-    { file: "init.sql · chunks", lang: "sql", why: "Die Tabelle für Abschnitte und Embeddings", code: src("src-chunks"),
+    { file: "Tabelle chunks", lang: "sql", why: "Hier liegen die Textabschnitte und ihre Embeddings", code: src("src-chunks"),
       notes: {
-        2: "bigint statt UUID: Abschnitte gibt es viele, und ihre ID erscheint nie in einer URL. 8 Byte statt 16 machen den Index kleiner. „generated always“ heißt: Nur Postgres vergibt die Nummer.",
-        4: "notebook_id steht absichtlich doppelt da, in sources und hier. So filtern Suche und RLS direkt nach Notebook, ohne Join über sources.",
-        6: "Die Seite ist bei Text und Webseiten leer (null). check (page > 0) verhindert Seite 0 oder negative Seiten.",
-        9: "vector(1536) passt genau zu text-embedding-3-small. Ein Vektor mit anderer Länge wird abgelehnt.",
-        10: "Eine generierte Spalte: Postgres berechnet den tsvector bei jedem Insert selbst, mit deutscher Wortstammbildung („Quellen“ wird zu „quell“). Ein Trigger ist nicht nötig.",
-        11: "Der zusammengesetzte Fremdschlüssel: Das Paar (source_id, notebook_id) muss genau so in sources existieren. Damit kann die kopierte notebook_id nie falsch sein. Der RLS-Test prüft das.",
-        12: "on delete cascade: Wird eine Quelle gelöscht, löscht Postgres ihre Abschnitte und Embeddings mit. Das verlangt die Muss-Liste.",
-        13: "Jede Position kommt pro Quelle nur einmal vor. Ein doppeltes Einlesen fällt so sofort auf.",
-        17: "HNSW ist ein Graph-Index für schnelle Näherungssuche. vector_cosine_ops passt zum Operator <=> (Kosinus-Abstand), den wir in Schritt 4 benutzen.",
-        18: "GIN-Index für die Volltextsuche mit websearch_to_tsquery. Ohne Index müsste Postgres jeden Abschnitt durchsuchen."
+        2: "Jeder Abschnitt bekommt eine Nummer als ID. Die Datenbank zählt selbst hoch.",
+        4: "Zu welchem Notebook gehört der Abschnitt? Das steht auch bei der Quelle. Wir speichern es hier noch einmal, damit die Suche schneller ist.",
+        6: "Die Seitenzahl im PDF. Bei Webseiten und Text bleibt sie leer. Seite 0 oder kleiner ist verboten.",
+        9: "Das [[embedding|Embedding]]: 1.536 Zahlen, die die Bedeutung des Textes beschreiben. Die Anzahl passt genau zum OpenAI-Modell.",
+        10: "Für die [[fts|Wortsuche]]. Postgres füllt diese Spalte selbst aus dem Text. Wir müssen nichts tun.",
+        11: "Ein [[fk|Fremdschlüssel]] zur Quelle. Er prüft: Gehören Quelle und Notebook wirklich zusammen? Sonst lehnt die Datenbank den Abschnitt ab.",
+        12: "Wird die Quelle gelöscht, verschwinden ihre Abschnitte automatisch mit ([[cascade|cascade]]).",
+        13: "Jede Position gibt es pro Quelle nur einmal. So fällt doppeltes Einlesen sofort auf.",
+        17: "Ein [[index|Index]] für die Embeddings. Damit findet Postgres ähnliche Texte schnell, statt alle zu vergleichen.",
+        18: "Ein [[index|Index]] für die Wortsuche, wie das Stichwortverzeichnis in einem Buch."
       } },
-    { file: "init.sql · Rechte", lang: "sql", why: "Schicht 1 (GRANT) und Schicht 2 (RLS)", code: src("src-rls"),
+    { file: "Rechte und Regeln", lang: "sql", why: "Kontrolle 1 (Recht) und Kontrolle 2 (Zeilen-Regel)", code: src("src-rls"),
       notes: {
-        1: "Neue Tabellen bekommen in diesem Projekt Standardrechte wie TRUNCATE. revoke all räumt sie ab. Danach geben wir genau das, was die App braucht.",
-        4: "Eingeloggte Nutzer (authenticated) dürfen Notebooks, Quellen und Studio-Inhalte lesen, anlegen, ändern und löschen. Welche Zeilen, entscheidet erst RLS.",
-        6: "chunks und messages haben kein update. Abschnitte werden neu erzeugt, Nachrichten nie bearbeitet. Ein Recht, das es nicht gibt, kann man nicht missbrauchen.",
-        8: "Das Projekt schaltet RLS zwar automatisch ein. Die Migration tut es trotzdem selbst, damit sie auch ohne diese Projekt-Option richtig ist.",
-        11: "„to authenticated“: Die Policy gilt nur für eingeloggte Nutzer. Für anon gibt es keine Policy, und ohne Policy sieht RLS keine einzige Zeile.",
-        12: "using filtert, welche bestehenden Zeilen der Nutzer überhaupt sieht. (select auth.uid()) in Klammern: Postgres ruft die Funktion einmal pro Abfrage auf, nicht einmal pro Zeile.",
-        13: "with check prüft die neue Version der Zeile. Ohne diese Bedingung könnte Lea ihr Notebook per update an Tom übertragen, indem sie owner_id ändert.",
-        17: "Kindtabellen prüfen das Notebook. „notebook_id in (Teilabfrage)“ berechnet die Liste der eigenen Notebooks einmal und vergleicht dann jede Zeile damit."
+        1: "Zuerst nehmen wir allen [[rolle|Rollen]] alle Rechte weg. Danach geben wir nur, was wirklich nötig ist.",
+        4: "Angemeldete Nutzer dürfen Notebooks, Quellen und Studio-Inhalte lesen, anlegen, ändern und löschen. Welche genau, entscheidet gleich die Zeilen-Regel.",
+        6: "Abschnitte und Nachrichten darf niemand ändern, nur anlegen und löschen. Ein Recht, das es nicht gibt, kann niemand missbrauchen.",
+        8: "Schaltet die [[rls|Zeilen-Regeln]] für die Tabelle ein. Ab jetzt sieht man nur Zeilen, die eine Regel erlaubt.",
+        11: "Diese [[policy|Regel]] gilt nur für angemeldete Nutzer. Für Gäste gibt es keine Regel, also sehen sie nichts.",
+        12: "Prüft: Gehört das Notebook der Person, die fragt? [[uid|auth.uid()]] liefert ihre ID. Das „select“ davor macht die Prüfung schneller.",
+        13: "Prüft das Notebook nach der Änderung noch einmal. So kann niemand sein Notebook einer anderen Person zuschieben.",
+        17: "Für Abschnitte: Die Regel holt erst die Liste der eigenen Notebooks. Dann bleiben nur Abschnitte aus dieser Liste."
       } },
-    { file: "init.sql · Storage", lang: "sql", why: "Privater Bucket mit Ordner-Regel", code: src("src-storage"),
+    { file: "Dateiordner", lang: "sql", why: "Ein privater Ordner für PDFs", code: src("src-storage"),
       notes: {
-        2: "public = false: Ohne Login und ohne signierte URL kommt niemand an eine Datei. 20971520 Byte sind 20 MB. Nur PDF und Text sind erlaubt.",
-        4: "Storage speichert jede Datei als Zeile in storage.objects. Darum schützen wir Dateien mit derselben RLS wie Tabellen.",
-        7: "Die Policy gilt nur für unseren Bucket. Andere Buckets (später für den Podcast) bekommen eigene Regeln.",
-        8: "storage.foldername zerlegt den Pfad in Ordner. [1] ist der erste Ordner, bei uns die notebook_id.",
-        9: "id::text, weil der Pfad Text ist. Ein ungültiger Pfad wird nie zu einer UUID umgewandelt, darum kann er auch keinen Fehler auslösen."
+        2: "Legt den Ordner ([[bucket|Bucket]]) „sources“ an. Er ist privat. Erlaubt sind höchstens 20 MB pro Datei, nur PDF und Text.",
+        4: "Jede Datei hat eine Zeile in einer Tabelle. Darum schützen wir Dateien mit denselben Zeilen-Regeln.",
+        7: "Diese Regel gilt nur für unseren Ordner.",
+        8: "Nimmt den ersten Ordner im Dateipfad. Bei uns ist das die ID des Notebooks, zum Beispiel nb-123/datei.pdf.",
+        9: "Prüft: Gehört dieses Notebook der Person, die fragt?"
       } },
-    { file: "src/lib/supabase/proxy.ts", lang: "ts", why: "Hält den Login frisch (gekürzt, ohne Kommentare)", code: src("src-proxy"),
+    { file: "Proxy", lang: "ts", why: "Der Pförtner: erneuert den Login (gekürzt)", code: src("src-proxy"),
       notes: {
-        2: "Die Antwort startet als „weiter zur Seite“. Sie bekommt die Anfrage mit, damit geänderte Cookies bei der Seite ankommen.",
-        6: "Der Publishable Key ist öffentlich. Er sagt Supabase nur, welches Projekt gemeint ist. Rechte gibt erst das JWT des Nutzers.",
-        10: "Der Client liest die Session aus den Cookies der Anfrage.",
-        12: "setAll ruft der Client nur auf, wenn sich Cookies ändern, etwa nach einem neuen Token.",
-        14: "Das neue Token geht in die Anfrage. So sieht die Server Component danach schon das frische Token und erneuert es nicht ein zweites Mal.",
-        16: "Eine neue Antwort, die die geänderte Anfrage mitnimmt.",
-        18: "Das neue Token geht auch in die Antwort. Der Browser speichert es und schickt es beim nächsten Mal mit.",
-        21: "Neu in @supabase/ssr: Cache-Header wie Cache-Control: private. Ein CDN darf eine Antwort mit Session-Cookie nie für andere Nutzer speichern.",
-        28: "getClaims() prüft die JWT-Signatur und erneuert ein abgelaufenes Token. getSession() wäre falsch: Es liest den Cookie, ohne ihn zu prüfen.",
-        30: "Genau dieses Objekt zurückgeben. Eine neue Antwort ohne die Cookies würde Nutzer scheinbar zufällig ausloggen."
+        2: "Startet die Antwort mit „weiter zur Seite“.",
+        6: "Der [[publishable|öffentliche Schlüssel]]. Er sagt Supabase nur, welches Projekt gemeint ist.",
+        10: "Liest den Login-[[cookie|Cookie]] aus der Anfrage.",
+        12: "Dieser Teil läuft nur, wenn es einen neuen Ausweis gibt.",
+        14: "Gibt den neuen Ausweis an die Seite weiter, die gleich gebaut wird.",
+        16: "Baut die Antwort neu, mit dem neuen Ausweis darin.",
+        18: "Schickt den neuen Ausweis auch zum Browser. Der speichert ihn für das nächste Mal.",
+        21: "Sagt Zwischenspeichern im Netz: „Diese Antwort nicht aufheben.“ Sonst könnte ein Fremder den Login bekommen.",
+        28: "Die wichtigste Zeile. Sie prüft, ob der [[token|Ausweis]] echt ist, und erneuert ihn, wenn er abgelaufen ist.",
+        30: "Genau diese Antwort zurückgeben. Sonst geht der neue Ausweis verloren, und der Nutzer wird abgemeldet."
       } },
-    { file: "supabase/checks/rls.sql", lang: "sql", why: "Ausschnitt: Tom versucht, an Leas Daten zu kommen", code: src("src-check"),
+    { file: "Test", lang: "sql", why: "Ausschnitt: Person B versucht, an Daten von A zu kommen", code: src("src-check"),
       notes: {
-        1: "Das Skript wechselt in die Rolle authenticated. Ab hier gelten GRANT und RLS, genau wie bei einer Anfrage über die Data API.",
-        2: "Die Claims sagen, wer wir sind. auth.uid() liest „sub“. So spielt das Skript Nutzer B, ohne echten Login.",
-        5: "B zählt alle Notebooks. RLS blendet die Zeilen von A aus, also kommt 0 heraus.",
-        6: "assert bricht das ganze Skript mit genau dieser Meldung ab, falls die Bedingung falsch ist. Beim ersten Lauf ist so ein Fehler im Test selbst aufgefallen.",
-        8: "B versucht, das Notebook von A umzubenennen. Postgres meldet keinen Fehler.",
-        9: "row_count zeigt, wie viele Zeilen das update wirklich geändert hat: 0. RLS hat die Zeile vorher weggefiltert.",
-        14: "Ein Insert in ein fremdes Notebook. Hier greift with check und wirft einen echten Fehler.",
-        15: "insufficient_privilege ist SQLSTATE 42501: „new row violates row-level security policy“. Fangen wir ihn ab, hat die Regel funktioniert."
+        1: "Der Test tut so, als wäre er ein angemeldeter Nutzer.",
+        2: "Und zwar Person B. Die Datenbank glaubt jetzt, dass B fragt.",
+        5: "B zählt alle Notebooks. Richtig ist 0, denn alle gehören A.",
+        6: "assert heißt: „Das muss stimmen.“ Sonst bricht der Test mit dieser Meldung ab.",
+        8: "B versucht, das Notebook von A umzubenennen.",
+        9: "Wie viele Zeilen wurden wirklich geändert? Richtig ist 0. Es kommt aber keine Fehlermeldung.",
+        14: "B versucht, eine Quelle in das Notebook von A zu legen.",
+        15: "Hier kommt eine echte Fehlermeldung. Der Test fängt sie ab. Dann hat die Regel funktioniert."
       } }
   ];
   var KW_TS = /^(import|from|export|default|const|let|function|async|await|return|type|true|false)$/;
@@ -785,7 +882,7 @@ assert failed, 'B could add a source to A''s notebook';</script>
   function selectLine(el) {
     pre.querySelectorAll(".sel").forEach(function (x) { x.classList.remove("sel"); });
     el.classList.add("sel"); var n = el.getAttribute("data-n");
-    note.innerHTML = '<b>Zeile ' + n + '</b> · ' + esc(snippets[active].notes[n]);
+    note.innerHTML = '<b>Zeile ' + n + '</b> · ' + rich(snippets[active].notes[n]);
   }
   pre.addEventListener("click", function (e) { var el = e.target.closest(".ln.has-note"); if (el) selectLine(el); });
   pre.addEventListener("keydown", function (e) { var el = e.target.closest(".ln.has-note"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectLine(el); } });
@@ -804,9 +901,9 @@ assert failed, 'B could add a source to A''s notebook';</script>
 
   /* ---------- Demo: RLS ---------- */
   var people = {
-    anon: { label: "Gast", av: "?", role: "anon", uid: null },
-    lea: { label: "Lea", av: "L", role: "authenticated", uid: "a1f3…" },
-    tom: { label: "Tom", av: "T", role: "authenticated", uid: "b7c2…" }
+    anon: { label: "Gast", av: "?", role: "anon", roleText: "Gast (anon)", uid: null },
+    lea: { label: "Lea", av: "L", role: "authenticated", roleText: "angemeldet (authenticated)", uid: "a1f3…" },
+    tom: { label: "Tom", av: "T", role: "authenticated", roleText: "angemeldet (authenticated)", uid: "b7c2…" }
   };
   var notebooks = [
     { id: "nb-lea-1", title: "Klimabericht", owner: "lea" },
@@ -819,70 +916,66 @@ assert failed, 'B could add a source to A''s notebook';</script>
     { id: 3, nb: "nb-lea-2", text: "Hiermit bewerbe ich mich …" },
     { id: 4, nb: "nb-tom-1", text: "200 g Mehl, 2 Eier …" }
   ];
-  var files = [
-    { path: "nb-lea-1/src-7.pdf" },
-    { path: "nb-tom-1/src-9.pdf" }
-  ];
-  function ownerOf(nb) { var n = notebooks.filter(function (x) { return x.id === nb; })[0]; return n && n.owner; }
+  var files = [{ path: "nb-lea-1/src-7.pdf" }, { path: "nb-tom-1/src-9.pdf" }];
   function mine(who) { return notebooks.filter(function (n) { return n.owner === who; }).map(function (n) { return n.id; }); }
-  function noGrant(table, op) { return { state: "fail", text: "Die Rolle anon hat kein " + op.toUpperCase() + " auf " + table + ". Postgres bricht sofort ab." }; }
-  var SKIP = { state: "skip", text: "Wird nicht geprüft, weil Schicht 1 schon abgelehnt hat." };
-  function denied(table) { return { cls: "out", title: "Fehler 42501: permission denied for table " + table, small: "Die Data API antwortet mit HTTP 401. Genau das hat curl gegen unser Projekt gezeigt." }; }
+  function noGrant() { return { state: "fail", text: "Gäste haben kein Recht, diese Tabelle zu öffnen. Die Datenbank bricht sofort ab." }; }
+  var SKIP = { state: "skip", text: "Wird nicht mehr geprüft. Kontrolle 1 hat schon Nein gesagt." };
+  function denied() { return { cls: "out", title: "Fehler: kein Zugriff (permission denied)", small: "Supabase antwortet mit [[http|401]], also „nicht angemeldet“. Das haben wir mit dem echten Projekt ausprobiert." }; }
 
   var actions = [
-    { id: "nb-read", label: "Notebooks lesen", sub: "select", run: function (w) {
-      var r = { sql: "select id, title from notebooks;", head: ["id", "title", "Besitzer", ""] };
-      r.rows = notebooks.map(function (n) { var on = w !== "anon" && n.owner === w; return { cells: [n.id, n.title, people[n.owner].label], on: on, state: w === "anon" ? "" : (on ? "sichtbar" : "ausgeblendet"), cls: on ? "on" : "" }; });
-      if (w === "anon") { r.g1 = noGrant("notebooks", "select"); r.g2 = SKIP; r.v = denied("notebooks"); return r; }
+    { id: "nb-read", label: "Notebooks ansehen", sub: "lesen", run: function (w) {
+      var r = { sql: "select id, title from notebooks;", head: ["id", "Titel", "gehört", ""] };
+      r.rows = notebooks.map(function (n) { var on = w !== "anon" && n.owner === w; return { cells: [n.id, n.title, people[n.owner].label], on: on, state: w === "anon" ? "" : (on ? "sichtbar" : "versteckt"), cls: on ? "on" : "" }; });
+      if (w === "anon") { r.g1 = noGrant(); r.g2 = SKIP; r.v = denied(); return r; }
       var n = mine(w).length;
-      r.g1 = { state: "ok", text: "authenticated hat SELECT auf notebooks." };
-      r.g2 = { state: "ok", text: "Policy „owner can select“ behält nur Zeilen mit owner_id = auth.uid()." };
-      r.v = { cls: "in", title: n + (n === 1 ? " Zeile" : " Zeilen"), small: "Die anderen Notebooks existieren, tauchen aber nicht auf. Für " + people[w].label + " gibt es sie nicht. Darum zeigt Faden bei fremden Notebooks 404." };
+      r.g1 = { state: "ok", text: "Angemeldete dürfen Notebooks lesen." };
+      r.g2 = { state: "ok", text: "Regel: Man sieht nur Notebooks, die einem gehören." };
+      r.v = { cls: "in", title: n + (n === 1 ? " Notebook" : " Notebooks"), small: "Die anderen gibt es zwar, aber " + people[w].label + " sieht sie nicht. Für " + people[w].label + " existieren sie nicht." };
       return r; } },
-    { id: "ch-read", label: "Abschnitte lesen", sub: "select", run: function (w) {
+    { id: "ch-read", label: "Textabschnitte ansehen", sub: "lesen", run: function (w) {
       var my = mine(w);
-      var r = { sql: "select id, notebook_id, content from chunks;", head: ["id", "notebook_id", "content", ""] };
-      r.rows = chunks.map(function (c) { var on = w !== "anon" && my.indexOf(c.nb) >= 0; return { cells: [String(c.id), c.nb, c.text], on: on, state: w === "anon" ? "" : (on ? "sichtbar" : "ausgeblendet"), cls: on ? "on" : "" }; });
-      if (w === "anon") { r.g1 = noGrant("chunks", "select"); r.g2 = SKIP; r.v = denied("chunks"); return r; }
+      var r = { sql: "select id, notebook_id, content from chunks;", head: ["id", "Notebook", "Text", ""] };
+      r.rows = chunks.map(function (c) { var on = w !== "anon" && my.indexOf(c.nb) >= 0; return { cells: [String(c.id), c.nb, c.text], on: on, state: w === "anon" ? "" : (on ? "sichtbar" : "versteckt"), cls: on ? "on" : "" }; });
+      if (w === "anon") { r.g1 = noGrant(); r.g2 = SKIP; r.v = denied(); return r; }
       var n = r.rows.filter(function (x) { return x.on; }).length;
-      r.g1 = { state: "ok", text: "authenticated hat SELECT auf chunks." };
-      r.g2 = { state: "ok", text: "Teilabfrage liefert die eigenen Notebooks: " + my.join(", ") + ". Nur Abschnitte mit notebook_id in dieser Liste bleiben." };
-      r.v = { cls: "in", title: n + " Zeilen", small: "Kein Join über sources nötig, weil notebook_id direkt in chunks steht." };
+      r.g1 = { state: "ok", text: "Angemeldete dürfen Abschnitte lesen." };
+      r.g2 = { state: "ok", text: "Deine Notebooks: " + my.join(", ") + ". Nur Abschnitte daraus bleiben übrig." };
+      r.v = { cls: "in", title: n + " Abschnitte", small: "Jeder Abschnitt weiß selbst, zu welchem Notebook er gehört. Das macht die Prüfung schnell." };
       return r; } },
-    { id: "nb-rename", label: "Leas „Klimabericht“ umbenennen", sub: "update", run: function (w) {
-      var r = { sql: "update notebooks set title = 'gehackt'\nwhere id = 'nb-lea-1';", head: ["id", "title", "Besitzer", ""] };
+    { id: "nb-rename", label: "Leas „Klimabericht“ umbenennen", sub: "ändern", run: function (w) {
+      var r = { sql: "update notebooks set title = 'gehackt'\nwhere id = 'nb-lea-1';", head: ["id", "Titel", "gehört", ""] };
       var ok = w === "lea";
       r.rows = [{ cells: ["nb-lea-1", ok ? "gehackt" : "Klimabericht", "Lea"], on: w !== "anon" && ok, state: w === "anon" ? "" : (ok ? "geändert" : "unsichtbar"), cls: ok ? "hit" : "" }];
-      if (w === "anon") { r.g1 = noGrant("notebooks", "update"); r.g2 = SKIP; r.v = denied("notebooks"); return r; }
-      r.g1 = { state: "ok", text: "authenticated hat UPDATE auf notebooks." };
-      if (ok) { r.g2 = { state: "ok", text: "using: Zeile gehört Lea ✓ · with check: neue Zeile gehört weiter Lea ✓" }; r.v = { cls: "in", title: "1 Zeile geändert", small: "Lea darf ihr eigenes Notebook umbenennen." }; }
-      else { r.g2 = { state: "fail", text: "using blendet die Zeile aus, bevor das update sie überhaupt sieht." }; r.v = { cls: "warn", title: "0 Zeilen geändert – und kein Fehler", small: "Postgres meldet Erfolg. Die App muss prüfen, ob eine Zeile zurückkam, und sonst 404 zeigen. Der RLS-Test prüft genau das mit row_count." }; }
+      if (w === "anon") { r.g1 = noGrant(); r.g2 = SKIP; r.v = denied(); return r; }
+      r.g1 = { state: "ok", text: "Angemeldete dürfen Notebooks ändern." };
+      if (ok) { r.g2 = { state: "ok", text: "Das Notebook gehört Lea ✓" }; r.v = { cls: "in", title: "1 Notebook geändert", small: "Lea darf ihr eigenes Notebook umbenennen." }; }
+      else { r.g2 = { state: "fail", text: "Das Notebook gehört nicht Tom. Für ihn ist es unsichtbar." }; r.v = { cls: "warn", title: "0 geändert – aber keine Fehlermeldung", small: "Vorsicht: Die Datenbank meldet trotzdem „fertig“. Die App muss selbst merken, dass nichts passiert ist, und „nicht gefunden“ zeigen." }; }
       return r; } },
-    { id: "src-add", label: "Quelle in „Klimabericht“ anlegen", sub: "insert", run: function (w) {
-      var r = { sql: "insert into sources (notebook_id, type, title)\nvalues ('nb-lea-1', 'pdf', 'Studie.pdf');", head: ["notebook_id", "type", "title", ""] };
+    { id: "src-add", label: "Quelle in „Klimabericht“ anlegen", sub: "anlegen", run: function (w) {
+      var r = { sql: "insert into sources (notebook_id, type, title)\nvalues ('nb-lea-1', 'pdf', 'Studie.pdf');", head: ["Notebook", "Typ", "Titel", ""] };
       var ok = w === "lea";
       r.rows = [{ cells: ["nb-lea-1", "pdf", "Studie.pdf"], on: ok, state: w === "anon" ? "" : (ok ? "neu" : "abgelehnt"), cls: ok ? "hit" : "bad" }];
-      if (w === "anon") { r.g1 = noGrant("sources", "insert"); r.g2 = SKIP; r.v = denied("sources"); return r; }
-      r.g1 = { state: "ok", text: "authenticated hat INSERT auf sources." };
-      if (ok) { r.g2 = { state: "ok", text: "with check: nb-lea-1 ist in Leas Notebooks ✓" }; r.v = { cls: "in", title: "1 Zeile eingefügt", small: "status steht automatisch auf 'pending'. Ab Schritt 3 startet dann die Verarbeitung." }; }
-      else { r.g2 = { state: "fail", text: "with check: nb-lea-1 gehört nicht " + people[w].label + " ✗" }; r.v = { cls: "out", title: "Fehler 42501: new row violates row-level security policy", small: "Bei insert gibt es keine Zeile zum Ausblenden. Darum wirft with check einen echten Fehler." }; }
+      if (w === "anon") { r.g1 = noGrant(); r.g2 = SKIP; r.v = denied(); return r; }
+      r.g1 = { state: "ok", text: "Angemeldete dürfen Quellen anlegen." };
+      if (ok) { r.g2 = { state: "ok", text: "Das Ziel-Notebook gehört Lea ✓" }; r.v = { cls: "in", title: "1 Quelle angelegt", small: "Ihr Status ist zuerst „wartet“. Ab Schritt 3 wird sie dann verarbeitet." }; }
+      else { r.g2 = { state: "fail", text: "Das Ziel-Notebook gehört nicht " + people[w].label + " ✗" }; r.v = { cls: "out", title: "Fehler: Regel verletzt (row-level security)", small: "Beim Anlegen kommt eine echte Fehlermeldung, anders als beim Ändern." }; }
       return r; } },
-    { id: "ch-edit", label: "Abschnitt bearbeiten", sub: "update", run: function (w) {
-      var r = { sql: "update chunks set content = '…'\nwhere id = 1;", head: ["id", "notebook_id", "content", ""] };
+    { id: "ch-edit", label: "Textabschnitt ändern", sub: "ändern", run: function (w) {
+      var r = { sql: "update chunks set content = '…'\nwhere id = 1;", head: ["id", "Notebook", "Text", ""] };
       r.rows = [{ cells: ["1", "nb-lea-1", chunks[0].text], on: false, state: w === "anon" ? "" : "abgelehnt", cls: "bad" }];
-      r.g1 = { state: "fail", text: (w === "anon" ? "anon" : "Auch authenticated") + " hat kein UPDATE auf chunks. Abschnitte ändert niemand, sie werden nur neu erzeugt." };
+      r.g1 = { state: "fail", text: w === "anon" ? "Gäste haben kein Recht, diese Tabelle zu öffnen." : "Niemand darf Abschnitte ändern, auch Angemeldete nicht. Abschnitte werden nur neu erzeugt." };
       r.g2 = SKIP;
-      r.v = { cls: "out", title: "Fehler 42501: permission denied for table chunks", small: w === "lea" ? "Sogar Lea scheitert, obwohl es ihr Abschnitt ist. Schicht 1 verbietet das für alle." : "Schicht 1 verbietet das für alle, auch für die Besitzerin." };
+      r.v = { cls: "out", title: "Fehler: kein Zugriff (permission denied)", small: w === "lea" ? "Sogar Lea scheitert, obwohl es ihr Abschnitt ist. Kontrolle 1 gilt für alle." : "Kontrolle 1 gilt für alle, sogar für die Besitzerin." };
       return r; } },
-    { id: "file-read", label: "PDF aus „Klimabericht“ laden", sub: "storage", run: function (w) {
+    { id: "file-read", label: "PDF aus „Klimabericht“ laden", sub: "Datei", run: function (w) {
       var my = mine(w);
-      var r = { sql: "storage.from('sources')\n  .download('nb-lea-1/src-7.pdf');", head: ["Pfad", "erster Ordner", "", ""] };
-      r.rows = files.map(function (f) { var folder = f.path.split("/")[0]; var on = w !== "anon" && my.indexOf(folder) >= 0; return { cells: [f.path, folder, ""], on: on, state: on ? "sichtbar" : "ausgeblendet", cls: on ? "on" : "" }; });
-      r.g1 = { state: "ok", text: "Supabase gibt " + people[w].role + " Grundrechte auf storage.objects. Der Schutz liegt hier ganz bei RLS." };
-      if (w === "anon") { r.g2 = { state: "fail", text: "Unsere Policies gelten nur „to authenticated“. Für anon gibt es keine Policy, und ohne Policy sieht RLS keine Zeile." }; r.v = { cls: "out", title: "Object not found", small: "Storage sagt nicht „verboten“, sondern „nicht gefunden“. So verrät es nicht einmal, dass die Datei existiert." }; return r; }
-      if (w === "lea") { r.g2 = { state: "ok", text: "Erster Ordner nb-lea-1 ist in Leas Notebooks ✓" }; r.v = { cls: "in", title: "Download startet", small: "Später lädt der Browser so die PDF für die Beleg-Ansicht." }; return r; }
-      r.g2 = { state: "fail", text: "Erster Ordner nb-lea-1 ist nicht in Toms Notebooks (" + my.join(", ") + ")." };
-      r.v = { cls: "out", title: "Object not found", small: "Tom erfährt nicht einmal, dass die Datei existiert." };
+      var r = { sql: "storage.from('sources')\n  .download('nb-lea-1/src-7.pdf');", head: ["Dateipfad", "erster Ordner", "", ""] };
+      r.rows = files.map(function (f) { var folder = f.path.split("/")[0]; var on = w !== "anon" && my.indexOf(folder) >= 0; return { cells: [f.path, folder, ""], on: on, state: on ? "sichtbar" : "versteckt", cls: on ? "on" : "" }; });
+      r.g1 = { state: "ok", text: "Bei Dateien lässt Supabase alle durch Kontrolle 1. Den Schutz übernimmt hier ganz Kontrolle 2." };
+      if (w === "anon") { r.g2 = { state: "fail", text: "Für Gäste gibt es keine Regel. Ohne Regel sieht man nichts." }; r.v = { cls: "out", title: "Datei nicht gefunden", small: "Supabase sagt nicht „verboten“, sondern „nicht gefunden“. So verrät es nicht, dass die Datei existiert." }; return r; }
+      if (w === "lea") { r.g2 = { state: "ok", text: "Der Ordner nb-lea-1 gehört Lea ✓" }; r.v = { cls: "in", title: "Download startet", small: "Später zeigt Faden so das PDF in der Beleg-Ansicht." }; return r; }
+      r.g2 = { state: "fail", text: "Der Ordner nb-lea-1 gehört nicht Tom." };
+      r.v = { cls: "out", title: "Datei nicht gefunden", small: "Tom erfährt nicht einmal, dass es die Datei gibt." };
       return r; } }
   ];
 
@@ -902,23 +995,23 @@ assert failed, 'B could add a source to A''s notebook';</script>
   });
   function gateHtml(n, name, g) {
     var st = g.state === "ok" ? "erlaubt" : g.state === "fail" ? "abgelehnt" : "–";
-    return '<div class="gate ' + g.state + '"><div class="gh">Schicht ' + n + ' · ' + name + '<span class="st">' + st + '</span></div><p>' + esc(g.text) + '</p></div>';
+    return '<div class="gate ' + g.state + '"><div class="gh">Kontrolle ' + n + ' · ' + name + '<span class="st">' + st + '</span></div><p>' + rich(g.text) + '</p></div>';
   }
   function runDemo() {
     Array.prototype.forEach.call(whoEl.children, function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-k") === who)); });
     Array.prototype.forEach.call(actsEl.children, function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-k") === act)); });
     var p = people[who];
-    uidEl.innerHTML = "Rolle <b>" + p.role + "</b> · auth.uid() = <b>" + (p.uid ? p.uid : "null") + "</b>";
+    uidEl.innerHTML = "Rolle: <b>" + esc(p.roleText) + "</b> · Nutzer-ID: <b>" + (p.uid ? p.uid : "keine") + "</b>";
     var a = actions.filter(function (x) { return x.id === act; })[0];
     var r = a.run(who);
     var html = '<div class="demo-sql">' + r.sql.split("\n").map(function (l) { return hlLine(l, "sql"); }).join("\n") + '</div>';
-    html += '<div class="gates">' + gateHtml(1, "GRANT", r.g1) + gateHtml(2, "RLS-Policy", r.g2) + '</div>';
+    html += '<div class="gates">' + gateHtml(1, "Recht (GRANT)", r.g1) + gateHtml(2, "Zeilen-Regel (RLS)", r.g2) + '</div>';
     html += '<div class="table-wrap rowtable"><table><thead><tr>' + r.head.map(function (h) { return "<th>" + esc(h.toUpperCase()) + "</th>"; }).join("") + '</tr></thead><tbody>' +
       r.rows.map(function (row) {
         return '<tr class="' + (row.on || row.cls === "hit" ? "" : "off") + '">' + row.cells.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") +
           '<td>' + (row.state ? '<span class="state ' + row.cls + '">' + esc(row.state) + '</span>' : "") + '</td></tr>';
       }).join("") + '</tbody></table></div>';
-    html += '<div class="verdict ' + r.v.cls + '">' + esc(r.v.title) + '<small>' + esc(r.v.small) + '</small></div>';
+    html += '<div class="verdict ' + r.v.cls + '">' + esc(r.v.title) + '<small>' + rich(r.v.small) + '</small></div>';
     resEl.innerHTML = html;
     resEl.classList.remove("result-swap"); void resEl.offsetWidth; resEl.classList.add("result-swap");
   }
@@ -926,11 +1019,11 @@ assert failed, 'B could add a source to A''s notebook';</script>
 
   /* ---------- Flashcards ---------- */
   var qa = [
-    { q: "Warum schützt du jede Tabelle zweimal, mit GRANT und mit RLS?", a: ["GRANT entscheidet, ob eine Rolle eine Tabelle überhaupt benutzen darf. RLS entscheidet danach, welche Zeilen. anon hat bei uns kein einziges Recht. Die Data API antwortet Gästen darum mit 401, bevor eine Policy gefragt wird.", "Die zwei Schichten fangen Fehler gegenseitig ab. Vergisst jemand RLS auf einer neuen Tabelle, kommt anon trotzdem nicht heran. Und chunks hat gar kein UPDATE-Recht, das kann auch keine Policy versehentlich erlauben."] },
-    { q: "Tom versucht, Leas Notebook umzubenennen. Was passiert genau?", a: ["Schicht 1 erlaubt es, denn authenticated hat UPDATE auf notebooks. Dann filtert die using-Bedingung der Policy alle Zeilen weg, die nicht Tom gehören. Das update findet also keine Zeile.", "Postgres meldet „0 Zeilen geändert“, aber keinen Fehler. Die App muss das erkennen und 404 zeigen. Bei einem insert in Leas Notebook wäre es anders: with check wirft dann Fehler 42501."] },
-    { q: "Warum steht notebook_id auch in chunks, und wie verhinderst du, dass der Wert falsch ist?", a: ["Suche und RLS filtern direkt nach Notebook, ohne Join über sources. Bei vielen Abschnitten spart das Arbeit bei jeder Frage.", "Ein zusammengesetzter Fremdschlüssel (source_id, notebook_id) → sources(id, notebook_id) sorgt dafür, dass das Paar genau so in sources existiert. Ein Abschnitt mit falscher notebook_id wird abgelehnt. Der RLS-Test prüft das mit foreign_key_violation."] },
-    { q: "Warum schreibst du (select auth.uid()) und nicht einfach auth.uid()?", a: ["auth.uid() ist eine Funktion. Ohne select ruft Postgres sie unter Umständen für jede Zeile neu auf. In Klammern als Teilabfrage wird sie einmal pro Abfrage berechnet und dann wiederverwendet.", "Supabase empfiehlt das in der RLS-Doku. Der Performance-Advisor meldet sonst eine Warnung. Bei uns meldet er keine."] },
-    { q: "Was macht der Proxy, und warum getClaims() statt getSession()?", a: ["Server Components dürfen keine Cookies schreiben. Der Proxy läuft vor jeder Anfrage, erneuert ein abgelaufenes Token und schreibt es in Anfrage und Antwort. Er schützt aber keine Seite, das macht jede Seite selbst.", "getClaims() prüft die Signatur des JWT mit den öffentlichen Schlüsseln des Projekts. getSession() liest nur den Cookie, den jeder fälschen kann. Auf dem Server darf man dem nie vertrauen."] }
+    { q: "Warum gibt es zwei Kontrollen, GRANT und RLS?", a: ["GRANT ist wie ein Schlüssel für einen Raum: Darf diese [[rolle|Rolle]] die Tabelle überhaupt öffnen? RLS ist wie ein Türsteher drinnen: Welche Zeilen darf diese Person sehen?", "Fällt eine Kontrolle aus, hält die andere. Vergisst jemand RLS bei einer neuen Tabelle, kommen Gäste trotzdem nicht hinein. Sie haben ja keinen Schlüssel."] },
+    { q: "Tom will Leas Notebook umbenennen. Was passiert?", a: ["Kontrolle 1 lässt ihn durch, denn Angemeldete dürfen Notebooks ändern. Kontrolle 2 versteckt Leas Notebook vor ihm. Die Änderung findet also nichts.", "Die Datenbank meldet „0 Zeilen geändert“, aber keinen Fehler. Die App muss das merken und „nicht gefunden“ zeigen. Will Tom dagegen etwas in Leas Notebook anlegen, kommt eine echte Fehlermeldung."] },
+    { q: "Warum steht die Notebook-ID auch bei jedem Textabschnitt?", a: ["So findet die Suche die Abschnitte eines Notebooks direkt, ohne Umweg über die Quellen. Das macht jede Frage schneller.", "Damit die doppelte Angabe nie falsch ist, prüft ein [[fk|Fremdschlüssel]]: Quelle und Notebook müssen zusammenpassen. Sonst lehnt die Datenbank den Abschnitt ab. Der Test prüft das."] },
+    { q: "Warum steht in den Regeln (select auth.uid()) statt nur auth.uid()?", a: ["[[uid|auth.uid()]] liefert die ID der Person, die fragt. Ohne „select“ rechnet Postgres sie unter Umständen für jede Zeile neu aus.", "Mit „select“ rechnet Postgres sie nur einmal pro Anfrage aus. Das empfiehlt Supabase, und die [[advisor|Supabase-Prüfung]] warnt sonst."] },
+    { q: "Was macht der Proxy, und warum getClaims() statt getSession()?", a: ["Der [[proxy|Proxy]] läuft vor jeder Seite. Er erneuert den Login-Ausweis, wenn er abgelaufen ist. Den neuen gibt er an die Seite und an den Browser weiter. Er schützt aber keine Seite, das macht jede Seite selbst.", "getClaims() prüft die Unterschrift des [[token|Ausweises]]. getSession() liest ihn nur. Einen gefälschten Ausweis würde getSession() glauben."] }
   ];
   var known = {};
   try { known = JSON.parse(store("faden-doc-s2-quiz") || "{}") || {}; } catch (e) { known = {}; }
@@ -938,7 +1031,7 @@ assert failed, 'B could add a source to A''s notebook';</script>
   var chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
   cardsEl.innerHTML = qa.map(function (c, i) {
     return '<div class="fc" data-i="' + i + '"><button class="fc-q" type="button" aria-expanded="false"><span class="num">0' + (i + 1) + '</span><span>' + esc(c.q) + '</span>' + chev + '</button>' +
-      '<div class="fc-a"><div><div class="inner">' + c.a.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("") +
+      '<div class="fc-a"><div><div class="inner">' + c.a.map(function (p) { return "<p>" + rich(p) + "</p>"; }).join("") +
       '<div class="fc-actions"><button class="btn accent" type="button" data-k="1">Gewusst</button><button class="btn ghost" type="button" data-k="0">Noch nicht</button></div></div></div></div></div>';
   }).join("");
   function paintQuiz() {
