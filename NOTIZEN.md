@@ -59,6 +59,7 @@
 - **11.10.2026 · Modell kürzte den Titel ab (6b).** Der erste Stapel hieß „Faden-Haus und Völki“. Das kam vom Modell, unser Code kürzt erst ab 120 Zeichen. Gelöst: Beschreibung im Schema „höchstens 6 ganze Wörter. Kürze keine Wörter ab.“ Nächster Versuch: „Hausordnung und Völkerschlachtdenkmal“.
 - **11.10.2026 · Wieder ein Screenshot mitten in der Animation (6b).** Nach dem Umdrehen zeigte der Screenshot die Karte bei ca. 90°. Gemessen: `transform` war schon `rotateY(180deg)`, keine Animation lief mehr. Der Screenshot war älter als der Zustand. Lehre aus 5c bestätigt: erst messen, dann reparieren.
 - **11.10.2026 · Nur ein `next dev` pro Ordner.** Ein zweiter Entwicklungsserver (anderer Port) bricht ab: „Another next dev server is already running“. Neu in Next 16. Gelöst: den laufenden Server auf Port 3000 benutzt, er lädt Änderungen sowieso neu.
+- **11.10.2026 · Erstes Podcast-Skript sprach nur über eine Quelle (6c).** Annahme: Das Modell nutzt von selbst alle Quellen. Falsch: Bei Hausordnung, Kurznotiz und Völkerschlachtdenkmal behandelte es nur das Denkmal (die größte Quelle). Außerdem sammelte es Belege am Ende eines Redebeitrags (einmal `[5][6][7][8][10][12]`) und schrieb einen Bandwurm-Abschied („…; damit verabschiede ich mich“). Gemerkt beim Lesen des ganzen Skripts. Gelöst: drei Regeln im Prompt geschärft („Sprich über alle Quellen … nacheinander mit Überleitung“, „Belege jeden Satz … sammle sie nicht am Ende“, Tom fasst zusammen, Lea verabschiedet sich kurz). Zweiter Versuch: alle Quellen, Belege pro Satz, sauberer Schluss. Lehre: Modell-Ausgaben ganz lesen, nicht nur „ready“ prüfen.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -202,6 +203,10 @@
 - **„Heute“ rechnet der Server (6b).** `formatDay` läuft in `summarizeStudioItem` auf dem Server. Mit `new Date()` im Browser könnten Server und Browser verschiedenen Text rendern (Hydration-Fehler, z. B. um Mitternacht).
 - **Eigene Seite pro Studio-Element (6b).** `/notebooks/[id]/studio/[itemId]`, wie im Design. Das Element muss zum Notebook in der URL gehören (`.eq("notebook_id", …)`), sonst 404. Getestet: echte ID 200, unbekannt/kein UUID/falsches Notebook 404.
 - **Gemeinsame Bausteine (6b).** `CitedText`, `CitationNumber`, `CitationChips` aus `chat.tsx` herausgezogen, `usePolling` aus der Quellenliste. Chat, Karteikarten und später das Transkript sehen gleich aus.
+- **Podcast in drei Teilschritten (6c–6e).** Erst nur das Skript mit Transkript auf der Studio-Seite. So lässt sich die Qualität beurteilen, bevor Geld für Sprache ausgegeben wird. 6d vertont im selben Job, 6e baut den Player.
+- **Belege im gesprochenen Text werden entfernt (6c).** Das Skript enthält `[n]` wie der Chat (fürs Transkript). `spokenText` entfernt sie vor der Vertonung, sonst läse die Stimme „eckige Klammer eins“.
+- **Kein Beleg im ganzen Skript = Fehler (6c).** Dann hat das Modell die Quellen ignoriert. Lieber eine ehrliche Fehlermeldung als ein Podcast aus eigenem Wissen.
+- **Feste Länge, Optionen vorbereitet (6c).** Ziel ca. 700 Wörter (≈ 5 Min.), max. 50 Redebeiträge. `length` und `focus` stehen schon optional im Daten-Schema, die Oberfläche dafür kommt später.
 
 ## Echte Zahlen
 - Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.
@@ -213,6 +218,7 @@
 - Suche (4a, lokal → Frankfurt): Frage einbetten 140–290 ms (erster Aufruf 2,2 s), `match_chunks` 100–180 ms bei 38 Abschnitten.
 - Text-to-Speech (6a, Hörtest, `gpt-4o-mini-tts`): ein Satz von ca. 9 s Audio braucht 1,8–3,4 s und ergibt ca. 150 KB MP3 (128 kbit/s = 16 KB pro Sekunde, 5 Minuten ≈ 4,8 MB).
 - Karteikarten (6b, lokal, 3 Quellen, 13 Abschnitte als Material): 10–12 s vom Klick bis „Bereit“, je 12 Karten.
+- Podcast-Skript (6c, lokal, 3 Quellen, 16 Abschnitte): unter 20 s, 28–29 Redebeiträge, ca. 760 Wörter (≈ 5,4 Min. Sprechzeit).
 - Dauer Podcast-Erstellung:
 
 ## Schwierigstes Problem

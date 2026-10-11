@@ -3,14 +3,16 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { notebookIdSchema, studioItemIdSchema } from "@/lib/schemas";
 import { flashcardsDataSchema } from "@/lib/studio/flashcards";
+import { podcastDataSchema } from "@/lib/studio/podcast";
 import { summarizeStudioItem } from "@/lib/studio/summary";
 import { FlashcardsView } from "./flashcards-view";
+import { PodcastView } from "./podcast-view";
 import { StudioFrame } from "./studio-frame";
 import { StudioStatus } from "./studio-status";
 
 export const metadata: Metadata = { title: "Studio · Faden" };
 
-// One studio item on its own page: flashcards now, the podcast follows.
+// One studio item on its own page: flashcards or podcast.
 export default async function StudioItemPage({ params }: PageProps<"/notebooks/[id]/studio/[itemId]">) {
   // Login first: a logged-out visitor goes to /login, not to a 404.
   const { supabase } = await requireUser();
@@ -51,11 +53,25 @@ export default async function StudioItemPage({ params }: PageProps<"/notebooks/[
         </StudioFrame>
       );
     }
+  }
+
+  if (item.state === "ready" && row.kind === "podcast") {
+    const data = podcastDataSchema.safeParse(row.data);
+    if (data.success && data.data.turns && data.data.citations) {
+      return (
+        <StudioFrame {...frame}>
+          <PodcastView summary={data.data.summary ?? ""} turns={data.data.turns} citations={data.data.citations} />
+        </StudioFrame>
+      );
+    }
+  }
+
+  if (item.state === "ready") {
     // Ready, but the data does not fit the schema: show it as an error.
     console.error("studio item with broken data", row.id);
     return (
       <StudioFrame {...frame}>
-        <StudioStatus item={{ ...item, state: "error", error: "Die Karten konnten nicht geladen werden." }} />
+        <StudioStatus item={{ ...item, state: "error", error: "Dieses Element konnte nicht geladen werden." }} />
       </StudioFrame>
     );
   }

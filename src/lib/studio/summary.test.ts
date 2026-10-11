@@ -54,4 +54,18 @@ describe("summarizeStudioItem", () => {
     const summary = summarizeStudioItem(row({ data: { cards: "kaputt" } }), now);
     expect(summary).toMatchObject({ title: "Karteikarten", detail: null });
   });
+
+  it("shows title and turn count of a ready podcast", () => {
+    const data = {
+      sourceIds: [sourceId],
+      title: "Die Hausordnung im Gespräch",
+      turns: [
+        { speaker: "lea", text: "Willkommen bei Faden!" },
+        { speaker: "tom", text: "Ruhe ab 22 Uhr [1]." },
+      ],
+      citations: [],
+    };
+    const summary = summarizeStudioItem(row({ kind: "podcast", data }), now);
+    expect(summary).toMatchObject({ title: "Die Hausordnung im Gespräch", detail: "2 Redebeiträge" });
+  });
 });

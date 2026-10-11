@@ -1,5 +1,6 @@
 import { formatDay } from "@/lib/format";
 import { flashcardsDataSchema } from "./flashcards";
+import { podcastDataSchema } from "./podcast";
 import { STUCK_MESSAGE, studioState, type StudioState } from "./status";
 
 // What the studio column shows for one item.
@@ -8,7 +9,7 @@ export type StudioItemSummary = {
   kind: string;
   state: StudioState;
   title: string;
-  // "12 Karten", only when ready.
+  // "12 Karten" or "24 Redebeiträge", only when ready.
   detail: string | null;
   error: string | null;
   // "Heute", "Gestern", "6. Okt.": computed on the server, so server and
@@ -43,6 +44,15 @@ export function summarizeStudioItem(row: StudioRow, now: Date): StudioItemSummar
     if (state === "ready" && data.success && data.data.cards) {
       const count = data.data.cards.length;
       detail = `${count} ${count === 1 ? "Karte" : "Karten"}`;
+    }
+  }
+
+  if (row.kind === "podcast") {
+    const data = podcastDataSchema.safeParse(row.data);
+    if (data.success && data.data.title) title = data.data.title;
+    if (state === "ready" && data.success && data.data.turns) {
+      const count = data.data.turns.length;
+      detail = `${count} ${count === 1 ? "Redebeitrag" : "Redebeiträge"}`;
     }
   }
 

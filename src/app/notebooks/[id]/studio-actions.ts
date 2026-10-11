@@ -6,9 +6,16 @@ import { requireUser } from "@/lib/auth";
 import { allowStudioRequest } from "@/lib/rate-limit";
 import { studioItemIdSchema, studioRequestSchema } from "@/lib/schemas";
 import { generateFlashcards } from "@/lib/studio/generate-flashcards";
+import { generatePodcast } from "@/lib/studio/generate-podcast";
 import { studioState } from "@/lib/studio/status";
 
 export type StudioActionResult = { error: string | null };
+
+// One background job per kind.
+const JOBS = {
+  flashcards: generateFlashcards,
+  podcast: generatePodcast,
+};
 
 // Starts a studio item. The work runs in the background (after()), so the
 // action answers at once. The item shows "In Arbeit" and the page polls.
@@ -53,7 +60,8 @@ export async function createStudioItem(input: unknown): Promise<StudioActionResu
   }
 
   // Runs after the response, up to maxDuration of the page (see page.tsx).
-  after(() => generateFlashcards(item.id));
+  const job = JOBS[kind];
+  after(() => job(item.id));
 
   refresh();
   return { error: null };
