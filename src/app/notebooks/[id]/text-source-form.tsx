@@ -9,7 +9,15 @@ import { createTextSource, type SourceFormState } from "./actions";
 
 const initialState: SourceFormState = { error: null };
 
-export function TextSourceForm({ notebookId, onDone }: { notebookId: string; onDone?: () => void }) {
+export function TextSourceForm({
+  notebookId,
+  defaultTitle,
+  onDone,
+}: {
+  notebookId: string;
+  defaultTitle?: string;
+  onDone?: () => void;
+}) {
   // A wrapper around the Server Action: tell the dialog when it worked.
   const [state, formAction, pending] = useActionState(
     async (prev: SourceFormState, formData: FormData) => {
@@ -27,6 +35,8 @@ export function TextSourceForm({ notebookId, onDone }: { notebookId: string; onD
         name="title"
         required
         maxLength={500}
+        defaultValue={defaultTitle}
+        autoFocus={defaultTitle === undefined}
         placeholder="Titel, z. B. Notizen aus dem Meeting"
         aria-label="Titel des Texts"
       />
@@ -35,6 +45,8 @@ export function TextSourceForm({ notebookId, onDone }: { notebookId: string; onD
         required
         rows={6}
         maxLength={MAX_TEXT_CHARS}
+        // With a title already filled in, the cursor goes straight to the text.
+        autoFocus={defaultTitle !== undefined}
         placeholder="Text hier einfügen …"
         aria-label="Text"
         className="max-h-72"

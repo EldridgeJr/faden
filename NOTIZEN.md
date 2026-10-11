@@ -162,6 +162,12 @@
 - **Beleg-Chips nur für benutzte Belege.** Die Route schickt alle 8 Abschnitte vorab. Unter der Antwort erscheinen nur die Nummern, die im Text stehen (aus `splitCitations`). Während des Streamings kommen sie nach und nach dazu.
 - **Fortschrittsbalken ohne Prozent.** Wir messen keinen Fortschritt. Ein wandernder Balken zeigt nur „es passiert etwas“, mit `motion-reduce:animate-none`. Ein erfundener Prozentwert wäre unehrlich.
 - **Quellen-Dialog in 5c noch schlicht.** Die drei Formulare aus Schritt 3 im Faden-Look, mit `onDone` zum Schließen. Drag & Drop und mehrere Dateien folgen in 5d.
+- **Mehrere PDFs nacheinander, nicht parallel (5d).** `usePdfUploads` lädt eine Datei nach der anderen und führt pro Datei einen Status (lädt hoch / fertig / Fehler). Leichter nachzuvollziehen, und der Server startet nicht viele Verarbeitungen gleichzeitig. Alternative: `Promise.all` (schneller bei vielen Dateien).
+- **Upload-Zustand im Workspace, nicht im Dialog.** Schließt jemand den Dialog während des Uploads, läuft der Upload weiter. Ein Hook im Dialog würde mit ihm ausgehängt.
+- **Keine doppelte Prüfung im Browser.** Typ und Größe prüft der Server (`pdfUploadSchema`) und schickt eine deutsche Meldung, die wir pro Datei anzeigen. Eine zweite Prüfung im Browser wäre doppelter Code, der auseinanderlaufen kann. Preis: ein Server-Aufruf für eine falsche Datei.
+- **Drag & Drop auf die ganze Quellen-Spalte.** Kleiner Hook `useFileDrop`, genutzt von Spalte und Dialog. Er reagiert nur auf Dateien (`dataTransfer.types` enthält „Files“), nicht auf gezogenen Text. `dragleave` feuert auch beim Wechsel auf ein Kind-Element, deshalb prüfen wir `relatedTarget`.
+- **Gescannte PDF: „Als Text einfügen“.** Der Knopf öffnet den Dialog mit offenem Textformular und dem Titel „<Name> (Text)“. Der Weg aus dem Fehler ist damit ein Klick. OCR bleibt unter „Später“.
+- **Drop im Browser-Test per JavaScript.** Das Test-Werkzeug kann keine Datei ziehen. Wir haben ein echtes `drop`-Event mit `DataTransfer` und einer `File` aus `tmp/test-pdfs/scan.pdf` ausgelöst. Getestet: gescannte PDF → Fehlerkarte, `.txt` → „Bitte wähle eine PDF-Datei.“, Dialog bleibt bei Fehlern offen.
 
 ## Echte Zahlen
 - Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.

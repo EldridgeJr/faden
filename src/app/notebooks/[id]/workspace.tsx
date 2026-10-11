@@ -14,6 +14,7 @@ import { Chat } from "./chat";
 import { CitationPanel, type OpenCitation } from "./citation-panel";
 import { SourcePanel, type SourceItem } from "./source-panel";
 import { StudioPanel } from "./studio-panel";
+import { usePdfUploads } from "./use-pdf-uploads";
 
 type Tab = "sources" | "chat" | "studio";
 
@@ -40,6 +41,9 @@ export function Workspace({
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [openCitation, setOpenCitation] = useState<OpenCitation | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  // Set when the dialog should open with the text form and this title.
+  const [textTitle, setTextTitle] = useState<string | null>(null);
+  const uploads = usePdfUploads(notebook.id);
 
   const ready = sources.filter((s) => s.status === "ready");
   const selectedIds = ready.filter((s) => !excluded.has(s.id)).map((s) => s.id);
@@ -56,6 +60,22 @@ export function Workspace({
 
   function toggleAll(selectAll: boolean) {
     setExcluded(selectAll ? new Set() : new Set(ready.map((s) => s.id)));
+  }
+
+  function openAddDialog(title: string | null = null) {
+    // A fresh start: no upload list from last time.
+    if (!uploads.busy) uploads.clear();
+    setTextTitle(title);
+    setAddOpen(true);
+  }
+
+  // From the dropzone in the dialog or a drop on the sources column.
+  // The dialog shows the progress and closes when every file worked.
+  async function uploadFiles(files: File[]) {
+    setTextTitle(null);
+    setAddOpen(true);
+    const allOk = await uploads.upload(files);
+    if (allOk) setAddOpen(false);
   }
 
   // Small screens: an open citation covers the active tab.
@@ -98,7 +118,7 @@ export function Workspace({
               </StatusChip>
             )}
             <NotebookMenu notebookId={notebook.id} title={notebook.title} className="size-11" />
-            <Button onClick={() => setAddOpen(true)}>
+            <Button onClick={() => openAddDialog()}>
               <Plus aria-hidden />
               <span className="max-sm:sr-only">Quelle hinzufügen</span>
             </Button>
@@ -147,7 +167,10 @@ export function Workspace({
               excluded={excluded}
               onToggle={toggleSource}
               onToggleAll={toggleAll}
-              onAdd={() => setAddOpen(true)}
+              onAdd={() => openAddDialog()}
+              onFiles={uploadFiles}
+              onPasteText={openAddDialog}
+              uploading={uploads.busy}
             />
           </div>
 
@@ -185,7 +208,15 @@ export function Workspace({
         </div>
       </div>
 
-      <AddSourceDialog notebookId={notebook.id} open={addOpen} onOpenChange={setAddOpen} />
+      <AddSourceDialog
+        notebookId={notebook.id}
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        textTitle={textTitle}
+        uploads={uploads.items}
+        uploading={uploads.busy}
+        onFiles={uploadFiles}
+      />
     </div>
   );
 }

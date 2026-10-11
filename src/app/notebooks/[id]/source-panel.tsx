@@ -1,11 +1,12 @@
 "use client";
 
-import { AlignLeft, FileText, Globe, Plus, TriangleAlert } from "lucide-react";
+import { AlignLeft, CloudUpload, FileText, Globe, Plus, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DeleteSourceButton } from "./delete-source-button";
+import { useFileDrop } from "./use-file-drop";
 
 export type SourceItem = {
   id: string;
@@ -41,14 +42,22 @@ export function SourcePanel({
   onToggle,
   onToggleAll,
   onAdd,
+  onFiles,
+  onPasteText,
+  uploading,
 }: {
   sources: SourceItem[];
   excluded: ReadonlySet<string>;
   onToggle: (id: string) => void;
   onToggleAll: (selectAll: boolean) => void;
   onAdd: () => void;
+  onFiles: (files: File[]) => void;
+  onPasteText: (title: string) => void;
+  uploading: boolean;
 }) {
   const router = useRouter();
+  // PDFs can be dropped anywhere on this column, not only in the dialog.
+  const { dragging, handlers } = useFileDrop(onFiles, uploading);
   const busy = sources.some((s) => s.status === "pending" || s.status === "processing");
 
   // Polling: while a source is busy, ask the server for the page again every
@@ -66,7 +75,20 @@ export function SourcePanel({
   const allSelected = ready.length > 0 && selectedCount === ready.length;
 
   return (
-    <section aria-labelledby="sources-heading" className="flex min-h-0 flex-1 flex-col gap-3.5">
+    <section
+      aria-labelledby="sources-heading"
+      {...handlers}
+      className="relative flex min-h-0 flex-1 flex-col gap-3.5"
+    >
+      {dragging && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -inset-2 z-10 flex flex-col items-center justify-center gap-2 rounded-tile border-[1.5px] border-dashed border-foreground bg-highlight/25 font-medium backdrop-blur-[2px]"
+        >
+          <CloudUpload className="size-6" />
+          Loslassen zum Hochladen
+        </div>
+      )}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-baseline gap-2">
           <h2 id="sources-heading" className="text-xl font-medium tracking-tight">
@@ -101,6 +123,7 @@ export function SourcePanel({
             source={source}
             checked={source.status === "ready" && !excluded.has(source.id)}
             onToggle={() => onToggle(source.id)}
+            onPasteText={() => onPasteText(`${source.title} (Text)`)}
           />
         ))}
       </ul>
@@ -114,7 +137,9 @@ export function SourcePanel({
         <span className="font-medium">
           {sources.length === 0 ? "Erste Quelle hinzufügen" : "Quelle hinzufügen"}
         </span>
-        <span className="text-xs text-muted-foreground">PDF, Webseite oder eingefügter Text</span>
+        <span className="text-xs text-muted-foreground">
+          PDF, Webseite oder Text · PDFs auch hierher ziehen
+        </span>
       </button>
     </section>
   );
@@ -124,10 +149,12 @@ function SourceRow({
   source,
   checked,
   onToggle,
+  onPasteText,
 }: {
   source: SourceItem;
   checked: boolean;
   onToggle: () => void;
+  onPasteText: () => void;
 }) {
   const { Icon } = TYPES[source.type] ?? TYPES.text;
   const isReady = source.status === "ready";
@@ -137,7 +164,7 @@ function SourceRow({
   return (
     <li
       className={cn(
-        "flex items-start gap-1 rounded-tile py-2.5 pr-1.5 pl-3",
+        "flex flex-wrap items-start gap-1 rounded-tile py-2.5 pr-1.5 pl-3",
         isError ? "bg-error/50" : "bg-surface",
       )}
     >
@@ -184,6 +211,18 @@ function SourceRow({
         </span>
       </label>
       <DeleteSourceButton sourceId={source.id} title={source.title} />
+      {/* Error card of a PDF: often a scan without text. The way out is to
+          paste the text by hand. Outside the label, so a click does not
+          toggle the checkbox. */}
+      {isError && source.type === "pdf" && (
+        // pl-[78px]: checkbox 18 + gap 12 + icon 36 + gap 12, so the button
+        // starts below the title.
+        <div className="basis-full pb-1 pl-[78px]">
+          <Button variant="outline" size="sm" onClick={onPasteText}>
+            Als Text einfügen
+          </Button>
+        </div>
+      )}
     </li>
   );
 }
