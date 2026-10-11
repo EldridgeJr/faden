@@ -1,0 +1,1302 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schritt 6 · Studio</title>
+<meta name="description" content="Faden, Schritt 6: Studio mit Audio-Zusammenfassung (Lea und Tom, zwei Stimmen, Transkript mit Belegen) und Karteikarten. Einfach erklärt, mit zwei Mini-Demos.">
+<style>
+  :root {
+    --bg: #E9EBEE; --surface: #F6F7F8; --card: #FFFFFF; --tile: #F3F4F6; --line: #E3E5E8;
+    --text: #111315; --muted: #6B7078; --accent: #D6EE57; --on-accent: #111315;
+    --ok: #6E9A1C; --warn-bg: #FDF0D5; --warn: #8A5A00; --err-bg: #FDE4DB; --err: #A3361A;
+    --primary: #111315; --on-primary: #FFFFFF;
+    --c-kw: #8B3FA8; --c-str: #3B7A12; --c-num: #B25A00; --c-com: #8A9099; --c-key: #1F5FA8;
+    --shadow: 0 1px 2px rgba(17,19,21,.04), 0 8px 24px rgba(17,19,21,.06);
+    --r-card: 28px; --r-tile: 18px; --r-pill: 999px;
+    --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+      --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+      --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+      --primary: #EDEFF1; --on-primary: #111315;
+      --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+    --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+    --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+    --primary: #EDEFF1; --on-primary: #111315;
+    --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  code, .mono { font-family: var(--mono); }
+  :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 6px; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 96px; }
+  .topbar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .topbar-in { max-width: 980px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; text-decoration: none; }
+  .brand-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+  .crumb { color: var(--muted); font-size: 14px; }
+  .spacer { flex: 1; }
+  .icon-btn { border: 1px solid var(--line); background: var(--card); color: var(--text); width: 36px; height: 36px; border-radius: var(--r-pill); display: grid; place-items: center; cursor: pointer; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .toc { display: flex; gap: 6px; overflow-x: auto; padding: 14px 0 4px; scrollbar-width: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc a { flex: none; text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); color: var(--muted); transition: color .2s, border-color .2s; }
+  .toc a:hover { color: var(--text); border-color: var(--muted); }
+
+  .hero { padding: 40px 0 8px; }
+  .eyebrow { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+  h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.05; letter-spacing: -0.03em; margin: 10px 0 14px; font-weight: 650; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 640px; margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); }
+  .chip.ok::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+  .chip.err { background: var(--err-bg); color: var(--err); border-color: transparent; }
+
+  section { margin-top: 56px; scroll-margin-top: 70px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .sec-num { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  h2 { font-size: 26px; letter-spacing: -0.02em; margin: 0; font-weight: 620; }
+  h3 { font-size: 17px; margin: 0 0 6px; font-weight: 600; }
+  p { margin: 0 0 12px; }
+  .card { background: var(--card); border-radius: var(--r-card); padding: 28px; box-shadow: var(--shadow); }
+  .tile { background: var(--tile); border-radius: var(--r-tile); padding: 18px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+
+  /* 1. Was funktioniert */
+  .facts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 20px; }
+  .fact .k { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .fact .v { font-weight: 600; margin-top: 2px; word-break: break-word; }
+
+  /* 2. Diagramm */
+  .diagram-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer; font: 500 14px var(--sans); padding: 10px 16px; border-radius: var(--r-pill); background: var(--primary); color: var(--on-primary); transition: transform .15s; }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: var(--tile); color: var(--text); }
+  .btn.accent { background: var(--accent); color: var(--on-accent); }
+  .btn svg { width: 16px; height: 16px; }
+  .scroll-x { overflow-x: auto; margin: 0 -8px; padding: 0 8px; }
+  .diagram { display: block; width: 100%; min-width: 760px; height: auto; }
+  .diagram .node rect { fill: var(--tile); stroke: var(--line); stroke-width: 1.5; transition: fill .25s, stroke .25s; }
+  .diagram .node text { fill: var(--text); font: 600 13px var(--sans); }
+  .diagram .node .sub { fill: var(--muted); font: 400 11px var(--mono); }
+  .diagram .node .ico { stroke: var(--text); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .diagram .node, .diagram .edge { cursor: pointer; }
+  .diagram .node.later rect { fill: none; stroke-dasharray: 5 5; }
+  .diagram .node.later text, .diagram .node.later .ico { opacity: .55; }
+  .diagram .edge path { stroke: var(--muted); stroke-width: 1.8; fill: none; transition: stroke .25s; }
+  .diagram .edge .hit { stroke: transparent; stroke-width: 18; }
+  .diagram .edge.later path { stroke-dasharray: 4 5; opacity: .6; }
+  .diagram .edge text { fill: var(--muted); font: 500 11px var(--mono); }
+  .diagram .edge .label-bg { fill: var(--surface); }
+  .diagram .arrowhead { fill: var(--muted); }
+  .diagram .is-active rect { fill: var(--accent); stroke: var(--accent); }
+  .diagram .is-active text, .diagram .is-active .sub { fill: #111315; }
+  .diagram .is-active .ico { stroke: #111315; }
+  .diagram .edge.is-active path:not(.hit) { stroke: var(--text); stroke-width: 2.4; stroke-dasharray: 7 6; animation: flow .8s linear infinite; }
+  .diagram .edge.is-active text { fill: var(--text); }
+  @keyframes flow { to { stroke-dashoffset: -13; } }
+  .detail { margin-top: 14px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; min-height: 92px; }
+  .detail .badge { font-family: var(--mono); font-size: 12px; background: var(--accent); color: var(--on-accent); padding: 4px 10px; border-radius: var(--r-pill); white-space: nowrap; }
+  .detail h3 { margin-bottom: 4px; }
+  .detail p { margin: 0; color: var(--muted); }
+  .detail.swap { animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 520px) { .detail { grid-template-columns: 1fr; gap: 8px; } .detail .badge { justify-self: start; } }
+  .step-dots { display: flex; gap: 6px; margin-left: auto; }
+  .step-dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; transition: background .2s, transform .2s; }
+  .step-dots button.on { background: var(--text); transform: scale(1.25); }
+
+  /* 3. Dateien */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; font-size: 12px; font-weight: 500; color: var(--muted); font-family: var(--mono); padding: 0 12px 10px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { white-space: nowrap; }
+  td code { font-size: 13px; background: var(--tile); padding: 2px 7px; border-radius: 6px; }
+  .filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter button { font: 500 13px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 6px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .filter button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  tr.hidden { display: none; }
+
+  /* 4. Code */
+  .code-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .code-tabs button { font: 500 13px var(--mono); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 7px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .code-tabs button[aria-selected="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .code-card { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .code-head { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .code-head .file { font: 500 13px var(--mono); }
+  .code-head .why { color: var(--muted); font-size: 14px; flex: 1; min-width: 0; }
+  .copy { font: 500 12px var(--sans); border: 1px solid var(--line); background: var(--tile); color: var(--text); border-radius: var(--r-pill); padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .copy svg { width: 14px; height: 14px; }
+  pre { margin: 0; padding: 14px 0; overflow-x: auto; font: 13.5px/1.7 var(--mono); }
+  .ln { display: flex; padding: 0 20px 0 0; }
+  .ln .n { width: 44px; flex: none; text-align: right; padding-right: 16px; color: var(--c-com); user-select: none; }
+  .ln .t { white-space: pre; }
+  .ln.has-note { cursor: pointer; position: relative; }
+  .ln.has-note .n { color: var(--text); }
+  .ln.has-note .n::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 6px; vertical-align: middle; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .ln.has-note:hover { background: var(--tile); }
+  .ln.sel { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+  .note { margin: 0 20px 18px; padding: 14px 16px; border-radius: var(--r-tile); background: var(--tile); font-size: 15px; min-height: 52px; }
+  .note b { font-family: var(--mono); font-weight: 500; font-size: 13px; }
+  .tok-kw { color: var(--c-kw); } .tok-str { color: var(--c-str); } .tok-num { color: var(--c-num); }
+  .tok-com { color: var(--c-com); font-style: italic; } .tok-key { color: var(--c-key); } .tok-neg { color: var(--ok); font-weight: 600; }
+
+  /* Demo */
+  .demo-grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .demo-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; gap: 8px; }
+  .field input { flex: 1; min-width: 0; font: 15px var(--mono); padding: 12px 16px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); color: var(--text); }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .presets button { font: 12px var(--mono); border: 1px dashed var(--line); background: transparent; color: var(--muted); padding: 5px 10px; border-radius: var(--r-pill); cursor: pointer; }
+  .presets button:hover { color: var(--text); border-color: var(--muted); }
+  .verdict { margin-top: 16px; padding: 16px; border-radius: var(--r-tile); font-weight: 600; transition: background .25s, color .25s; }
+  .verdict.in { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+  .verdict.out { background: var(--err-bg); color: var(--err); }
+  .verdict small { display: block; font-weight: 400; color: var(--text); margin-top: 4px; font-size: 14px; }
+  .rules { list-style: none; margin: 0; padding: 0; font: 13.5px var(--mono); }
+  .rules li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 12px; border-radius: 10px; transition: background .2s; }
+  .rules li .hint { color: var(--muted); font-family: var(--sans); font-size: 12px; }
+  .rules li.hit { background: var(--tile); }
+  .rules li.win { background: var(--accent); color: #111315; }
+  .rules li.win .hint { color: #111315; }
+
+  /* Entscheidungen */
+  .decisions { display: grid; gap: 12px; }
+  .decision { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--card); border-radius: var(--r-card); overflow: hidden; box-shadow: var(--shadow); }
+  .decision > div { padding: 20px 24px; }
+  .decision .alt { background: var(--tile); }
+  .decision .lbl { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .decision .pick .lbl::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .decision p { margin: 0; font-size: 15px; }
+  @media (max-width: 640px) { .decision { grid-template-columns: 1fr; } }
+
+  /* Risiken */
+  .risks { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .risk { background: var(--card); border-radius: var(--r-tile); padding: 18px 20px; box-shadow: var(--shadow); }
+  .risk .chip { margin-bottom: 10px; }
+  .risk p { margin: 0; font-size: 15px; color: var(--muted); }
+
+  /* Lernkarten */
+  .quiz-top { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .progress { flex: 1; min-width: 160px; height: 10px; background: var(--card); border-radius: var(--r-pill); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+  .progress span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: var(--r-pill); transition: width .4s ease; }
+  .score { font: 500 14px var(--mono); }
+  .cards { display: grid; gap: 12px; }
+  .fc { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .fc-q { width: 100%; text-align: left; border: 0; background: transparent; color: var(--text); font: 600 17px/1.4 var(--sans); padding: 22px 24px; display: flex; gap: 14px; align-items: flex-start; cursor: pointer; }
+  .fc-q .num { font: 500 12px var(--mono); color: var(--muted); padding-top: 4px; }
+  .fc-q .chev { margin-left: auto; flex: none; width: 20px; height: 20px; transition: transform .3s; color: var(--muted); }
+  .fc.open .fc-q .chev { transform: rotate(180deg); }
+  .fc-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  .fc.open .fc-a { grid-template-rows: 1fr; }
+  .fc-a > div { overflow: hidden; }
+  .fc-a .inner { padding: 0 24px 22px 58px; }
+  .fc-a p { color: var(--text); }
+  .fc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .fc.known { box-shadow: var(--shadow), inset 0 0 0 2px var(--accent); }
+  .fc.known .num { color: var(--ok); }
+  @media (max-width: 520px) { .fc-a .inner { padding-left: 24px; } .card { padding: 22px; } }
+
+  footer { margin-top: 72px; color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+
+  /* Schritt 2: RLS-Demo */
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 8px 14px; border-radius: var(--r-pill); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .2s, color .2s, border-color .2s; }
+  .seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .seg .av { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 600 11px var(--sans); background: var(--tile); color: var(--text); }
+  .seg button[aria-pressed="true"] .av { background: var(--accent); color: #111315; }
+  .demo-label { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; }
+  .demo-label:first-child { margin-top: 0; }
+  .actions { display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .actions button { text-align: left; font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 10px 14px; border-radius: var(--r-tile); cursor: pointer; transition: border-color .2s, background .2s; }
+  .actions button small { display: block; color: var(--muted); font: 12px var(--mono); margin-top: 2px; }
+  .actions button[aria-pressed="true"] { border-color: var(--text); background: var(--tile); }
+  .uid { display: inline-flex; gap: 6px; align-items: center; font: 13px var(--mono); color: var(--muted); margin-top: 10px; }
+  .uid b { color: var(--text); font-weight: 500; }
+  .demo-sql { margin: 18px 0 0; padding: 14px 18px; background: var(--tile); border-radius: var(--r-tile); font: 13.5px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .gates { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; margin-top: 12px; }
+  @media (max-width: 640px) { .gates { grid-template-columns: 1fr; } }
+  .gate { border-radius: var(--r-tile); padding: 14px 16px; border: 1px solid var(--line); transition: background .25s, border-color .25s; }
+  .gate .gh { display: flex; align-items: center; gap: 8px; font: 500 12px var(--mono); color: var(--muted); }
+  .gate .st { margin-left: auto; font: 600 12px var(--mono); padding: 2px 9px; border-radius: var(--r-pill); background: var(--tile); color: var(--muted); }
+  .gate p { margin: 8px 0 0; font-size: 14.5px; }
+  .gate.ok { border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+  .gate.ok .st { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .gate.fail { border-color: color-mix(in srgb, var(--err) 45%, transparent); }
+  .gate.fail .st { background: var(--err-bg); color: var(--err); }
+  .gate.skip { opacity: .55; }
+  .rowtable { margin-top: 12px; }
+  .rowtable td, .rowtable th { font-size: 14px; }
+  .rowtable td:first-child { font-family: var(--mono); font-size: 13px; }
+  .rowtable tr { transition: opacity .25s; }
+  .rowtable tr.off td:not(:last-child) { opacity: .38; text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+  .state { font: 500 12px var(--mono); padding: 2px 9px; border-radius: var(--r-pill); white-space: nowrap; background: var(--tile); color: var(--muted); }
+  .state.on { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .state.hit { background: var(--accent); color: #111315; }
+  .state.bad { background: var(--err-bg); color: var(--err); }
+  .verdict.warn { background: var(--warn-bg); color: var(--warn); }
+  .result-swap { animation: fade .3s ease; }
+
+  /* Begriffe zum Antippen */
+  .term { display: inline; cursor: help; padding: 0 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; text-decoration: underline dotted; text-decoration-color: var(--muted); text-decoration-thickness: 1.5px; text-underline-offset: 3px; border-radius: 4px; transition: background .2s; }
+  .term:hover, .term[aria-expanded="true"] { background: color-mix(in srgb, var(--accent) 45%, transparent); text-decoration-color: transparent; }
+  .detail .badge .term, .lbl .term { text-decoration: none; }
+  .pop { position: fixed; z-index: 50; width: max-content; max-width: min(320px, calc(100vw - 24px)); background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: var(--r-tile); box-shadow: 0 12px 32px rgba(17,19,21,.18); padding: 12px 14px; font: 14.5px/1.5 var(--sans); text-align: left; animation: fade .18s ease; }
+  .pop[hidden] { display: none; }
+  .pop b { display: block; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 4px; letter-spacing: .02em; }
+  .pop p { margin: 0; color: var(--text); }
+  .hint { font-size: 14px; color: var(--muted); margin-top: 14px; }
+
+  /* ---------- Step 3: demos ---------- */
+  .demo-tabs { margin-bottom: 18px; }
+  .pane[hidden] { display: none; }
+  .demo-text { width: 100%; min-height: 150px; font: 14px/1.6 var(--sans); padding: 14px 16px; border-radius: var(--r-tile); border: 1px solid var(--line); background: var(--surface); color: var(--text); resize: vertical; }
+  .sliders { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; margin-top: 14px; }
+  .slider label { display: flex; justify-content: space-between; gap: 8px; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 6px; }
+  .slider label b { color: var(--text); font-weight: 600; }
+  .slider input[type=range] { width: 100%; accent-color: var(--text); }
+  .chunk-sum { margin-top: 18px; font-size: 14px; color: var(--muted); }
+  .chunk-sum b { color: var(--text); }
+  .chunk-list { display: grid; gap: 10px; margin-top: 10px; }
+  .chunk { border: 1px solid var(--line); border-radius: var(--r-tile); padding: 12px 14px; animation: fade .3s ease; }
+  .chunk .ch { display: flex; align-items: center; gap: 10px; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 6px; }
+  .chunk .meter { flex: 1; height: 6px; border-radius: var(--r-pill); background: var(--tile); overflow: hidden; }
+  .chunk .meter span { display: block; height: 100%; border-radius: var(--r-pill); background: var(--text); transition: width .3s ease; }
+  .chunk p { margin: 0; font-size: 14px; line-height: 1.6; }
+  .chunk mark { background: var(--warn-bg); color: var(--warn); border-radius: 4px; padding: 0 2px; }
+  .chunk .para { color: var(--muted); font-family: var(--mono); }
+  .gates.three { grid-template-columns: repeat(3, 1fr); margin-top: 16px; }
+  @media (max-width: 760px) { .sliders, .gates.three { grid-template-columns: 1fr; } }
+
+  /* ---------- Step 4: demos ---------- */
+  .rrf-mode { margin-bottom: 4px; }
+  .rrf-grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr 1.35fr; margin-top: 18px; }
+  @media (max-width: 860px) { .rrf-grid { grid-template-columns: 1fr; } }
+  .rrf-query { font-family: var(--mono); font-size: 12px; margin: -2px 0 8px; }
+  .rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .rank li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 14px; font-size: 14px; animation: fade .25s ease; }
+  .rank .pl { font: 500 12px var(--mono); color: var(--muted); width: 16px; padding-top: 2px; flex: none; }
+  .rank .it { flex: 1; min-width: 0; }
+  .rank .it b { font-family: var(--mono); font-weight: 600; }
+  .rank .it small { display: block; color: var(--muted); font: 12px var(--mono); }
+  .rank .it code { display: block; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+  .rank .mvs { display: flex; gap: 4px; flex: none; }
+  .rank .mv { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; font-size: 13px; line-height: 1; }
+  .rank .mv:disabled { opacity: .35; cursor: default; }
+  .rank li.empty { color: var(--muted); border-style: dashed; justify-content: center; }
+  .rank.fused li.top { background: color-mix(in srgb, var(--accent) 30%, transparent); border-color: color-mix(in srgb, var(--accent) 70%, var(--line)); }
+  .rank.fused li.cut { border: 0; padding: 2px 0; justify-content: center; font: 500 11px var(--mono); color: var(--muted); }
+  .rrf-bar { display: flex; height: 6px; margin-top: 6px; border-radius: var(--r-pill); background: var(--tile); overflow: hidden; }
+  .rrf-bar .v { background: var(--text); transition: width .3s ease; }
+  .rrf-bar .f { background: var(--ok); transition: width .3s ease; }
+  .sliders.one { grid-template-columns: 1fr; max-width: 420px; }
+  .demo-text.short { min-height: 96px; font-family: var(--mono); font-size: 13.5px; }
+  .answer-preview { background: var(--surface); border-radius: var(--r-tile); padding: 14px 16px; white-space: pre-wrap; line-height: 1.7; }
+  .cite-btn { margin: 0 2px; border: 0; cursor: pointer; border-radius: var(--r-pill); padding: 0 6px; font: 600 11px var(--mono); vertical-align: super; background: var(--accent); color: #111315; }
+  .cite-btn.on { background: #111315; color: var(--accent); }
+  .cite-panel { margin-top: 8px; border: 1px solid var(--line); border-radius: var(--r-tile); padding: 12px 14px; font-size: 14px; animation: fade .25s ease; }
+  .cite-panel b { font-weight: 600; }
+  .cite-panel p { margin: 6px 0 0; color: var(--muted); }
+  .prompt-view { background: var(--surface); border-radius: var(--r-tile); padding: 14px 16px; font: 13px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .prompt-view .own { background: var(--accent); color: #111315; border-radius: 4px; padding: 0 3px; }
+  .prompt-view mark { background: var(--warn-bg); color: var(--warn); border-radius: 4px; padding: 0 2px; }
+  /* ---------- Step 6 ---------- */
+  .diagram .zone { fill: var(--muted); font: 500 11px var(--mono); letter-spacing: .06em; }
+  .sliders.three { grid-template-columns: repeat(3, 1fr); }
+  .sliders.one { margin-top: 14px; }
+  .pick-row { margin-top: 12px; }
+  .pick-row .pl { font: 500 12px var(--mono); color: var(--muted); }
+  .pick-row .pl b { color: var(--text); font-weight: 600; }
+  .cells { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .cell { width: 22px; height: 22px; border-radius: 6px; background: var(--tile); border: 1px solid var(--line); display: grid; place-items: center; font: 600 10px var(--mono); color: #111315; transition: background .2s, border-color .2s; }
+  .cell.on { background: var(--accent); border-color: var(--accent); }
+  #pickCompare { margin-top: 16px; }
+  .bitgroups { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bitgroup { border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; text-align: center; transition: background .2s, border-color .2s; }
+  .bitgroup b { display: block; font: 600 13px var(--mono); letter-spacing: .08em; }
+  .bitgroup small { display: block; font: 11px var(--mono); color: var(--muted); }
+  .bitgroup.key { border-color: var(--text); background: var(--tile); }
+  .bitgroup.bad { border-color: color-mix(in srgb, var(--err) 60%, transparent); background: var(--err-bg); }
+  .bitgroup.bad small { color: var(--err); }
+  .rowtable tr.cur td { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+  .mtrack { display: flex; align-items: center; gap: 3px; height: 40px; margin-top: 14px; }
+  .mseg { height: 12px; border-radius: 999px; background: var(--line); min-width: 3px; flex-basis: 0; transition: background .2s; }
+  .mseg.lea { height: 22px; }
+  .mseg.past { background: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+  .mseg.on { background: var(--accent); }
+  #mp3Now .verdict { margin-top: 10px; }
+  #fileRows td:first-child { line-height: 2; }
+  @media (max-width: 760px) { .sliders.three { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html" aria-label="Zur Übersicht aller Schritte">
+      <span class="brand-dot" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#111315" stroke-width="2.4" stroke-linecap="round"><path d="M4 12c4-8 12 8 16 0"/></svg></span>
+      Faden
+    </a>
+    <span class="crumb">/ Erklärungen / Schritt 6</span>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten"></button>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Abschnitte">
+    <a href="#funktioniert">Was funktioniert</a>
+    <a href="#ablauf">Ablauf</a>
+    <a href="#dateien">Dateien</a>
+    <a href="#code">Code</a>
+    <a href="#demo">Demo</a>
+    <a href="#entscheidungen">Entscheidungen</a>
+    <a href="#risiken">Was schiefgehen kann</a>
+    <a href="#interview">Interview-Check</a>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">SCHRITT 6 VON 7 · 12.10.2026</div>
+    <h1>Studio: Podcast mit zwei Stimmen und Karteikarten</h1>
+    <p class="lead" data-rich>Aus den ausgewählten Quellen macht Faden jetzt zwei neue Formate. Eine Audio-Zusammenfassung, in der Lea und Tom über die Quellen sprechen. Und Karteikarten zum Lernen. Beide haben [[citation|Belege]] wie der Chat.</p>
+    <div class="chips">
+      <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test 185/185</span><span class="chip ok">live auf Vercel getestet</span>
+    </div>
+    <div class="hint" data-rich>Tipp: [[term|Gepunktet unterstrichene Wörter]] antippen. Dann erscheint eine kurze Erklärung.</div>
+  </header>
+
+  <!-- 1 -->
+  <section id="funktioniert">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Was jetzt funktioniert</h2></div>
+    <div class="card" data-rich>
+      <p>Die Studio-Spalte hat zwei echte Knöpfe: „Audio-Zusammenfassung“ und „Karteikarten“. Ein Klick startet einen [[job|Hintergrundjob]], die Spalte zeigt den Fortschritt. Der Podcast ist etwa 5 Minuten lang, Lea fragt und Tom erklärt. Auf seiner eigenen Seite gibt es einen Player, ein Transkript zum Mitlesen und einen MP3-Download. Karteikarten dreht man mit einem Klick um. Jede Antwort hat einen Beleg, der zur Stelle in der Quelle springt.</p>
+      <div class="facts">
+        <div class="tile fact"><div class="k">PODCAST FERTIG IN</div><div class="v mono small">37–58 s (live 47 s)</div></div>
+        <div class="tile fact"><div class="k">LÄNGE</div><div class="v mono small">ca. 5 Min. · 20–24 Redebeiträge</div></div>
+        <div class="tile fact"><div class="k">STIMMEN</div><div class="v mono small">Lea: marin · Tom: cedar</div></div>
+        <div class="tile fact"><div class="k">KARTEIKARTEN</div><div class="v mono small">bis 12 Karten in 10–25 s</div></div>
+        <div class="tile fact"><div class="k">NEUE TESTS</div><div class="v mono small">66 (jetzt 185)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="ablauf">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Ablauf: Vom Klick zum Podcast</h2></div>
+    <div class="card">
+      <div class="diagram-tools">
+        <button class="btn" id="playBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg><span>Abspielen</span></button>
+        <button class="btn ghost" id="prevBtn" type="button" aria-label="Vorheriger Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button class="btn ghost" id="nextBtn" type="button" aria-label="Nächster Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        <div class="step-dots" id="dots" role="tablist" aria-label="Schritte im Ablauf"></div>
+      </div>
+      <div class="scroll-x">
+        <svg class="diagram" id="diagram" viewBox="0 0 900 380" role="img" aria-label="Datenfluss beim Podcast: Ein Klick im Studio ruft eine Server Action auf. Sie prüft alles und legt eine Zeile in Postgres an. Mit after() startet ein Hintergrundjob. Er holt 16 Abschnitte, lässt OpenAI das Skript schreiben und jeden Redebeitrag vertonen. Die Teile werden zu einer MP3 zusammengefügt und in Supabase Storage gespeichert. Die Seite fragt alle 2 Sekunden nach dem Status. Der Player holt die MP3 über eine signierte URL.">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0 0 10 5 0 10z"/></marker>
+          </defs>
+
+          <text class="zone" x="10" y="26">BROWSER</text>
+          <text class="zone" x="250" y="26">SERVER (VERCEL, FRANKFURT)</text>
+          <text class="zone" x="740" y="26">OPENAI</text>
+
+          <!-- edges -->
+          <g class="edge" data-id="e1"><path class="hit" d="M150 76 H250"/><path d="M150 76 H248" marker-end="url(#ah)"/><rect class="label-bg" x="168" y="46" width="64" height="18" rx="9"/><text x="200" y="59" text-anchor="middle">Klick</text></g>
+          <g class="edge" data-id="e3"><path class="hit" d="M390 76 H490"/><path d="M390 76 H488" marker-end="url(#ah)"/><rect class="label-bg" x="406" y="46" width="68" height="18" rx="9"/><text x="440" y="59" text-anchor="middle">after()</text></g>
+          <g class="edge" data-id="e5"><path class="hit" d="M630 62 H740"/><path d="M630 62 H738" marker-end="url(#ah)"/><rect class="label-bg" x="638" y="40" width="94" height="16" rx="8"/><text x="685" y="52" text-anchor="middle">Prompt · Texte</text></g>
+          <g class="edge" data-id="e6"><path class="hit" d="M740 96 H630"/><path d="M740 96 H632" marker-end="url(#ah)"/><rect class="label-bg" x="632" y="102" width="106" height="18" rx="9"/><text x="685" y="115" text-anchor="middle">Skript · MP3-Teile</text></g>
+          <g class="edge" data-id="e2"><path class="hit" d="M290 112 V250"/><path d="M290 112 V248" marker-end="url(#ah)"/><rect class="label-bg" x="192" y="160" width="92" height="18" rx="9"/><text x="238" y="173" text-anchor="middle">Zeile: wartet</text></g>
+          <g class="edge" data-id="e4"><path class="hit" d="M520 112 V185 H370 V250"/><path d="M520 112 V185 H370 V248" marker-end="url(#ah)"/><rect class="label-bg" x="378" y="176" width="134" height="18" rx="9"/><text x="445" y="189" text-anchor="middle">Abschnitte · Status</text></g>
+          <g class="edge" data-id="e7"><path class="hit" d="M600 112 V250"/><path d="M600 112 V248" marker-end="url(#ah)"/><rect class="label-bg" x="606" y="160" width="62" height="18" rx="9"/><text x="637" y="173" text-anchor="middle">22 Teile</text></g>
+          <g class="edge" data-id="e8"><path class="hit" d="M630 286 H740"/><path d="M630 286 H738" marker-end="url(#ah)"/><rect class="label-bg" x="648" y="256" width="74" height="18" rx="9"/><text x="685" y="269" text-anchor="middle">eine MP3</text></g>
+          <g class="edge" data-id="e9"><path class="hit" d="M250 286 H150"/><path d="M250 286 H152" marker-end="url(#ah)"/><rect class="label-bg" x="152" y="292" width="96" height="18" rx="9"/><text x="200" y="305" text-anchor="middle">alle 2 s</text></g>
+          <g class="edge" data-id="e10"><path class="hit" d="M810 322 V362 H80 V322"/><path d="M810 322 V362 H80 V324" marker-end="url(#ah)"/><rect class="label-bg" x="390" y="353" width="120" height="18" rx="9"/><text x="450" y="366" text-anchor="middle">signierte URL</text></g>
+
+          <!-- nodes -->
+          <g class="node" data-id="n1" tabindex="0" role="button" aria-label="Studio-Spalte im Browser">
+            <rect x="10" y="40" width="140" height="72" rx="18"/>
+            <rect class="ico" x="26" y="56" width="8" height="8" rx="2"/><rect class="ico" x="38" y="56" width="8" height="8" rx="2"/><rect class="ico" x="26" y="68" width="8" height="8" rx="2"/><rect class="ico" x="38" y="68" width="8" height="8" rx="2"/>
+            <text x="56" y="68">Studio</text><text class="sub" x="26" y="96">Kachel · Status</text>
+          </g>
+          <g class="node" data-id="n2" tabindex="0" role="button" aria-label="Server Action createStudioItem">
+            <rect x="250" y="40" width="140" height="72" rx="18"/>
+            <path class="ico" d="M274 54l-8 11h6l-4 9 10-12h-6l4-8z"/>
+            <text x="294" y="68">Action</text><text class="sub" x="266" y="96">createStudioItem</text>
+          </g>
+          <g class="node" data-id="n3" tabindex="0" role="button" aria-label="Hintergrundjob generatePodcast">
+            <rect x="490" y="40" width="140" height="72" rx="18"/>
+            <circle class="ico" cx="513" cy="64" r="6"/><path class="ico" d="M513 54v3M513 71v3M503 64h3M520 64h3"/>
+            <text x="532" y="68">Job</text><text class="sub" x="506" y="96">generatePodcast</text>
+          </g>
+          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="OpenAI: Skript und Sprache">
+            <rect x="740" y="40" width="140" height="72" rx="18"/>
+            <path class="ico" d="M765 55l2.5 6.5L774 64l-6.5 2.5L765 73l-2.5-6.5L756 64l6.5-2.5z"/>
+            <text x="784" y="68">OpenAI</text><text class="sub" x="756" y="96">Skript · Sprache</text>
+          </g>
+          <g class="node" data-id="n8" tabindex="0" role="button" aria-label="Player im Browser">
+            <rect x="10" y="250" width="140" height="72" rx="18"/>
+            <circle class="ico" cx="35" cy="274" r="9"/><path class="ico" d="M32 270v8l7-4z"/>
+            <text x="56" y="278">Player</text><text class="sub" x="26" y="306">Transkript, Belege</text>
+          </g>
+          <g class="node" data-id="n5" tabindex="0" role="button" aria-label="Postgres, die Datenbank">
+            <rect x="250" y="250" width="140" height="72" rx="18"/>
+            <ellipse class="ico" cx="275" cy="268" rx="9" ry="4"/><path class="ico" d="M266 268v12c0 2 4 4 9 4s9-2 9-4v-12"/>
+            <text x="294" y="278">Postgres</text><text class="sub" x="266" y="306">studio_items</text>
+          </g>
+          <g class="node" data-id="n6" tabindex="0" role="button" aria-label="MP3 zusammenfügen">
+            <rect x="490" y="250" width="140" height="72" rx="18"/>
+            <path class="ico" d="M506 270v-6M511 274v-14M516 270v-6M521 276v-18M526 270v-6"/>
+            <text x="536" y="278">MP3</text><text class="sub" x="506" y="306">joinMp3</text>
+          </g>
+          <g class="node" data-id="n7" tabindex="0" role="button" aria-label="Supabase Storage, Bucket studio">
+            <rect x="740" y="250" width="140" height="72" rx="18"/>
+            <path class="ico" d="M756 264h7l2 3h11v12h-20z"/>
+            <text x="784" y="278">Storage</text><text class="sub" x="756" y="306">Bucket „studio“</text>
+          </g>
+        </svg>
+      </div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="dateien">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Geänderte Dateien</h2></div>
+    <div class="card">
+      <div class="filter" role="group" aria-label="Dateien filtern">
+        <button type="button" data-f="all" aria-pressed="true">Alle</button>
+        <button type="button" data-f="base" aria-pressed="false">Grundlage</button>
+        <button type="button" data-f="cards" aria-pressed="false">Karteikarten</button>
+        <button type="button" data-f="pod" aria-pressed="false">Podcast</button>
+        <button type="button" data-f="ui" aria-pressed="false">Oberfläche</button>
+        <button type="button" data-f="conf" aria-pressed="false">Tests und Notizen</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>DATEI</th><th>AUFGABE</th><th>WARUM SO</th></tr></thead>
+          <tbody id="fileRows" data-rich>
+            <tr data-k="base"><td><code>migrations/…_studio_bucket.sql</code></td><td>Privater [[bucket|Bucket]] „studio“ für die MP3s</td><td>Nutzer dürfen ihre Dateien lesen und löschen, aber nichts hochladen. Nur der Server schreibt, mit dem Admin-Schlüssel.</td></tr>
+            <tr data-k="base"><td><code>supabase/checks/rls.sql</code></td><td>Prüft den neuen Bucket mit</td><td>Zwei Testnutzer: A sieht seine MP3, B nicht, A kann nichts hochladen. Löschen lässt sich per SQL nicht testen, Supabase verbietet das direkt.</td></tr>
+            <tr data-k="base"><td><code>src/lib/ai/models.ts</code></td><td>Studio-Modell und Sprachmodell</td><td>Eine Stelle für alle Modelle. Das Studio nutzt dasselbe Modell wie der Chat, aber mit mehr [[reasoning|Nachdenken]].</td></tr>
+            <tr data-k="base"><td><code>src/lib/ai/source-blocks.ts</code></td><td>Die nummerierten [[quelle|Quellblöcke]] im Prompt</td><td>Aus dem Chat-Prompt herausgezogen. Der Schutz gegen [[injection|Prompt Injection]] steht nur noch einmal im Code.</td></tr>
+            <tr data-k="base"><td><code>src/lib/rate-limit.ts</code><br><code>schemas.ts</code></td><td>Studio-Limit, Eingabe-Schema</td><td>Eigene Grenzen: 5 pro Stunde, 20 pro Tag. Ein Podcast kostet ein Vielfaches einer Chat-Antwort.</td></tr>
+            <tr data-k="base"><td><code>src/lib/studio/pick-chunks.ts</code><br><code>load-chunks.ts</code></td><td>Welche Abschnitte das Modell bekommt</td><td>Ohne Frage gibt es keine Suche. 16 Abschnitte, gleichmäßig verteilt. Die Datenbank liefert höchstens 1.000 Zeilen pro Anfrage, darum seitenweise.</td></tr>
+            <tr data-k="base"><td><code>src/lib/studio/job.ts</code><br><code>status.ts</code><br><code>summary.ts</code></td><td>Gemeinsamer Ablauf aller Studio-Jobs</td><td>Element annehmen, Fehler speichern, [[stuck|hängende Jobs]] erkennen, Text für die Anzeige. Karteikarten und Podcast nutzen dasselbe.</td></tr>
+            <tr data-k="cards"><td><code>src/lib/studio/flashcards.ts</code></td><td>Schema, Prompt und Prüfung der Karten</td><td>Reine Funktionen, darum leicht zu testen. Eine Karte ohne gültigen Beleg fliegt raus.</td></tr>
+            <tr data-k="cards"><td><code>src/lib/studio/generate-flashcards.ts</code></td><td>Der Hintergrundjob für Karteikarten</td><td>Gleiches Muster wie beim Einlesen: wartet → in Arbeit → bereit oder Fehler.</td></tr>
+            <tr data-k="pod"><td><code>src/lib/studio/podcast.ts</code></td><td>Skript-Schema, Prompt, Hilfsfunktionen</td><td>Lea fragt, Tom erklärt. Vor der Sprache werden die Belege entfernt. Dazu: welcher Beitrag läuft gerade, Dateiname für den Download.</td></tr>
+            <tr data-k="pod"><td><code>src/lib/studio/generate-podcast.ts</code></td><td>Skript → Sprache → MP3 → Storage</td><td>Der Fortschritt steht nach jedem Teil in der Datenbank. Scheitert ein späterer Schritt, löscht der Job die MP3 wieder.</td></tr>
+            <tr data-k="pod"><td><code>src/lib/studio/mp3.ts</code></td><td>MP3 lesen, Dauer messen, zusammenfügen</td><td>Eigener kleiner Parser statt [[ffmpeg|ffmpeg]]. Gegen die echten OpenAI-Dateien geprüft: gleiche Dauer wie das macOS-Werkzeug.</td></tr>
+            <tr data-k="pod"><td><code>src/lib/studio/concurrency.ts</code></td><td>Höchstens 4 Aufrufe [[concurrency|gleichzeitig]]</td><td>Ergebnisse in der richtigen Reihenfolge. Nach einem Fehler startet kein neuer, bezahlter Aufruf.</td></tr>
+            <tr data-k="ui"><td><code>notebooks/[id]/studio-actions.ts</code></td><td>[[serveraction|Server Actions]]: erstellen, löschen</td><td>Prüft Login, Eingabe, [[ratelimit|Rate Limit]] und Rechte selbst. Erst danach startet der Job.</td></tr>
+            <tr data-k="ui"><td><code>studio-panel.tsx</code><br><code>use-polling.ts</code></td><td>Die Studio-Spalte mit Status</td><td>Fragt nach, solange etwas in Arbeit ist ([[polling|Polling]]). Die Polling-Logik der Quellenliste nutzt jetzt denselben [[hook|Hook]].</td></tr>
+            <tr data-k="ui"><td><code>cited-text.tsx</code></td><td>Belege überall gleich</td><td>Aus dem Chat herausgezogen. Chat, Karteikarten und Transkript zeigen [1] gleich.</td></tr>
+            <tr data-k="ui"><td><code>studio/[itemId]/page.tsx</code><br><code>studio-frame.tsx</code></td><td>Eigene Seite pro Studio-Element</td><td>Das Element muss zum Notebook in der Adresse gehören. Fremd, unbekannt oder falsch kombiniert: [[http404|404]].</td></tr>
+            <tr data-k="ui"><td><code>flashcards-view.tsx</code></td><td>Karten zum Umdrehen</td><td>Jede Karte ist ein neues Element (<code>[[reactkey|key]]</code>). Sonst sähe man beim Weiterblättern kurz die nächste Antwort.</td></tr>
+            <tr data-k="ui"><td><code>podcast-view.tsx</code><br><code>podcast-player.tsx</code><br><code>use-audio-player.ts</code></td><td>Player, Transkript, Mitlesen</td><td>Der Zustand kommt vom <code>&lt;audio&gt;</code>-Element. Die Leiste zeigt echte Redebeiträge, keine erfundene Wellenform.</td></tr>
+            <tr data-k="ui"><td><code>notebooks/actions.ts</code><br><code>globals.css</code><br><code>format.ts</code></td><td>Notebook löschen, Player-Farben, Zeitformate</td><td>Löschen leert jetzt beide Buckets. [[cascade|on delete cascade]] erreicht keine Dateien.</td></tr>
+            <tr data-k="conf"><td><code>src/lib/**/*.test.ts</code></td><td>66 neue Tests (jetzt 185)</td><td>Auswahl der Abschnitte, MP3-Parser, Parallel-Helfer, Prüfung von Karten und Skript, Status, Formate.</td></tr>
+            <tr data-k="conf"><td><code>NOTIZEN.md</code></td><td>Lerntagebuch</td><td>Zum Beispiel: Das Modell ignorierte die Wortzahl (962 statt 600 Wörter). Gelöst mit einer Zahl von Redebeiträgen.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="code">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Wichtigster Code</h2></div>
+    <p class="muted">Zeilen mit Punkt sind anklickbar. Ein Klick zeigt, was die Zeile tut. Die Ausschnitte sind leicht gekürzt.</p>
+    <div class="code-tabs" role="tablist" id="codeTabs"></div>
+    <div class="code-card">
+      <div class="code-head">
+        <span class="file" id="codeFile"></span>
+        <span class="why" id="codeWhy"></span>
+        <button class="copy" id="copyBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Kopieren</span></button>
+      </div>
+      <pre id="codePre" role="tabpanel"></pre>
+      <div class="note" id="codeNote" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo">
+    <div class="sec-head"><span class="sec-num">04b</span><h2>Mini-Demos</h2></div>
+    <div class="card">
+      <div class="seg demo-tabs" id="demoTabs" role="group" aria-label="Demo wählen">
+        <button type="button" data-pane="panePick" aria-pressed="true">Abschnitte verteilen</button>
+        <button type="button" data-pane="paneMp3" aria-pressed="false">MP3-Frames → Startzeiten</button>
+      </div>
+
+      <div class="pane" id="panePick">
+        <p class="muted" data-rich>Der Podcast hat keine Frage, also gibt es keine Suche. Trotzdem soll das Modell alle Quellen sehen, nicht nur die erste. [[pickchunks|pickChunks]] verteilt die Plätze reihum auf die Quellen und nimmt in jeder Quelle gleichmäßig verteilte [[chunk|Abschnitte]]. Stell die Größe der Quellen ein.</p>
+        <div class="sliders three">
+          <div class="slider"><label for="pickA">Hausordnung <b id="pickAVal"></b></label><input type="range" id="pickA" min="0" max="40" step="1" value="3"></div>
+          <div class="slider"><label for="pickB">Notiz <b id="pickBVal"></b></label><input type="range" id="pickB" min="0" max="40" step="1" value="1"></div>
+          <div class="slider"><label for="pickC">Völkerschlachtdenkmal <b id="pickCVal"></b></label><input type="range" id="pickC" min="0" max="80" step="1" value="40"></div>
+        </div>
+        <div class="sliders one">
+          <div class="slider"><label for="pickMax">Plätze für das Modell <b id="pickMaxVal"></b></label><input type="range" id="pickMax" min="4" max="24" step="1" value="16"></div>
+        </div>
+        <div class="demo-label">Abschnitte je Quelle · lime = ausgewählt · Zahl = Beleg im Prompt</div>
+        <div id="pickRows"></div>
+        <div class="gates" id="pickCompare"></div>
+      </div>
+
+      <div class="pane" id="paneMp3" hidden>
+        <p class="muted" data-rich>Jede MP3 von OpenAI besteht nur aus [[frame|Frames]]. Jeder Frame beginnt mit 4 Bytes, die sagen, wie lang er ist und wie viel Ton er enthält. Unten die echten 4 Bytes aus dem Hörtest. Mit dem Häkchen siehst du den Fehler, den die KI dabei zuerst gemacht hat.</p>
+        <div class="demo-label">Frame-Kopf: FF F3 C4 C4 in Bits</div>
+        <div class="bitgroups" id="mp3Bits"></div>
+        <label class="bugtoggle"><input type="checkbox" id="mp3Bug"> Fehler aus dem Hörtest: mit den Tabellen für MPEG-1 lesen</label>
+        <div class="gates" id="mp3Header"></div>
+        <div class="demo-label">Sechs Redebeiträge: Frames → Dauer → Startzeit</div>
+        <div class="table-wrap">
+          <table class="rowtable" id="mp3Turns"></table>
+        </div>
+        <div class="mtrack" id="mp3Track" aria-hidden="true"></div>
+        <div class="sliders one">
+          <div class="slider"><label for="mp3Time">Position im Podcast <b id="mp3TimeVal"></b></label><input type="range" id="mp3Time" min="0" max="49" step="0.1" value="12"></div>
+        </div>
+        <div id="mp3Now" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="entscheidungen">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Entscheidungen und Alternativen</h2></div>
+    <div class="decisions" data-rich>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>16 Abschnitte gleichmäßig verteilt</h3><p>[[pickchunks|pickChunks]] gibt jeder Quelle reihum einen Platz und nimmt Anfang, Mitte und Ende. Die Belege zeigen auf den echten Text der Quelle.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Jede Quelle erst zusammenfassen, dann aus den Zusammenfassungen schreiben (Map-Reduce). Deckt alles ab, kostet aber mehr Zeit und Geld. Belege würden auf Zusammenfassungen zeigen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Hintergrundjob mit after() und Polling</h3><p>Die Action antwortet sofort, der Job läuft weiter. Die Seite fragt alle 2 Sekunden nach. Kein extra Dienst nötig, ein Podcast braucht unter einer Minute.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Eine echte [[queue|Warteschlange]] und Push-Nachrichten. Robuster bei langen Jobs und vielen Nutzern, aber mehr Aufbau. Steht unter „Nächste Schritte“.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>MP3s selbst aneinanderhängen</h3><p>Ein kleiner Parser liest die Frame-Köpfe, misst die Dauer und hängt die Frames aneinander. So kennen wir auch die Startzeit jedes Redebeitrags.</p></div><div class="alt"><div class="lbl">Alternative</div><p>[[ffmpeg|ffmpeg]]. Kann alles, ist aber ein Programm von etwa 70 MB in der Vercel-Funktion. Für Aneinanderhängen zu viel.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Länge über die Zahl der Redebeiträge</h3><p>„20 bis 24 Redebeiträge, je höchstens 40 Wörter“. Gleiche Quellen: 604 Wörter, 4:54 Minuten.</p></div><div class="alt"><div class="lbl">Alternative</div><p>„Etwa 600 Wörter“. Ausprobiert: Das Modell schrieb 701 und einmal 962 Wörter, das waren 8 Minuten. Ein Modell kann seine eigenen Wörter nicht zählen.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Belege im Skript, vor der Sprache entfernt</h3><p>Das Modell schreibt [n] direkt hinter die Aussage, wie im Chat. Das Transkript macht Knöpfe daraus. <code>spokenText</code> entfernt sie, bevor die Stimme liest.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Ein eigenes Feld mit Belegnummern pro Redebeitrag. Dann wüsste man nicht, welcher Satz welchen Beleg hat.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Sprecher-Leiste statt Wellenform</h3><p>Ein Abschnitt pro Redebeitrag, so breit wie seine Dauer. Echte Daten. Darüber ein unsichtbarer Schieberegler, so geht Spulen auch mit Tastatur und Screenreader.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Balken wie im Design. Die Höhen wären erfunden, echte Lautstärken bräuchten ein Dekodieren der MP3.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Eigene Seite pro Studio-Element</h3><p>Wie im Design. Player, Transkript und Beleg-Ansicht haben Platz. Die Adresse lässt sich teilen und neu laden.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Alles in der schmalen Studio-Spalte, etwa 300 Pixel breit. Für ein Transkript mit Belegen zu eng.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Nur Funktionen, die es gibt</h3><p>Von „Folge anpassen“ bleibt nur „Neu erstellen“. Länge, Sprache und Stimmen sind nicht gebaut, also gibt es auch keine Knöpfe dafür.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Alle Felder aus dem Design zeigen. Knöpfe ohne Funktion wirken im Live-Test unecht.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="risiken">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Was schiefgehen kann</h2></div>
+    <div class="risks" data-rich>
+      <div class="risk"><span class="chip err">Betrieb</span><h3>Vercel bricht nach 300 Sekunden ab</h3><p>Ein Podcast braucht heute unter einer Minute. Bricht ein Job trotzdem ab, bleibt er „in Arbeit“. Nach 10 Minuten zeigt Faden ihn als Fehler, und man kann ihn löschen.</p></div>
+      <div class="risk"><span class="chip warn">Qualität</span><h3>Die Länge schwankt</h3><p>Das Modell hält die Grenzen nicht genau ein: 27 statt höchstens 24 Redebeiträge, ein Beitrag mit 70 Wörtern. Die Folgen liegen trotzdem bei 4 bis 6 Minuten.</p></div>
+      <div class="risk"><span class="chip warn">Qualität</span><h3>Aussprache</h3><p>Die Stimmen sind für Englisch optimiert. Die Anweisung „Hochdeutsch ohne Akzent“ hilft. Abkürzungen wie „NSDAP“ liest die Stimme Buchstabe für Buchstabe.</p></div>
+      <div class="risk"><span class="chip warn">Qualität</span><h3>Ein Beleg ist kein Beweis</h3><p>Karten ohne Beleg fliegen raus, ein Skript ohne Beleg ist ein Fehler. Eine falsch zusammengefasste Aussage kann trotzdem einen Beleg haben. Darum springt jeder Beleg zur Stelle: Man kann nachprüfen.</p></div>
+      <div class="risk"><span class="chip">Kosten</span><h3>Jeder Podcast kostet Geld</h3><p>Skript und Sprache. Das [[ratelimit|Rate Limit]] erlaubt 5 pro Stunde und 20 pro Tag. Die Sprach-API meldet keine Token-Zahlen, die echten Kosten pro Minute stehen nur im OpenAI-Dashboard.</p></div>
+      <div class="risk"><span class="chip">Betrieb</span><h3>Die MP3-Adresse läuft ab</h3><p>Die [[signedurl|signierte URL]] gilt eine Stunde. Wer die Seite länger offen hat, muss neu laden, bevor er wieder abspielt.</p></div>
+      <div class="risk"><span class="chip">Sicherheit</span><h3>Text aus Quellen im Prompt</h3><p>Steht in einer Quelle „Ignoriere alle Regeln“, ist das nur Material. Die [[quelle|Quellblöcke]] lassen sich nicht schließen, die Regeln sagen das ausdrücklich. Skript und Karten werden als Text gezeigt, nie als HTML.</p></div>
+      <div class="risk"><span class="chip">Noch offen</span><h3>Löschen eines Podcasts mit MP3</h3><p>Das Löschen von Karteikarten und von Podcasts ohne Audio ist im Browser getestet. Ein Podcast mit MP3 noch nicht: Dabei muss die Datei über die Storage-API verschwinden. Steht als nächster Test an.</p></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="interview">
+    <div class="sec-head"><span class="sec-num">07</span><h2>Interview-Check</h2></div>
+    <div class="quiz-top">
+      <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+      <span class="score" id="score">0 von 5 gewusst</span>
+      <button class="btn ghost" id="resetQuiz" type="button">Zurücksetzen</button>
+    </div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <footer>
+    <span>Faden · Erklärung zu Schritt 6</span>
+    <span><a href="schritt-5-oberflaeche.html">← Schritt 5</a> · <a href="index.html">Alle Schritte →</a></span>
+  </footer>
+</div>
+
+<div class="pop" id="pop" role="dialog" aria-live="polite" hidden><b id="popT"></b><p id="popD"></p></div>
+
+<!-- Code samples as plain text: no escaping needed -->
+<script type="text/plain" id="src-pick">export const MAX_STUDIO_CHUNKS = 16;
+
+export function pickChunks<T extends ChunkRef>(
+  chunks: T[],
+  sourceIds: string[],
+  max = MAX_STUDIO_CHUNKS,
+): T[] {
+  // The chunks of each source, in text order.
+  const bySource = sourceIds.map((sourceId) =>
+    chunks.filter((chunk) => chunk.sourceId === sourceId).sort((a, b) => a.position - b.position),
+  );
+
+  // 1. How many per source: one at a time, source after source (round robin).
+  const counts = bySource.map(() => 0);
+  let total = 0;
+  let added = true;
+  while (total < max && added) {
+    added = false;
+    for (let s = 0; s < bySource.length && total < max; s++) {
+      if (counts[s] < bySource[s].length) {
+        counts[s]++;
+        total++;
+        added = true;
+      }
+    }
+  }
+
+  // 2. Which ones: k chunks out of n, evenly spaced.
+  return bySource.flatMap((list, s) => {
+    const n = list.length;
+    const k = counts[s];
+    return Array.from({ length: k }, (_, i) => list[Math.floor(((i + 0.5) * n) / k)]);
+  });
+}</script>
+<script type="text/plain" id="src-action">export async function createStudioItem(input: unknown): Promise<CreateStudioItemResult> {
+  // 1. Login.
+  const { supabase, userId } = await requireUser();
+
+  // 2. Input.
+  const parsed = studioRequestSchema.safeParse(input);
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  const { notebookId, sourceIds, kind } = parsed.data;
+
+  // 3. Rate limit, before any paid call.
+  if (!(await allowStudioRequest(userId))) {
+    return { error: "Du hast gerade sehr viel erstellt. Bitte versuche es später noch einmal." };
+  }
+
+  // 4. Rights. RLS shows only sources in the user's notebooks.
+  const { data: sources } = await supabase
+    .from("sources")
+    .select("id")
+    .eq("notebook_id", notebookId)
+    .eq("status", "ready")
+    .in("id", sourceIds);
+  if (sources.length === 0) return { error: "Bitte wähle mindestens eine bereite Quelle aus." };
+
+  const { data: item } = await supabase
+    .from("studio_items")
+    .insert({ notebook_id: notebookId, kind, data: { sourceIds: sources.map((s) => s.id) } })
+    .select("id")
+    .single();
+
+  const job = JOBS[kind];
+  after(() => job(item.id));
+
+  refresh();
+  return { error: null, itemId: item.id };
+}</script>
+<script type="text/plain" id="src-podcast">let done = 0;
+let progressWrites = Promise.resolve();
+const saveProgress = (progress: PodcastProgress) => {
+  progressWrites = progressWrites
+    .then(() => saveData({ ...scripted, progress }))
+    .catch((error) => console.warn("podcast progress not saved", itemId, error));
+};
+
+const parts = await mapWithConcurrency(turns, CONCURRENT_SPEECH_CALLS, async (turn) => {
+  const { audio } = await generateSpeech({
+    model: speechModel,
+    text: spokenText(turn.text),
+    voice: SPEAKERS[turn.speaker].voice,
+    instructions: SPEECH_INSTRUCTIONS,
+    outputFormat: "mp3",
+    abortSignal: AbortSignal.timeout(SPEECH_TIMEOUT_MS),
+  });
+  done++;
+  saveProgress({ stage: "audio", done, total: turns.length });
+  return audio.uint8Array;
+});
+await progressWrites;
+
+const { bytes, durations } = joinMp3(parts);
+const starts = startTimes(durations);
+
+const path = `${item.notebook_id}/${item.id}.mp3`;
+const { error: uploadError } = await supabase.storage
+  .from("studio")
+  .upload(path, bytes, { contentType: "audio/mpeg" });
+if (uploadError) throw uploadError;
+uploadedPath = path;
+
+const ready: PodcastData = {
+  ...scripted,
+  turns: turns.map((turn, i) => ({ ...turn, start: Math.round(starts[i] * 1000) / 1000 })),
+  durationSeconds,
+  sizeBytes: bytes.length,
+};
+await supabase.from("studio_items").update({ status: "ready", data: ready, storage_path: path }).eq("id", item.id);</script>
+<script type="text/plain" id="src-mp3">export function readFrameHeader(bytes: Uint8Array, offset: number): FrameHeader | null {
+  const [b0, b1, b2] = [bytes[offset], bytes[offset + 1], bytes[offset + 2]];
+  if (b0 !== 0xff || (b1 & 0xe0) !== 0xe0) return null;
+
+  const versionBits = (b1 >> 3) & 0b11; // 3 = MPEG-1, 2 = MPEG-2, 0 = MPEG-2.5
+  const layerBits = (b1 >> 1) & 0b11; // 1 = Layer III
+  if (versionBits === 1 || layerBits !== 1) return null;
+  const version = versionBits === 3 ? "1" : versionBits === 2 ? "2" : "2.5";
+
+  const bitrateIndex = b2 >> 4;
+  const sampleRateIndex = (b2 >> 2) & 0b11;
+  const padding = (b2 >> 1) & 1;
+
+  const bitrate = (version === "1" ? BITRATES_V1 : BITRATES_V2)[bitrateIndex] * 1000;
+  const sampleRate = SAMPLE_RATES[version][sampleRateIndex];
+  const samples = version === "1" ? 1152 : 576;
+  const length = Math.floor(((samples / 8) * bitrate) / sampleRate) + padding;
+  return { length, samples, sampleRate };
+}
+
+export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: number } {
+  const start = id3v2Length(bytes);
+  let offset = start;
+  let seconds = 0;
+  while (offset < bytes.length) {
+    const header = readFrameHeader(bytes, offset);
+    if (!header || offset + header.length > bytes.length) {
+      throw new Error(`Invalid MP3 data at byte ${offset} of ${bytes.length}`);
+    }
+    seconds += header.samples / header.sampleRate;
+    offset += header.length;
+  }
+  return { frames: bytes.subarray(start, offset), seconds };
+}</script>
+<script type="text/plain" id="src-concurrency">export async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T, index: number) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let next = 0;
+  let failed = false;
+
+  async function worker() {
+    while (!failed && next < items.length) {
+      const index = next++;
+      try {
+        results[index] = await fn(items[index], index);
+      } catch (error) {
+        failed = true;
+        throw error;
+      }
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
+}</script>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function store(key, val) {
+    try { if (val === undefined) return localStorage.getItem(key); localStorage.setItem(key, val); } catch (e) { return null; }
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* ---------- Begriffe ---------- */
+  var G = {
+    term: ["So funktioniert es", "Genau so: antippen, lesen, irgendwo anders hintippen. Die Erklärung verschwindet wieder."],
+    citation: ["Beleg", "Eine Nummer wie [2] hinter einer Aussage. Sie zeigt auf den Abschnitt der Quelle, aus dem die Aussage stammt. Ein Klick öffnet die Quelle an dieser Stelle."],
+    chunk: ["Abschnitt (Chunk)", "Ein Stück Text aus einer Quelle, höchstens etwa eine Seite lang. Seit Schritt 3 zerlegt Faden jede Quelle in solche Abschnitte."],
+    pickchunks: ["pickChunks", "Unsere Funktion, die entscheidet, welche Abschnitte das Modell sieht: höchstens 16, reihum auf die Quellen verteilt und in jeder Quelle gleichmäßig."],
+    job: ["Hintergrundjob", "Arbeit, die weiterläuft, nachdem der Server schon geantwortet hat. Der Nutzer wartet nicht auf eine Antwort, die Seite zeigt den Fortschritt."],
+    after: ["after()", "Eine Funktion von Next.js: Code darin läuft erst, nachdem die Antwort verschickt ist. Auf Vercel höchstens so lange, wie die Seite erlaubt, hier 300 Sekunden."],
+    serveraction: ["Server Action", "Eine Funktion auf dem Server, die der Browser direkt aufrufen kann. Jeder kann sie aufrufen, darum prüft sie Login, Eingabe und Rechte selbst."],
+    zod: ["Zod", "Eine Bibliothek, die Daten prüft. Hier prüft sie Eingaben aus dem Browser und das JSON, das das Modell zurückgibt."],
+    schema: ["Schema", "Eine Beschreibung, wie Daten aussehen müssen, etwa: „title ist Text, turns ist eine Liste aus Sprecher und Text“. Das Modell bekommt das Schema mit, Zod prüft danach."],
+    json: ["JSON", "Ein Textformat für Daten, das Programme leicht lesen können. Das Modell liefert Skript und Karten als JSON."],
+    rls: ["Zeilen-Regel (RLS)", "Die Datenbank prüft für jede Zeile, ob die fragende Person sie sehen darf. Ein Nutzer sieht nur seine eigenen Notebooks, Quellen und Studio-Elemente."],
+    ratelimit: ["Rate Limit", "Eine Obergrenze, wie oft jemand etwas tun darf. Fürs Studio: 5 pro Stunde, 20 pro Tag. Gezählt wird in Upstash Redis."],
+    quelle: ["Quellblock", "Im Prompt steht jeder Abschnitt in einem Block <quelle nr=\"3\">…</quelle>. So weiß das Modell, welche Nummer zu welchem Text gehört."],
+    injection: ["Prompt Injection", "Ein Angriff über Text: In einer Quelle steht etwa „Ignoriere alle Regeln“. Faden behandelt Quelltext als Material, nie als Anweisung."],
+    reasoning: ["Reasoning (Nachdenken)", "Manche Modelle denken vor der Antwort intern nach. Mehr Nachdenken heißt bessere Qualität, aber mehr Zeit und Kosten. Das Studio nutzt „medium“, der Chat „low“."],
+    tts: ["Text-to-Speech", "Ein Modell, das Text in gesprochene Sprache verwandelt. Faden nutzt gpt-4o-mini-tts von OpenAI mit zwei Stimmen."],
+    concurrency: ["Gleichzeitig (parallel)", "Mehrere Aufrufe laufen zur selben Zeit statt nacheinander. Faden erlaubt höchstens 4, damit OpenAI nicht bremst."],
+    frame: ["Frame (MP3)", "Ein kleines Stück einer MP3, hier 24 Millisekunden Ton. Jeder Frame beginnt mit 4 Bytes, die seine Länge verraten. Eine MP3 ist einfach eine Reihe von Frames."],
+    samplerate: ["Abtastrate", "Wie oft pro Sekunde der Ton gemessen wird. Die MP3s von OpenAI haben 24.000 Messwerte pro Sekunde (24 kHz)."],
+    bitrate: ["Bitrate", "Wie viele Daten eine Sekunde Ton braucht. 128 kbit/s sind 16 KB pro Sekunde, also etwa 5 MB für 5 Minuten."],
+    ffmpeg: ["ffmpeg", "Ein bekanntes Programm, das fast jedes Audio- und Videoformat bearbeiten kann. Mächtig, aber groß."],
+    bucket: ["Bucket", "Ein Ordner-Bereich in Supabase Storage mit eigenen Regeln. „sources“ hat die Quellen, „studio“ die Podcast-MP3s."],
+    storage: ["Storage", "Der Dateispeicher von Supabase, in Frankfurt. Dort liegen PDFs, Texte und jetzt auch die MP3s."],
+    jsonb: ["jsonb", "Eine Spalte in Postgres, die beliebiges JSON speichert. Skript, Karten und Belege eines Studio-Elements stehen dort."],
+    polling: ["Polling", "Regelmäßig nachfragen. Solange etwas in Arbeit ist, lädt die Seite alle 2 Sekunden den Stand neu."],
+    signedurl: ["Signierte URL", "Eine Adresse mit eingebautem Schlüssel, die nach einer Zeit abläuft. Damit holt der Browser die private MP3 direkt bei Supabase."],
+    stuck: ["Hängender Job", "Ein Job, den Vercel nach 300 Sekunden abgebrochen hat. Er bleibt sonst für immer „in Arbeit“. Faden zeigt ihn nach 10 Minuten als Fehler."],
+    hook: ["Hook", "Eine wiederverwendbare Funktion für React-Komponenten. Ihr Name beginnt mit „use“, etwa usePolling."],
+    reactkey: ["key (React)", "Ein Name für ein Element in React. Ändert sich der key, baut React ein neues Element und vergisst den alten Zustand, hier: die umgedrehte Karte."],
+    cascade: ["on delete cascade", "Eine Regel in der Datenbank: Wird ein Notebook gelöscht, löscht Postgres alles, was dazugehört. Dateien in Storage erreicht diese Regel nicht."],
+    queue: ["Warteschlange", "Ein eigener Dienst, der Aufträge annimmt und abarbeitet, auch über Stunden und mit neuen Versuchen bei Fehlern."],
+    http404: ["404", "Der Code für „nicht gefunden“. Faden zeigt ihn auch bei fremden Elementen. So verrät es nicht, dass es sie gibt."],
+    claim: ["Annehmen (Claim)", "Ein einziger Datenbank-Befehl ändert „wartet“ in „in Arbeit“, aber nur, wenn die Zeile noch „wartet“. So arbeitet nie ein Job doppelt."],
+    promise: ["Promise", "Ein Versprechen auf ein Ergebnis, das später kommt, etwa die Antwort von OpenAI. Mit await wartet der Code darauf."],
+    abort: ["AbortSignal", "Ein Signal zum Abbrechen. AbortSignal.timeout(60 000) bricht einen Aufruf nach 60 Sekunden ab."]
+  };
+  function rich(s) {
+    return esc(s).replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) {
+      return G[k] ? '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>' : t;
+    });
+  }
+  document.querySelectorAll("[data-rich]").forEach(function (el) {
+    el.innerHTML = el.innerHTML.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) {
+      return G[k] ? '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>' : t;
+    });
+  });
+  var pop = document.getElementById("pop"), openTerm = null;
+  function closePop() { if (openTerm) openTerm.setAttribute("aria-expanded", "false"); openTerm = null; pop.hidden = true; }
+  function openPop(btn) {
+    var g = G[btn.getAttribute("data-t")]; if (!g) return;
+    if (openTerm === btn) { closePop(); return; }
+    closePop();
+    document.getElementById("popT").textContent = g[0];
+    document.getElementById("popD").textContent = g[1];
+    pop.hidden = false; openTerm = btn; btn.setAttribute("aria-expanded", "true");
+    place();
+  }
+  function place() {
+    if (!openTerm) return;
+    var r = openTerm.getClientRects()[0] || openTerm.getBoundingClientRect();
+    var pw = pop.offsetWidth, ph = pop.offsetHeight, vw = document.documentElement.clientWidth;
+    if (r.bottom < 0 || r.top > window.innerHeight) { closePop(); return; }
+    var left = Math.min(Math.max(12, r.left + r.width / 2 - pw / 2), vw - pw - 12);
+    var top = r.bottom + 8; if (top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 8);
+    pop.style.left = left + "px"; pop.style.top = top + "px";
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest(".term");
+    if (t) { e.preventDefault(); e.stopPropagation(); openPop(t); return; }
+    if (!e.target.closest(".pop")) closePop();
+  }, true);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closePop(); return; }
+    var t = e.target.closest && e.target.closest(".term");
+    if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); openPop(t); }
+  }, true);
+  window.addEventListener("scroll", place, { passive: true });
+  window.addEventListener("resize", place);
+
+  /* ---------- Theme ---------- */
+  var root = document.documentElement, themeBtn = document.getElementById("themeBtn");
+  var sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var moon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
+  function isDark() { var t = root.getAttribute("data-theme"); return t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches; }
+  function paintThemeBtn() { themeBtn.innerHTML = isDark() ? sun : moon; }
+  var saved = store("faden-doc-theme"); if (saved) root.setAttribute("data-theme", saved);
+  paintThemeBtn();
+  themeBtn.addEventListener("click", function () { var next = isDark() ? "light" : "dark"; root.setAttribute("data-theme", next); store("faden-doc-theme", next); paintThemeBtn(); });
+
+  /* ---------- Diagram ---------- */
+  var steps = [
+    { id: "n1", tag: "1 · Studio", title: "Klick auf „Audio-Zusammenfassung“", text: "Die Kachel schickt nur die Notebook-ID und die ausgewählten Quellen. Was daraus wird, entscheidet der Server." },
+    { id: "n2", tag: "2 · Server Action", title: "Der Server prüft alles selbst", text: "createStudioItem ist eine [[serveraction|Server Action]]. Sie prüft der Reihe nach: angemeldet? Eingabe gültig ([[zod|Zod]])? Unter dem [[ratelimit|Rate Limit]]? Gehören die Quellen dem Nutzer ([[rls|RLS]])? Erst danach kostet etwas Geld." },
+    { id: "e2", tag: "3 · Zeile: wartet", title: "Ein neues Studio-Element", text: "Eine Zeile in studio_items mit dem Status „wartet“. Die bereiten Quellen stehen gleich in der Zeile. Der Job liest sie von dort, nicht aus dem Browser." },
+    { id: "e3", tag: "4 · after()", title: "Antwort sofort, Arbeit danach", text: "Mit [[after|after()]] antwortet die Action sofort, die Kachel zeigt „In Arbeit“. Der [[job|Hintergrundjob]] läuft auf Vercel weiter, höchstens 300 Sekunden." },
+    { id: "n3", tag: "5 · Job", title: "Der Job nimmt das Element an", text: "Ein Befehl ändert „wartet“ in „in Arbeit“ ([[claim|Claim]]). Startet der Job zweimal, bekommt nur einer die Zeile. Der Job nutzt den Admin-Schlüssel, die Rechte sind schon geprüft." },
+    { id: "e4", tag: "6 · Abschnitte", title: "16 Abschnitte, gut verteilt", text: "Es gibt keine Frage, also keine Suche. [[pickchunks|pickChunks]] verteilt 16 [[chunk|Abschnitte]] reihum auf die Quellen und gleichmäßig über jede Quelle. Probier es unten in der Demo. Den Fortschritt schreibt der Job in dieselbe Zeile." },
+    { id: "e5", tag: "7 · Prompt", title: "Das Modell schreibt das Skript", text: "Feste Regeln: Lea fragt, Tom erklärt, 20 bis 24 Redebeiträge, gesprochene Sprache, jede Aussage mit Beleg. Die Abschnitte stehen als [1] bis [16] in [[quelle|Quellblöcken]]. Text darin ist Material, keine Anweisung." },
+    { id: "e6", tag: "8 · Skript", title: "Zod prüft die Antwort", text: "Das Modell liefert [[json|JSON]] nach einem [[schema|Schema]]. Unser Code entfernt Belegnummern, die es nicht gibt. Hat das ganze Skript keinen einzigen Beleg, gibt es einen Fehler statt eines Podcasts aus eigenem Wissen." },
+    { id: "n4", tag: "9 · Sprache", title: "Jeder Redebeitrag einzeln vertont", text: "[[tts|Text-to-Speech]] mit gpt-4o-mini-tts. Lea spricht mit der Stimme „marin“, Tom mit „cedar“. Vorher fliegen die [n] aus dem Text, sonst sagt die Stimme „eckige Klammer eins“. Höchstens 4 Aufrufe laufen [[concurrency|gleichzeitig]]." },
+    { id: "n6", tag: "10 · Zusammenfügen", title: "Aus 22 Teilen wird eine MP3", text: "Eine MP3 ist eine Reihe von [[frame|Frames]]. Unser Code liest jeden Frame-Kopf, zählt den Ton und hängt die Teile aneinander. Aus der Dauer jedes Teils folgt die Startzeit jedes Redebeitrags. Die zweite Demo zeigt das." },
+    { id: "e8", tag: "11 · Upload", title: "Die MP3 kommt in Storage", text: "In den privaten [[bucket|Bucket]] „studio“ in [[storage|Storage]], Pfad: Notebook-ID/Element-ID.mp3. Nur der Server darf dort schreiben. Scheitert danach noch etwas, löscht der Job die Datei wieder." },
+    { id: "n5", tag: "12 · Postgres", title: "Das Element ist bereit", text: "Status „bereit“, dazu Skript, Startzeiten, Belege, Dauer, Größe und Erstellungszeit. Alles steht in einer [[jsonb|jsonb]]-Spalte derselben Zeile." },
+    { id: "e9", tag: "13 · Polling", title: "Die Seite merkt es von selbst", text: "Solange etwas in Arbeit ist, lädt die Seite alle 2 Sekunden neu ([[polling|Polling]]). So sieht man auch „Sprache wird erzeugt: 12 von 22“." },
+    { id: "e10", tag: "14 · signierte URL", title: "Der Browser holt die MP3", text: "Die Seite erzeugt eine [[signedurl|signierte URL]], eine Stunde gültig. Die Datei fließt direkt von Supabase zum Browser, nicht über unseren Server." },
+    { id: "n8", tag: "15 · Player", title: "Hören und mitlesen", text: "Der Player zeigt, wer spricht. Das Transkript markiert den laufenden Redebeitrag und scrollt mit. Ein Klick auf eine Zeit springt dorthin, ein Klick auf [2] öffnet die Quelle." }
+  ];
+  var extras = {
+    e1: { tag: "Klick", title: "Nur IDs, kein Text", text: "Der Browser schickt keine Quelltexte und keinen Prompt. Alles Wichtige entscheidet und liest der Server." },
+    e7: { tag: "22 Teile", title: "Ein Teil pro Redebeitrag", text: "Jeder Teil ist eine kleine MP3 von OpenAI. Die Reihenfolge bleibt erhalten, auch wenn ein späterer Teil zuerst fertig ist." },
+    n7: { tag: "Storage", title: "Der Bucket „studio“", text: "Privat, höchstens 25 MB pro Datei, nur audio/mpeg. Lesen und Löschen darf nur der Besitzer des Notebooks, Hochladen nur der Server." }
+  };
+  var diagram = document.getElementById("diagram"), detail = document.getElementById("detail"), dots = document.getElementById("dots");
+  var current = -1, timer = null, playBtn = document.getElementById("playBtn");
+  steps.forEach(function (s, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.setAttribute("aria-label", "Schritt " + (i + 1) + ": " + s.title);
+    b.addEventListener("click", function () { stop(); show(i); });
+    dots.appendChild(b);
+  });
+  function highlight(id) {
+    diagram.querySelectorAll(".is-active").forEach(function (el) { el.classList.remove("is-active"); });
+    var el = diagram.querySelector('[data-id="' + id + '"]'); if (el) el.classList.add("is-active");
+  }
+  function renderDetail(d) {
+    detail.innerHTML = '<span class="badge">' + esc(d.tag) + '</span><div><h3>' + esc(d.title) + '</h3><p>' + rich(d.text) + '</p></div>';
+    detail.classList.remove("swap"); void detail.offsetWidth; detail.classList.add("swap");
+  }
+  function show(i) {
+    current = (i + steps.length) % steps.length;
+    highlight(steps[current].id); renderDetail(steps[current]);
+    Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle("on", k === current); d.setAttribute("aria-current", k === current ? "step" : "false"); });
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } playBtn.querySelector("span").textContent = "Abspielen"; }
+  function play() {
+    if (timer) { stop(); return; }
+    playBtn.querySelector("span").textContent = "Pause";
+    if (current >= steps.length - 1) current = -1;
+    show(current + 1);
+    timer = setInterval(function () { if (current >= steps.length - 1) { stop(); return; } show(current + 1); }, reduce ? 3600 : 2800);
+  }
+  playBtn.addEventListener("click", play);
+  document.getElementById("prevBtn").addEventListener("click", function () { stop(); show(current <= 0 ? steps.length - 1 : current - 1); });
+  document.getElementById("nextBtn").addEventListener("click", function () { stop(); show(current + 1); });
+  function pick(id) {
+    stop();
+    var idx = steps.findIndex(function (s) { return s.id === id; });
+    if (idx >= 0) { show(idx); return; }
+    current = -1; highlight(id); renderDetail(extras[id]);
+    Array.prototype.forEach.call(dots.children, function (d) { d.classList.remove("on"); });
+  }
+  diagram.querySelectorAll(".node, .edge").forEach(function (el) {
+    el.addEventListener("click", function () { pick(el.getAttribute("data-id")); });
+    el.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(el.getAttribute("data-id")); } });
+  });
+  show(0);
+
+  /* ---------- File filter ---------- */
+  document.querySelectorAll(".filter button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".filter button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      var f = b.getAttribute("data-f");
+      document.querySelectorAll("#fileRows tr").forEach(function (tr) { tr.classList.toggle("hidden", f !== "all" && tr.getAttribute("data-k") !== f); });
+    });
+  });
+
+  /* ---------- Code ---------- */
+  function src(id) { return document.getElementById(id).textContent; }
+  // Notes point to a line by its text: "m" is a piece of the line,
+  // "=" at the start means the whole line must match exactly.
+  var snippets = [
+    { file: "pick-chunks.ts", lang: "ts", why: "Welche Abschnitte das Modell sieht", code: src("src-pick"), notes: [
+      { m: "MAX_STUDIO_CHUNKS = 16", t: "Höchstens 16 Abschnitte. Einer hat höchstens etwa 800 Tokens, das sind höchstens etwa 13.000 Tokens für das Modell. Das hält Zeit und Kosten klein." },
+      { m: "export function pickChunks", t: "Eine reine Funktion: keine Datenbank, kein Modell. Darum testen 8 Vitest-Tests sie, einer davon mit allen Kombinationen von 1–40 Abschnitten und 1–20 Plätzen." },
+      { m: "chunks.filter((chunk)", t: "Die Abschnitte jeder Quelle, in der Reihenfolge des Textes. sourceIds bestimmt die Reihenfolge der Quellen, wie in der Quellenliste." },
+      { m: "const counts", t: "Wie viele Plätze jede Quelle bekommt. Am Anfang null." },
+      { m: "while (total < max && added)", t: "Runde um Runde, bis alle Plätze vergeben sind oder keine Quelle mehr Abschnitte hat." },
+      { m: "if (counts[s] < bySource[s].length)", t: "Jede Quelle bekommt pro Runde einen Platz, wenn sie noch Abschnitte hat. So kommt eine kleine Quelle nicht zu kurz, und eine große verdrängt die anderen nicht." },
+      { m: "Math.floor(((i + 0.5) * n) / k)", t: "k aus n gleichmäßig verteilt: die Mitte von k gleichen Teilen. Bei 4 aus 100: Abschnitt 12, 37, 62, 87. So sieht das Modell Anfang, Mitte und Ende." }
+    ] },
+    { file: "studio-actions.ts", lang: "ts", why: "Erst prüfen, dann bezahlen", code: src("src-action"), notes: [
+      { m: "input: unknown", t: "unknown mit Absicht: Eine [[serveraction|Server Action]] kann jeder mit beliebigen Daten aufrufen. Erst [[zod|Zod]] entscheidet, was gültig ist." },
+      { m: "await requireUser()", t: "Nicht angemeldet: weiter zur Login-Seite. userId brauchen wir für das Rate Limit." },
+      { m: "studioRequestSchema.safeParse", t: "Notebook-ID und Quellen-IDs müssen UUIDs sein, höchstens 100 Quellen, und kind ist „flashcards“ oder „podcast“." },
+      { m: "allowStudioRequest(userId)", t: "Das [[ratelimit|Rate Limit]] kommt vor allem, was Geld kostet. 5 pro Stunde, 20 pro Tag." },
+      { m: ".eq(\"status\", \"ready\")", t: "Nur fertige Quellen. Dank [[rls|RLS]] fallen fremde IDs hier still heraus." },
+      { m: ".insert({ notebook_id", t: "Die Zeile mit Status „wartet“. Die Quellen stehen in data. Der Job liest sie von dort, nicht später aus dem Browser." },
+      { m: "const job = JOBS[kind]", t: "Eine kleine Tabelle: Karteikarten oder Podcast. Beide Jobs folgen demselben Ablauf." },
+      { m: "after(() => job(item.id))", t: "[[after|after()]]: Die Antwort geht sofort raus, der [[job|Job]] läuft danach weiter." },
+      { m: "itemId: item.id", t: "Die neue ID. Mit „Neu erstellen“ springt die Seite direkt dorthin und zeigt den Fortschritt." }
+    ] },
+    { file: "generate-podcast.ts", lang: "ts", why: "Vertonen, zusammenfügen, speichern", code: src("src-podcast"), notes: [
+      { m: "let progressWrites = Promise.resolve()", t: "Eine Kette aus [[promise|Promises]]. Jeder Fortschritt wird hinten angehängt, die Schreibvorgänge laufen also nacheinander." },
+      { m: ".then(() => saveData", t: "Erst wenn der vorige Stand gespeichert ist, kommt der nächste. So überschreibt nie „11 von 22“ ein schon gespeichertes „12 von 22“." },
+      { m: ".catch((error)", t: "Der Fortschritt ist nur Anzeige. Scheitert ein Schreibvorgang, wird er geloggt, der Podcast läuft weiter." },
+      { m: "mapWithConcurrency(turns", t: "Ein Aufruf pro Redebeitrag, höchstens 4 [[concurrency|gleichzeitig]]. Die Ergebnisse kommen in der Reihenfolge der Redebeiträge zurück." },
+      { m: "text: spokenText(turn.text)", t: "Ohne [n]. Sonst würde die Stimme „eckige Klammer eins“ vorlesen." },
+      { m: "voice: SPEAKERS[turn.speaker].voice", t: "Lea spricht mit „marin“, Tom mit „cedar“. Beide hat OpenAI für die beste Qualität empfohlen, beide haben im Hörtest überzeugt." },
+      { m: "AbortSignal.timeout(SPEECH_TIMEOUT_MS)", t: "60 Sekunden pro Aufruf ([[abort|AbortSignal]]). Ein hängender Aufruf darf nicht die ganzen 300 Sekunden aufbrauchen." },
+      { m: "joinMp3(parts)", t: "Hängt die Frames aller Teile aneinander und gibt die Dauer jedes Teils zurück." },
+      { m: "startTimes(durations)", t: "0, Dauer 1, Dauer 1 + Dauer 2 … So weiß das Transkript, wann jeder Redebeitrag beginnt." },
+      { m: ".from(\"studio\")", t: "Mit dem Admin-Schlüssel: Nutzer dürfen in diesen [[bucket|Bucket]] nicht schreiben." },
+      { m: "uploadedPath = path", t: "Ab hier liegt eine Datei in Storage. Scheitert der letzte Schritt, löscht der catch-Block sie wieder. Keine Datei ohne fertiges Element." },
+      { m: "start: Math.round(starts[i] * 1000) / 1000", t: "Startzeiten auf Millisekunden gerundet. Genauer braucht kein Sprung im Player zu sein." }
+    ] },
+    { file: "mp3.ts", lang: "ts", why: "Frames lesen und die Dauer messen", code: src("src-mp3"), notes: [
+      { m: "b0 !== 0xff || (b1 & 0xe0) !== 0xe0", t: "Jeder Frame beginnt mit 11 Bits, die alle 1 sind. Fehlen sie, steht hier kein Frame." },
+      { m: "const versionBits", t: "Zwei Bits für die MPEG-Version. Genau hier lag der Fehler im Hörtest: „10“ heißt MPEG-2, nicht MPEG-1. Probier es in der Demo." },
+      { m: "layerBits !== 1", t: "Nur Layer III, das „3“ in MP3. Alles andere lehnen wir ab." },
+      { m: "const bitrateIndex", t: "Vier Bits zeigen in eine Tabelle mit [[bitrate|Bitraten]]. Bei OpenAI: Index 12, also 128 kbit/s." },
+      { m: "const sampleRateIndex", t: "Zwei Bits zeigen in eine Tabelle mit [[samplerate|Abtastraten]]. Bei OpenAI: Index 1, bei MPEG-2 also 24.000 Hz." },
+      { m: "const samples = version", t: "Wie viele Messwerte ein Frame enthält: 1152 bei MPEG-1, 576 bei MPEG-2. 576 ÷ 24.000 = 24 Millisekunden pro Frame." },
+      { m: "const length = Math.floor", t: "Bytes pro Frame. Bei OpenAI: 72 × 128.000 ÷ 24.000 = 384. Damit weiß der Code, wo der nächste Frame beginnt." },
+      { m: "throw new Error", t: "Steht kein gültiger Frame da, gibt es einen Fehler. Lieber das als ein Podcast mit einer stummen oder kaputten Stelle." },
+      { m: "seconds += header.samples / header.sampleRate", t: "Die genaue Dauer: alle Messwerte durch die Abtastrate. Gegen die echten Dateien geprüft, gleich wie das macOS-Werkzeug afinfo: 8,808 s." }
+    ] },
+    { file: "concurrency.ts", lang: "ts", why: "Höchstens 4 gleichzeitig, Reihenfolge bleibt", code: src("src-concurrency"), notes: [
+      { m: "const results = new Array<R>(items.length)", t: "Eine Liste mit festen Plätzen. Jedes Ergebnis kommt an den Platz seines Redebeitrags, egal wann es fertig wird." },
+      { m: "let failed = false", t: "Nach dem ersten Fehler startet niemand mehr einen neuen Aufruf. Der Podcast scheitert sowieso, jeder weitere Aufruf würde Geld kosten." },
+      { m: "const index = next++", t: "Jeder Worker nimmt sich die nächste freie Nummer. JavaScript führt immer nur ein Stück Code zur Zeit aus, darum bekommen zwei Worker nie dieselbe." },
+      { m: "results[index] = await fn", t: "Warten auf OpenAI. Während dieser Worker wartet, arbeiten die anderen weiter." },
+      { m: "failed = true", t: "Fehler merken und weiterwerfen. Promise.all bricht dann ab, der Job speichert den Fehler." },
+      { m: "Math.min(limit, items.length)", t: "4 Worker, bei weniger Redebeiträgen entsprechend weniger. Ein Test misst: Nie laufen mehr als 4 gleichzeitig." }
+    ] }
+  ];
+  var KW_TS = /^(import|from|export|default|const|let|function|async|await|return|type|true|false|for|of|if|else|try|catch|throw|new|break|continue|instanceof|null|unknown)$/;
+  var KW_SQL = /^(create|or|replace|function|returns|table|language|sql|stable|security|invoker|set|as|with|select|from|where|and|order|by|limit|over|row_number|join|full|outer|on|coalesce|desc|any|default|least|integer|text|uuid|bigint|double|precision)$/i;
+  function hlLine(line, lang) {
+    var out = "", last = 0, m, kw = lang === "sql" ? KW_SQL : KW_TS;
+    var re = lang === "sql"
+      ? /(--.*$)|('(?:[^'])*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_][\w]*)()/g
+      : /(\/\/.*$)|("(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(\s*:)?/g;
+    while ((m = re.exec(line))) {
+      out += esc(line.slice(last, m.index));
+      if (m[1]) out += '<span class="tok-com">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="tok-str">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="tok-num">' + m[3] + '</span>';
+      else if (m[4]) {
+        if (kw.test(m[4])) out += '<span class="tok-kw">' + m[4] + '</span>' + esc(m[5] || "");
+        else if (m[5]) out += '<span class="tok-key">' + m[4] + '</span>' + esc(m[5]);
+        else out += esc(m[4]);
+      }
+      last = re.lastIndex;
+    }
+    return out + esc(line.slice(last));
+  }
+  // Turn the list of notes into { lineNumber: text }.
+  snippets.forEach(function (s) {
+    var lines = s.code.split("\n"), byLine = {};
+    s.notes.forEach(function (n) {
+      for (var i = 0; i < lines.length; i++) {
+        var hit = n.m.charAt(0) === "=" ? lines[i] === n.m.slice(1) : lines[i].indexOf(n.m) >= 0;
+        if (hit && !byLine[i + 1]) { byLine[i + 1] = n.t; break; }
+      }
+    });
+    s.lineNotes = byLine;
+  });
+  var tabs = document.getElementById("codeTabs"), pre = document.getElementById("codePre"), note = document.getElementById("codeNote");
+  var active = 0;
+  function defaultNote() { note.innerHTML = '<span class="muted">Klick auf eine Zeile mit Punkt.</span>'; }
+  function renderCode(i) {
+    active = i; var s = snippets[i];
+    Array.prototype.forEach.call(tabs.children, function (t, k) { t.setAttribute("aria-selected", String(k === i)); });
+    document.getElementById("codeFile").textContent = s.file;
+    document.getElementById("codeWhy").textContent = s.why;
+    pre.innerHTML = s.code.split("\n").map(function (l, k) {
+      var n = k + 1, has = s.lineNotes[n] ? " has-note" : "";
+      return '<div class="ln' + has + '" data-n="' + n + '"' + (has ? ' role="button" tabindex="0"' : "") + '><span class="n">' + n + '</span><span class="t">' + (hlLine(l, s.lang) || " ") + '</span></div>';
+    }).join("");
+    defaultNote();
+  }
+  function selectLine(el) {
+    pre.querySelectorAll(".sel").forEach(function (x) { x.classList.remove("sel"); });
+    el.classList.add("sel"); var n = el.getAttribute("data-n");
+    note.innerHTML = '<b>Zeile ' + n + '</b> · ' + rich(snippets[active].lineNotes[n]);
+  }
+  pre.addEventListener("click", function (e) { var el = e.target.closest(".ln.has-note"); if (el) selectLine(el); });
+  pre.addEventListener("keydown", function (e) { var el = e.target.closest(".ln.has-note"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectLine(el); } });
+  snippets.forEach(function (s, i) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = s.file;
+    b.addEventListener("click", function () { renderCode(i); }); tabs.appendChild(b);
+  });
+  renderCode(0);
+  var copyBtn = document.getElementById("copyBtn");
+  copyBtn.addEventListener("click", function () {
+    var text = snippets[active].code, label = copyBtn.querySelector("span");
+    function done() { label.textContent = "Kopiert"; setTimeout(function () { label.textContent = "Kopieren"; }, 1400); }
+    function fallback() { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+  });
+
+  /* ---------- Demo tabs ---------- */
+  var demoTabs = document.getElementById("demoTabs");
+  demoTabs.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-pane]"); if (!b) return;
+    Array.prototype.forEach.call(demoTabs.children, function (x) {
+      var on = x === b; x.setAttribute("aria-pressed", String(on));
+      document.getElementById(x.getAttribute("data-pane")).hidden = !on;
+    });
+  });
+
+  /* ---------- Demo 1: pickChunks (same rules as src/lib/studio/pick-chunks.ts) ---------- */
+  var PICK_SOURCES = [
+    { id: "pickA", name: "Hausordnung" },
+    { id: "pickB", name: "Notiz" },
+    { id: "pickC", name: "Völkerschlachtdenkmal" }
+  ];
+  function el(id) { return document.getElementById(id); }
+  // 1. How many per source: one at a time, source after source.
+  function pickCounts(sizes, max) {
+    var counts = sizes.map(function () { return 0; }), total = 0, added = true;
+    while (total < max && added) {
+      added = false;
+      for (var s = 0; s < sizes.length && total < max; s++) {
+        if (counts[s] < sizes[s]) { counts[s]++; total++; added = true; }
+      }
+    }
+    return counts;
+  }
+  // 2. Which ones: k out of n, evenly spaced.
+  function pickIndices(n, k) {
+    var out = [];
+    for (var i = 0; i < k; i++) out.push(Math.floor(((i + 0.5) * n) / k));
+    return out;
+  }
+  function renderPick() {
+    var sizes = PICK_SOURCES.map(function (s) { return Number(el(s.id).value); });
+    var max = Number(el("pickMax").value);
+    PICK_SOURCES.forEach(function (s, i) { el(s.id + "Val").textContent = sizes[i]; });
+    el("pickMaxVal").textContent = max;
+
+    var counts = pickCounts(sizes, max), nr = 0;
+    el("pickRows").innerHTML = PICK_SOURCES.map(function (s, i) {
+      var picked = {};
+      pickIndices(sizes[i], counts[i]).forEach(function (j) { picked[j] = true; });
+      var cells = "";
+      for (var j = 0; j < sizes[i]; j++) {
+        if (picked[j]) { nr++; cells += '<span class="cell on" title="Abschnitt ' + (j + 1) + ' wird Beleg [' + nr + ']">' + nr + '</span>'; }
+        else cells += '<span class="cell" title="Abschnitt ' + (j + 1) + '"></span>';
+      }
+      return '<div class="pick-row"><div class="pl"><b>' + esc(s.name) + '</b> · ' + sizes[i] + ' Abschnitte · ' + counts[i] + ' ausgewählt</div>' +
+        '<div class="cells">' + (cells || '<span class="muted small">keine Abschnitte</span>') + '</div></div>';
+    }).join("");
+
+    // Comparison: simply the first `max` chunks, in source order.
+    var left = max, naive = sizes.map(function (n) { var c = Math.min(n, left); left -= c; return c; });
+    var missing = PICK_SOURCES.filter(function (s, i) { return sizes[i] > 0 && naive[i] === 0; }).map(function (s) { return s.name; });
+    var cut = PICK_SOURCES.filter(function (s, i) { return naive[i] > 0 && naive[i] < sizes[i]; }).map(function (s, k) { var i = PICK_SOURCES.indexOf(s); return s.name + " nur Abschnitt 1–" + naive[i] + " von " + sizes[i]; });
+    var naiveBad = missing.length > 0 || cut.length > 0;
+    var naiveText = naiveBad
+      ? (missing.length ? "Fehlt ganz: " + missing.join(", ") + ". " : "") + (cut.length ? "Nur der Anfang: " + cut.join(", ") + "." : "")
+      : "Hier passt alles, weil alle Abschnitte Platz haben.";
+    var used = counts.reduce(function (a, b) { return a + b; }, 0);
+    el("pickCompare").innerHTML =
+      '<div class="gate ' + (naiveBad ? "fail" : "ok") + '"><div class="gh">DIE ERSTEN ' + max + ' NEHMEN<span class="st">' + naive.join(" · ") + '</span></div><p>' + esc(naiveText) + '</p></div>' +
+      '<div class="gate ok"><div class="gh">PICKCHUNKS<span class="st">' + counts.join(" · ") + '</span></div><p>' + (used === 0 ? "Keine Abschnitte, also kein Podcast: Faden meldet einen Fehler." : "Jede Quelle mit Abschnitten ist dabei, verteilt über Anfang, Mitte und Ende. " + used + " von " + max + " Plätzen belegt.") + '</p></div>';
+  }
+  PICK_SOURCES.map(function (s) { return el(s.id); }).concat([el("pickMax")]).forEach(function (input) { input.addEventListener("input", renderPick); });
+  renderPick();
+
+  /* ---------- Demo 2: MP3 frames (same tables as src/lib/studio/mp3.ts) ---------- */
+  var BITRATES_V1 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320];
+  var BITRATES_V2 = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160];
+  var RATES_V1 = [44100, 48000, 32000], RATES_V2 = [22050, 24000, 16000];
+  var BIT_GROUPS = [
+    { bits: "11111111111", label: "Sync" },
+    { bits: "10", label: "Version", key: true },
+    { bits: "01", label: "Layer III" },
+    { bits: "1", label: "Schutz" },
+    { bits: "1100", label: "Bitrate-Index", key: true },
+    { bits: "01", label: "Abtastrate", key: true },
+    { bits: "0", label: "Padding" },
+    { bits: "0", label: "Privat" },
+    { bits: "11", label: "Mono" },
+    { bits: "000100", label: "Rest" }
+  ];
+  var mp3Bug = el("mp3Bug");
+  function renderHeader() {
+    var bug = mp3Bug.checked;
+    el("mp3Bits").innerHTML = BIT_GROUPS.map(function (g) {
+      var cls = g.key ? (bug && g.label === "Version" ? " bad" : " key") : "";
+      var label = g.label === "Version" ? (bug ? "als MPEG-1 gelesen" : "Version: MPEG-2") : g.label;
+      return '<div class="bitgroup' + cls + '"><b>' + g.bits + '</b><small>' + label + '</small></div>';
+    }).join("");
+    // Index 12 for the bit rate, index 1 for the sample rate (from the bits above).
+    var v1 = bug, bitrate = (v1 ? BITRATES_V1 : BITRATES_V2)[12], rate = (v1 ? RATES_V1 : RATES_V2)[1];
+    var samples = v1 ? 1152 : 576, length = Math.floor(((samples / 8) * bitrate * 1000) / rate);
+    var de = new Intl.NumberFormat("de-DE");
+    el("mp3Header").innerHTML =
+      '<div class="gate ' + (bug ? "fail" : "ok") + '"><div class="gh">' + (bug ? "MIT MPEG-1-TABELLEN" : "MIT MPEG-2-TABELLEN") + '<span class="st">' + bitrate + ' kbit/s</span></div>' +
+      '<p>' + de.format(rate) + ' Hz · ' + samples + ' Messwerte pro Frame · ' + length + ' Bytes pro Frame · ' + de.format(samples / rate * 1000) + ' ms</p></div>' +
+      '<div class="gate ' + (bug ? "fail" : "ok") + '"><div class="gh">NÄCHSTER FRAME<span class="st">Byte ' + length + '</span></div>' +
+      '<p>' + (bug
+        ? "Dort beginnt kein Frame, der echte ist nur 384 Bytes lang: „kein Sync bei Byte 672“. Gemerkt, weil afinfo 128 kbit/s meldete."
+        : "Dort beginnt genau der nächste Frame. So geht es durch die ganze Datei, 367 Frames = 8,808 s, wie bei afinfo.") + '</p></div>';
+  }
+  mp3Bug.addEventListener("change", renderHeader);
+  renderHeader();
+
+  // Six turns with frame counts like in a real episode. 1 frame = 24 ms.
+  var TURNS = [
+    { s: "Lea", frames: 367 }, { s: "Tom", frames: 405 }, { s: "Lea", frames: 142 },
+    { s: "Tom", frames: 560 }, { s: "Lea", frames: 198 }, { s: "Tom", frames: 331 }
+  ];
+  var FRAME_SECONDS = 0.024, t = 0;
+  TURNS.forEach(function (turn) { turn.start = t; turn.seconds = turn.frames * FRAME_SECONDS; t += turn.seconds; });
+  var TOTAL = t, mp3Time = el("mp3Time");
+  mp3Time.max = String(Math.floor(TOTAL * 10) / 10);
+  function clock(sec, decimals) {
+    var m = Math.floor(sec / 60), s = sec - m * 60;
+    var str = decimals ? s.toFixed(2).replace(".", ",") : String(Math.floor(s));
+    return m + ":" + (s < 10 ? "0" : "") + str;
+  }
+  // Same rule as currentTurnIndex: the last turn that has started.
+  function currentTurn(time) {
+    var index = -1;
+    for (var i = 0; i < TURNS.length && TURNS[i].start <= time; i++) index = i;
+    return index;
+  }
+  function renderTurns() {
+    var time = Number(mp3Time.value), cur = currentTurn(time);
+    el("mp3TimeVal").textContent = clock(time, false) + " von " + clock(TOTAL, false);
+    el("mp3Turns").innerHTML = '<thead><tr><th>NR.</th><th>WER</th><th>FRAMES</th><th>DAUER</th><th>START</th></tr></thead><tbody>' +
+      TURNS.map(function (turn, i) {
+        return '<tr class="' + (i === cur ? "cur" : "") + '"><td>' + (i + 1) + '</td><td>' + turn.s + '</td><td>' + turn.frames + '</td><td>' +
+          turn.seconds.toFixed(3).replace(".", ",") + ' s</td><td>' + clock(turn.start, true) + '</td></tr>';
+      }).join("") + '</tbody>';
+    el("mp3Track").innerHTML = TURNS.map(function (turn, i) {
+      var cls = "mseg " + turn.s.toLowerCase() + (i === cur ? " on" : i < cur ? " past" : "");
+      return '<span class="' + cls + '" style="flex-grow:' + turn.frames + '"></span>';
+    }).join("");
+    var turn = TURNS[cur];
+    el("mp3Now").innerHTML = '<div class="verdict in">Bei ' + clock(time, false) + ' spricht ' + turn.s + ' (Redebeitrag ' + (cur + 1) + ')' +
+      '<small>Er hat bei ' + clock(turn.start, true) + ' begonnen: die Summe der Frames davor × 24 ms. Genau so markiert „Mitlesen“ im Transkript die richtige Zeile.</small></div>';
+  }
+  mp3Time.addEventListener("input", renderTurns);
+  renderTurns();
+
+  /* ---------- Flashcards ---------- */
+  var qa = [
+    { q: "Erklär den Weg vom Klick auf „Audio-Zusammenfassung“ bis zum Player.", a: ["Die [[serveraction|Server Action]] prüft Login, Eingabe ([[zod|Zod]]), [[ratelimit|Rate Limit]] und Rechte ([[rls|RLS]]). Dann legt sie eine Zeile mit Status „wartet“ an, die bereiten Quellen stehen gleich darin. Mit [[after|after()]] antwortet sie sofort, der [[job|Job]] läuft weiter und nimmt das Element mit einem einzigen Befehl an ([[claim|Claim]]).", "[[pickchunks|pickChunks]] wählt 16 Abschnitte. Das Studio-Modell schreibt das Skript als [[json|JSON]] nach [[schema|Schema]], unser Code prüft die Belege. Dann wird jeder Redebeitrag ohne [n] vertont, höchstens 4 gleichzeitig. joinMp3 fügt die Teile zusammen und liefert die Startzeiten. Die MP3 kommt mit dem Admin-Schlüssel in den Bucket „studio“, die Zeile wird „bereit“. Die Seite merkt das per [[polling|Polling]] und spielt über eine [[signedurl|signierte URL]]. Live: 47 Sekunden."] },
+    { q: "Warum fügst du die MP3s ohne ffmpeg zusammen, und woher kommen die Startzeiten?", a: ["Eine MP3 ist eine Reihe von [[frame|Frames]]. Im Hörtest habe ich die Datei von OpenAI untersucht: kein ID3-Kopf, kein Info-Frame, immer 128 kbit/s, 24 kHz, Mono. Dann reicht es, die Frames hintereinanderzuhängen. [[ffmpeg|ffmpeg]] wäre ein Programm von etwa 70 MB in der Vercel-Funktion.", "readFrameHeader liest aus 4 Bytes Version, Bitrate und Abtastrate, daraus folgen Länge und Messwerte jedes Frames. Die Summe der Messwerte durch die Abtastrate ist die genaue Dauer, geprüft gegen afinfo: 391,008 Sekunden auf beiden Seiten. startTimes addiert die Dauern zu Startzeiten. Ein Fehler dabei: Zuerst las die KI die Bits mit MPEG-1-Tabellen. Gemerkt, weil afinfo etwas anderes meldete."] },
+    { q: "Wie stellst du sicher, dass Podcast und Karteikarten nur aus den Quellen kommen?", a: ["Im Prompt: Nur die Quellen nutzen, jede Aussage mit Beleg, nur die Nummern 1 bis n. Der Quelltext steht in [[quelle|Quellblöcken]], die sich nicht schließen lassen. So bleibt Text wie „Ignoriere alle Regeln“ Material ([[injection|Prompt Injection]]).", "Im Code: Nummern außerhalb 1 bis n werden entfernt. Eine Karte ohne gültigen Beleg fliegt raus. Ein Skript ganz ohne Beleg ist ein Fehler. Die Belege speichern wir mit Text, ein Klick zeigt die Stelle. Grenze: Ein Beleg ist kein Beweis, eine falsch zusammengefasste Aussage kann trotzdem einen haben. Darum macht Faden das Nachprüfen leicht."] },
+    { q: "Was passiert, wenn ein Job mittendrin scheitert oder hängt?", a: ["Jeder Fehler landet im catch-Block. failStudioItem speichert eine deutsche Meldung, bei unerwarteten Fehlern eine allgemeine, die Details nur im Server-Log. Liegt die MP3 schon in Storage, löscht der Job sie wieder. Der Parallel-Helfer startet nach dem ersten Fehler keine neuen, bezahlten Aufrufe.", "Bricht Vercel nach 300 Sekunden ab, läuft kein catch mehr. Dafür gibt es studioState: Was nach 10 Minuten noch „in Arbeit“ ist, gilt als Fehler. Die Seite hört auf nachzufragen, man kann es löschen. Solange ein Job läuft, sperren wir das Löschen von Element und Notebook. Sonst könnte der Job eine MP3 in einen geleerten Ordner hochladen."] },
+    { q: "Der Podcast sollte 5 Minuten dauern, wurde aber 8. Wie bist du vorgegangen?", a: ["Erst gemessen statt geraten: 779 Wörter ergaben 6:31 Minuten, die Stimmen sprechen also etwa 120 Wörter pro Minute, nicht 140. Ziel 600 Wörter ergab 701 Wörter lokal und 962 live, das waren 8:04 Minuten.", "Ein Modell kann seine eigenen Wörter nicht zählen. Die Wörter pro Redebeitrag waren aber stabil, 26 bis 35. Darum verlangt der Prompt jetzt 20 bis 24 Redebeiträge mit höchstens 40 Wörtern. Gleiche Quellen: 604 Wörter, 4:54 Minuten. Die Lehre: Modell-Ausgaben messen und über das steuern, was das Modell einhalten kann. Steht mit allen Zahlen in den Notizen."] }
+  ];
+  var known = {};
+  try { known = JSON.parse(store("faden-doc-s6-quiz") || "{}") || {}; } catch (e) { known = {}; }
+  var cardsEl = document.getElementById("cards");
+  var chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  cardsEl.innerHTML = qa.map(function (c, i) {
+    return '<div class="fc" data-i="' + i + '"><button class="fc-q" type="button" aria-expanded="false"><span class="num">0' + (i + 1) + '</span><span>' + esc(c.q) + '</span>' + chev + '</button>' +
+      '<div class="fc-a"><div><div class="inner">' + c.a.map(function (p) { return "<p>" + rich(p) + "</p>"; }).join("") +
+      '<div class="fc-actions"><button class="btn accent" type="button" data-k="1">Gewusst</button><button class="btn ghost" type="button" data-k="0">Noch nicht</button></div></div></div></div></div>';
+  }).join("");
+  function paintQuiz() {
+    var n = 0;
+    Array.prototype.forEach.call(cardsEl.children, function (el, i) { var k = !!known[i]; el.classList.toggle("known", k); if (k) n++; });
+    document.getElementById("score").textContent = n + " von " + qa.length + " gewusst";
+    document.getElementById("bar").style.width = (n / qa.length * 100) + "%";
+  }
+  cardsEl.addEventListener("click", function (e) {
+    var card = e.target.closest(".fc"); if (!card) return;
+    var i = card.getAttribute("data-i");
+    if (e.target.closest(".fc-q")) {
+      var open = card.classList.toggle("open");
+      card.querySelector(".fc-q").setAttribute("aria-expanded", String(open));
+      return;
+    }
+    var a = e.target.closest("[data-k]");
+    if (a) {
+      if (a.getAttribute("data-k") === "1") known[i] = true; else delete known[i];
+      store("faden-doc-s6-quiz", JSON.stringify(known));
+      card.classList.remove("open"); card.querySelector(".fc-q").setAttribute("aria-expanded", "false");
+      paintQuiz();
+    }
+  });
+  document.getElementById("resetQuiz").addEventListener("click", function () { known = {}; store("faden-doc-s6-quiz", "{}"); paintQuiz(); });
+  paintQuiz();
+})();
+</script>
+</body>
+</html>

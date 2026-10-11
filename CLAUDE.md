@@ -117,7 +117,7 @@ Vorlage: Design-Artefakt „Faden“ (5 Screens: Startseite, Notebook mit Quelle
 - [x] 3. Einlesen: Upload → Text → Abschnitte → Embeddings (zuerst mit einer PDF testen)
 - [x] 4. Chat: hybride Suche, Prompt, Streaming, Belege
 - [x] 5. UI nach dem Design: drei Spalten, Beleg-Ansicht, Quellen-Dialog
-- [ ] 6. Podcast + Karteikarten
+- [x] 6. Podcast + Karteikarten
 - [ ] 7. Tests (Vitest + Playwright), README, Demo-Notebook, Loom
 
 ## Befehle
