@@ -1,0 +1,1248 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schritt 5 · Oberfläche</title>
+<meta name="description" content="Faden, Schritt 5: Die Oberfläche nach dem Design – drei Spalten, Beleg-Ansicht mit markierter Stelle, Quellen-Dialog mit Drag &amp; Drop, hell und dunkel. Einfach erklärt, mit zwei Mini-Demos.">
+<style>
+  :root {
+    --bg: #E9EBEE; --surface: #F6F7F8; --card: #FFFFFF; --tile: #F3F4F6; --line: #E3E5E8;
+    --text: #111315; --muted: #6B7078; --accent: #D6EE57; --on-accent: #111315;
+    --ok: #6E9A1C; --warn-bg: #FDF0D5; --warn: #8A5A00; --err-bg: #FDE4DB; --err: #A3361A;
+    --primary: #111315; --on-primary: #FFFFFF;
+    --c-kw: #8B3FA8; --c-str: #3B7A12; --c-num: #B25A00; --c-com: #8A9099; --c-key: #1F5FA8;
+    --shadow: 0 1px 2px rgba(17,19,21,.04), 0 8px 24px rgba(17,19,21,.06);
+    --r-card: 28px; --r-tile: 18px; --r-pill: 999px;
+    --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+      --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+      --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+      --primary: #EDEFF1; --on-primary: #111315;
+      --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+    --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+    --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+    --primary: #EDEFF1; --on-primary: #111315;
+    --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  code, .mono { font-family: var(--mono); }
+  :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 6px; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 96px; }
+  .topbar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .topbar-in { max-width: 980px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; text-decoration: none; }
+  .brand-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+  .crumb { color: var(--muted); font-size: 14px; }
+  .spacer { flex: 1; }
+  .icon-btn { border: 1px solid var(--line); background: var(--card); color: var(--text); width: 36px; height: 36px; border-radius: var(--r-pill); display: grid; place-items: center; cursor: pointer; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .toc { display: flex; gap: 6px; overflow-x: auto; padding: 14px 0 4px; scrollbar-width: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc a { flex: none; text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); color: var(--muted); transition: color .2s, border-color .2s; }
+  .toc a:hover { color: var(--text); border-color: var(--muted); }
+
+  .hero { padding: 40px 0 8px; }
+  .eyebrow { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+  h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.05; letter-spacing: -0.03em; margin: 10px 0 14px; font-weight: 650; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 640px; margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); }
+  .chip.ok::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+  .chip.err { background: var(--err-bg); color: var(--err); border-color: transparent; }
+
+  section { margin-top: 56px; scroll-margin-top: 70px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .sec-num { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  h2 { font-size: 26px; letter-spacing: -0.02em; margin: 0; font-weight: 620; }
+  h3 { font-size: 17px; margin: 0 0 6px; font-weight: 600; }
+  p { margin: 0 0 12px; }
+  .card { background: var(--card); border-radius: var(--r-card); padding: 28px; box-shadow: var(--shadow); }
+  .tile { background: var(--tile); border-radius: var(--r-tile); padding: 18px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+
+  /* 1. Was funktioniert */
+  .facts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 20px; }
+  .fact .k { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .fact .v { font-weight: 600; margin-top: 2px; word-break: break-word; }
+
+  /* 2. Diagramm */
+  .diagram-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer; font: 500 14px var(--sans); padding: 10px 16px; border-radius: var(--r-pill); background: var(--primary); color: var(--on-primary); transition: transform .15s; }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: var(--tile); color: var(--text); }
+  .btn.accent { background: var(--accent); color: var(--on-accent); }
+  .btn svg { width: 16px; height: 16px; }
+  .scroll-x { overflow-x: auto; margin: 0 -8px; padding: 0 8px; }
+  .diagram { display: block; width: 100%; min-width: 760px; height: auto; }
+  .diagram .node rect { fill: var(--tile); stroke: var(--line); stroke-width: 1.5; transition: fill .25s, stroke .25s; }
+  .diagram .node text { fill: var(--text); font: 600 13px var(--sans); }
+  .diagram .node .sub { fill: var(--muted); font: 400 11px var(--mono); }
+  .diagram .node .ico { stroke: var(--text); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .diagram .node, .diagram .edge { cursor: pointer; }
+  .diagram .node.later rect { fill: none; stroke-dasharray: 5 5; }
+  .diagram .node.later text, .diagram .node.later .ico { opacity: .55; }
+  .diagram .edge path { stroke: var(--muted); stroke-width: 1.8; fill: none; transition: stroke .25s; }
+  .diagram .edge .hit { stroke: transparent; stroke-width: 18; }
+  .diagram .edge.later path { stroke-dasharray: 4 5; opacity: .6; }
+  .diagram .edge text { fill: var(--muted); font: 500 11px var(--mono); }
+  .diagram .edge .label-bg { fill: var(--surface); }
+  .diagram .arrowhead { fill: var(--muted); }
+  .diagram .is-active rect { fill: var(--accent); stroke: var(--accent); }
+  .diagram .is-active text, .diagram .is-active .sub { fill: #111315; }
+  .diagram .is-active .ico { stroke: #111315; }
+  .diagram .edge.is-active path:not(.hit) { stroke: var(--text); stroke-width: 2.4; stroke-dasharray: 7 6; animation: flow .8s linear infinite; }
+  .diagram .edge.is-active text { fill: var(--text); }
+  @keyframes flow { to { stroke-dashoffset: -13; } }
+  .detail { margin-top: 14px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; min-height: 92px; }
+  .detail .badge { font-family: var(--mono); font-size: 12px; background: var(--accent); color: var(--on-accent); padding: 4px 10px; border-radius: var(--r-pill); white-space: nowrap; }
+  .detail h3 { margin-bottom: 4px; }
+  .detail p { margin: 0; color: var(--muted); }
+  .detail.swap { animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 520px) { .detail { grid-template-columns: 1fr; gap: 8px; } .detail .badge { justify-self: start; } }
+  .step-dots { display: flex; gap: 6px; margin-left: auto; }
+  .step-dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; transition: background .2s, transform .2s; }
+  .step-dots button.on { background: var(--text); transform: scale(1.25); }
+
+  /* 3. Dateien */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; font-size: 12px; font-weight: 500; color: var(--muted); font-family: var(--mono); padding: 0 12px 10px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { white-space: nowrap; }
+  td code { font-size: 13px; background: var(--tile); padding: 2px 7px; border-radius: 6px; }
+  .filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter button { font: 500 13px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 6px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .filter button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  tr.hidden { display: none; }
+
+  /* 4. Code */
+  .code-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .code-tabs button { font: 500 13px var(--mono); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 7px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .code-tabs button[aria-selected="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .code-card { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .code-head { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .code-head .file { font: 500 13px var(--mono); }
+  .code-head .why { color: var(--muted); font-size: 14px; flex: 1; min-width: 0; }
+  .copy { font: 500 12px var(--sans); border: 1px solid var(--line); background: var(--tile); color: var(--text); border-radius: var(--r-pill); padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .copy svg { width: 14px; height: 14px; }
+  pre { margin: 0; padding: 14px 0; overflow-x: auto; font: 13.5px/1.7 var(--mono); }
+  .ln { display: flex; padding: 0 20px 0 0; }
+  .ln .n { width: 44px; flex: none; text-align: right; padding-right: 16px; color: var(--c-com); user-select: none; }
+  .ln .t { white-space: pre; }
+  .ln.has-note { cursor: pointer; position: relative; }
+  .ln.has-note .n { color: var(--text); }
+  .ln.has-note .n::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 6px; vertical-align: middle; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .ln.has-note:hover { background: var(--tile); }
+  .ln.sel { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+  .note { margin: 0 20px 18px; padding: 14px 16px; border-radius: var(--r-tile); background: var(--tile); font-size: 15px; min-height: 52px; }
+  .note b { font-family: var(--mono); font-weight: 500; font-size: 13px; }
+  .tok-kw { color: var(--c-kw); } .tok-str { color: var(--c-str); } .tok-num { color: var(--c-num); }
+  .tok-com { color: var(--c-com); font-style: italic; } .tok-key { color: var(--c-key); } .tok-neg { color: var(--ok); font-weight: 600; }
+
+  /* Demo */
+  .demo-grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .demo-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; gap: 8px; }
+  .field input { flex: 1; min-width: 0; font: 15px var(--mono); padding: 12px 16px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); color: var(--text); }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .presets button { font: 12px var(--mono); border: 1px dashed var(--line); background: transparent; color: var(--muted); padding: 5px 10px; border-radius: var(--r-pill); cursor: pointer; }
+  .presets button:hover { color: var(--text); border-color: var(--muted); }
+  .verdict { margin-top: 16px; padding: 16px; border-radius: var(--r-tile); font-weight: 600; transition: background .25s, color .25s; }
+  .verdict.in { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+  .verdict.out { background: var(--err-bg); color: var(--err); }
+  .verdict small { display: block; font-weight: 400; color: var(--text); margin-top: 4px; font-size: 14px; }
+  .rules { list-style: none; margin: 0; padding: 0; font: 13.5px var(--mono); }
+  .rules li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 12px; border-radius: 10px; transition: background .2s; }
+  .rules li .hint { color: var(--muted); font-family: var(--sans); font-size: 12px; }
+  .rules li.hit { background: var(--tile); }
+  .rules li.win { background: var(--accent); color: #111315; }
+  .rules li.win .hint { color: #111315; }
+
+  /* Entscheidungen */
+  .decisions { display: grid; gap: 12px; }
+  .decision { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--card); border-radius: var(--r-card); overflow: hidden; box-shadow: var(--shadow); }
+  .decision > div { padding: 20px 24px; }
+  .decision .alt { background: var(--tile); }
+  .decision .lbl { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .decision .pick .lbl::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .decision p { margin: 0; font-size: 15px; }
+  @media (max-width: 640px) { .decision { grid-template-columns: 1fr; } }
+
+  /* Risiken */
+  .risks { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .risk { background: var(--card); border-radius: var(--r-tile); padding: 18px 20px; box-shadow: var(--shadow); }
+  .risk .chip { margin-bottom: 10px; }
+  .risk p { margin: 0; font-size: 15px; color: var(--muted); }
+
+  /* Lernkarten */
+  .quiz-top { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .progress { flex: 1; min-width: 160px; height: 10px; background: var(--card); border-radius: var(--r-pill); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+  .progress span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: var(--r-pill); transition: width .4s ease; }
+  .score { font: 500 14px var(--mono); }
+  .cards { display: grid; gap: 12px; }
+  .fc { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .fc-q { width: 100%; text-align: left; border: 0; background: transparent; color: var(--text); font: 600 17px/1.4 var(--sans); padding: 22px 24px; display: flex; gap: 14px; align-items: flex-start; cursor: pointer; }
+  .fc-q .num { font: 500 12px var(--mono); color: var(--muted); padding-top: 4px; }
+  .fc-q .chev { margin-left: auto; flex: none; width: 20px; height: 20px; transition: transform .3s; color: var(--muted); }
+  .fc.open .fc-q .chev { transform: rotate(180deg); }
+  .fc-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  .fc.open .fc-a { grid-template-rows: 1fr; }
+  .fc-a > div { overflow: hidden; }
+  .fc-a .inner { padding: 0 24px 22px 58px; }
+  .fc-a p { color: var(--text); }
+  .fc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .fc.known { box-shadow: var(--shadow), inset 0 0 0 2px var(--accent); }
+  .fc.known .num { color: var(--ok); }
+  @media (max-width: 520px) { .fc-a .inner { padding-left: 24px; } .card { padding: 22px; } }
+
+  footer { margin-top: 72px; color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+
+  /* Schritt 2: RLS-Demo */
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 8px 14px; border-radius: var(--r-pill); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .2s, color .2s, border-color .2s; }
+  .seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .seg .av { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 600 11px var(--sans); background: var(--tile); color: var(--text); }
+  .seg button[aria-pressed="true"] .av { background: var(--accent); color: #111315; }
+  .demo-label { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; }
+  .demo-label:first-child { margin-top: 0; }
+  .actions { display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .actions button { text-align: left; font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 10px 14px; border-radius: var(--r-tile); cursor: pointer; transition: border-color .2s, background .2s; }
+  .actions button small { display: block; color: var(--muted); font: 12px var(--mono); margin-top: 2px; }
+  .actions button[aria-pressed="true"] { border-color: var(--text); background: var(--tile); }
+  .uid { display: inline-flex; gap: 6px; align-items: center; font: 13px var(--mono); color: var(--muted); margin-top: 10px; }
+  .uid b { color: var(--text); font-weight: 500; }
+  .demo-sql { margin: 18px 0 0; padding: 14px 18px; background: var(--tile); border-radius: var(--r-tile); font: 13.5px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .gates { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; margin-top: 12px; }
+  @media (max-width: 640px) { .gates { grid-template-columns: 1fr; } }
+  .gate { border-radius: var(--r-tile); padding: 14px 16px; border: 1px solid var(--line); transition: background .25s, border-color .25s; }
+  .gate .gh { display: flex; align-items: center; gap: 8px; font: 500 12px var(--mono); color: var(--muted); }
+  .gate .st { margin-left: auto; font: 600 12px var(--mono); padding: 2px 9px; border-radius: var(--r-pill); background: var(--tile); color: var(--muted); }
+  .gate p { margin: 8px 0 0; font-size: 14.5px; }
+  .gate.ok { border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+  .gate.ok .st { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .gate.fail { border-color: color-mix(in srgb, var(--err) 45%, transparent); }
+  .gate.fail .st { background: var(--err-bg); color: var(--err); }
+  .gate.skip { opacity: .55; }
+  .rowtable { margin-top: 12px; }
+  .rowtable td, .rowtable th { font-size: 14px; }
+  .rowtable td:first-child { font-family: var(--mono); font-size: 13px; }
+  .rowtable tr { transition: opacity .25s; }
+  .rowtable tr.off td:not(:last-child) { opacity: .38; text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+  .state { font: 500 12px var(--mono); padding: 2px 9px; border-radius: var(--r-pill); white-space: nowrap; background: var(--tile); color: var(--muted); }
+  .state.on { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .state.hit { background: var(--accent); color: #111315; }
+  .state.bad { background: var(--err-bg); color: var(--err); }
+  .verdict.warn { background: var(--warn-bg); color: var(--warn); }
+  .result-swap { animation: fade .3s ease; }
+
+  /* Begriffe zum Antippen */
+  .term { display: inline; cursor: help; padding: 0 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; text-decoration: underline dotted; text-decoration-color: var(--muted); text-decoration-thickness: 1.5px; text-underline-offset: 3px; border-radius: 4px; transition: background .2s; }
+  .term:hover, .term[aria-expanded="true"] { background: color-mix(in srgb, var(--accent) 45%, transparent); text-decoration-color: transparent; }
+  .detail .badge .term, .lbl .term { text-decoration: none; }
+  .pop { position: fixed; z-index: 50; width: max-content; max-width: min(320px, calc(100vw - 24px)); background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: var(--r-tile); box-shadow: 0 12px 32px rgba(17,19,21,.18); padding: 12px 14px; font: 14.5px/1.5 var(--sans); text-align: left; animation: fade .18s ease; }
+  .pop[hidden] { display: none; }
+  .pop b { display: block; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 4px; letter-spacing: .02em; }
+  .pop p { margin: 0; color: var(--text); }
+  .hint { font-size: 14px; color: var(--muted); margin-top: 14px; }
+
+  /* ---------- Step 3: demos ---------- */
+  .demo-tabs { margin-bottom: 18px; }
+  .pane[hidden] { display: none; }
+  .demo-text { width: 100%; min-height: 150px; font: 14px/1.6 var(--sans); padding: 14px 16px; border-radius: var(--r-tile); border: 1px solid var(--line); background: var(--surface); color: var(--text); resize: vertical; }
+  .sliders { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; margin-top: 14px; }
+  .slider label { display: flex; justify-content: space-between; gap: 8px; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 6px; }
+  .slider label b { color: var(--text); font-weight: 600; }
+  .slider input[type=range] { width: 100%; accent-color: var(--text); }
+  .chunk-sum { margin-top: 18px; font-size: 14px; color: var(--muted); }
+  .chunk-sum b { color: var(--text); }
+  .chunk-list { display: grid; gap: 10px; margin-top: 10px; }
+  .chunk { border: 1px solid var(--line); border-radius: var(--r-tile); padding: 12px 14px; animation: fade .3s ease; }
+  .chunk .ch { display: flex; align-items: center; gap: 10px; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 6px; }
+  .chunk .meter { flex: 1; height: 6px; border-radius: var(--r-pill); background: var(--tile); overflow: hidden; }
+  .chunk .meter span { display: block; height: 100%; border-radius: var(--r-pill); background: var(--text); transition: width .3s ease; }
+  .chunk p { margin: 0; font-size: 14px; line-height: 1.6; }
+  .chunk mark { background: var(--warn-bg); color: var(--warn); border-radius: 4px; padding: 0 2px; }
+  .chunk .para { color: var(--muted); font-family: var(--mono); }
+  .gates.three { grid-template-columns: repeat(3, 1fr); margin-top: 16px; }
+  @media (max-width: 760px) { .sliders, .gates.three { grid-template-columns: 1fr; } }
+
+  /* ---------- Step 4: demos ---------- */
+  .rrf-mode { margin-bottom: 4px; }
+  .rrf-grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr 1.35fr; margin-top: 18px; }
+  @media (max-width: 860px) { .rrf-grid { grid-template-columns: 1fr; } }
+  .rrf-query { font-family: var(--mono); font-size: 12px; margin: -2px 0 8px; }
+  .rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .rank li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 14px; font-size: 14px; animation: fade .25s ease; }
+  .rank .pl { font: 500 12px var(--mono); color: var(--muted); width: 16px; padding-top: 2px; flex: none; }
+  .rank .it { flex: 1; min-width: 0; }
+  .rank .it b { font-family: var(--mono); font-weight: 600; }
+  .rank .it small { display: block; color: var(--muted); font: 12px var(--mono); }
+  .rank .it code { display: block; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+  .rank .mvs { display: flex; gap: 4px; flex: none; }
+  .rank .mv { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; font-size: 13px; line-height: 1; }
+  .rank .mv:disabled { opacity: .35; cursor: default; }
+  .rank li.empty { color: var(--muted); border-style: dashed; justify-content: center; }
+  .rank.fused li.top { background: color-mix(in srgb, var(--accent) 30%, transparent); border-color: color-mix(in srgb, var(--accent) 70%, var(--line)); }
+  .rank.fused li.cut { border: 0; padding: 2px 0; justify-content: center; font: 500 11px var(--mono); color: var(--muted); }
+  .rrf-bar { display: flex; height: 6px; margin-top: 6px; border-radius: var(--r-pill); background: var(--tile); overflow: hidden; }
+  .rrf-bar .v { background: var(--text); transition: width .3s ease; }
+  .rrf-bar .f { background: var(--ok); transition: width .3s ease; }
+  .sliders.one { grid-template-columns: 1fr; max-width: 420px; }
+  .demo-text.short { min-height: 96px; font-family: var(--mono); font-size: 13.5px; }
+  .answer-preview { background: var(--surface); border-radius: var(--r-tile); padding: 14px 16px; white-space: pre-wrap; line-height: 1.7; }
+  .cite-btn { margin: 0 2px; border: 0; cursor: pointer; border-radius: var(--r-pill); padding: 0 6px; font: 600 11px var(--mono); vertical-align: super; background: var(--accent); color: #111315; }
+  .cite-btn.on { background: #111315; color: var(--accent); }
+  .cite-panel { margin-top: 8px; border: 1px solid var(--line); border-radius: var(--r-tile); padding: 12px 14px; font-size: 14px; animation: fade .25s ease; }
+  .cite-panel b { font-weight: 600; }
+  .cite-panel p { margin: 6px 0 0; color: var(--muted); }
+  .prompt-view { background: var(--surface); border-radius: var(--r-tile); padding: 14px 16px; font: 13px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .prompt-view .own { background: var(--accent); color: #111315; border-radius: 4px; padding: 0 3px; }
+  .prompt-view mark { background: var(--warn-bg); color: var(--warn); border-radius: 4px; padding: 0 2px; }
+  /* ---------- Step 5 ---------- */
+  .diagram .zone { fill: var(--muted); font: 500 11px var(--mono); letter-spacing: .06em; }
+  .chunk.pickable { cursor: pointer; transition: border-color .2s, background .2s; }
+  .chunk.pickable:hover { border-color: var(--muted); }
+  .chunk.on { border-color: var(--text); background: var(--tile); }
+  #asmCompare { margin-top: 16px; }
+  .answer-preview mark.pick { background: color-mix(in srgb, var(--accent) 55%, transparent); color: var(--text); border-radius: 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .bugtoggle { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-top: 14px; color: var(--muted); cursor: pointer; }
+  .bugtoggle input { width: 18px; height: 18px; accent-color: var(--text); }
+  .ld-demo {
+    --d-bg: light-dark(#E9EBEE, #0B0C0E); --d-card: light-dark(#FFFFFF, #1A1D21); --d-text: light-dark(#111315, #ECEEF0);
+    --d-muted: light-dark(#6B7078, #9BA1AA); --d-primary: light-dark(#111315, #ECEEF0); --d-on-primary: light-dark(#FFFFFF, #111315);
+    --d-tile: light-dark(#F3F4F6, #23272C);
+    color-scheme: light dark; background: var(--d-bg); padding: 18px; border-radius: var(--r-tile); margin-top: 14px; transition: background .3s;
+  }
+  .ld-card { background: var(--d-card); color: var(--d-text); border-radius: 22px; padding: 18px 20px; transition: background .3s, color .3s; }
+  .ld-title { font-weight: 600; margin-bottom: 6px; }
+  .ld-text { margin: 0 0 14px; line-height: 1.9; }
+  .ld-cite { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 8px; background: #D6EE57; color: #111315; font: 600 12px var(--mono); vertical-align: 1px; }
+  .ld-cite.ld-active { background: #111315; color: #D6EE57; box-shadow: 0 0 0 1px #D6EE57; }
+  .ld-cite.ld-active.bug { background: var(--d-primary); box-shadow: none; }
+  .ld-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ld-btn { background: var(--d-primary); color: var(--d-on-primary); border-radius: 999px; padding: 8px 16px; font-weight: 500; font-size: 14px; }
+  .ld-chip { background: var(--d-tile); color: var(--d-muted); border-radius: 999px; padding: 8px 14px; font-size: 13px; }
+  #themeCode { margin-top: 0; }
+  #themeVerdict .verdict { margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html" aria-label="Zur Übersicht aller Schritte">
+      <span class="brand-dot" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#111315" stroke-width="2.4" stroke-linecap="round"><path d="M4 12c4-8 12 8 16 0"/></svg></span>
+      Faden
+    </a>
+    <span class="crumb">/ Erklärungen / Schritt 5</span>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten"></button>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Abschnitte">
+    <a href="#funktioniert">Was funktioniert</a>
+    <a href="#ablauf">Ablauf</a>
+    <a href="#dateien">Dateien</a>
+    <a href="#code">Code</a>
+    <a href="#demo">Demo</a>
+    <a href="#entscheidungen">Entscheidungen</a>
+    <a href="#risiken">Was schiefgehen kann</a>
+    <a href="#interview">Interview-Check</a>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">SCHRITT 5 VON 7 · 11.10.2026</div>
+    <h1>Oberfläche: drei Spalten, Beleg-Ansicht, Quellen-Dialog</h1>
+    <p class="lead" data-rich>Faden sieht jetzt aus wie im Design, hell und dunkel. Ein Notebook hat drei Spalten: Quellen, Chat und Studio. Ein Klick auf einen [[citation|Beleg]] öffnet die Quelle und springt zur markierten Stelle. PDFs zieht man einfach in das Fenster.</p>
+    <div class="chips">
+      <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test 119/119</span><span class="chip ok">im Browser getestet: hell, dunkel, Handy</span>
+    </div>
+    <div class="hint" data-rich>Tipp: [[term|Gepunktet unterstrichene Wörter]] antippen. Dann erscheint eine kurze Erklärung.</div>
+  </header>
+
+  <!-- 1 -->
+  <section id="funktioniert">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Was jetzt funktioniert</h2></div>
+    <div class="card" data-rich>
+      <p>Die Startseite hat eine [[sidebar|Seitenleiste]] und zeigt alle Notebooks als Karten. Man kann Notebooks anlegen, umbenennen und löschen. Im Notebook stehen links die Quellen mit Häkchen, in der Mitte der Chat, rechts das Studio. Ein Klick auf [1] zeigt den ganzen Text der Quelle, die Stelle ist lime markiert. Quellen kommen über einen [[dialog|Dialog]]: PDFs per [[dragdrop|Drag &amp; Drop]], eine Webseite per Link oder eingefügter Text.</p>
+      <p class="muted small" style="margin:0">Das Studio zeigt Audio-Zusammenfassung und Karteikarten noch als „Kommt bald“. Gebaut werden sie in Schritt 6.</p>
+      <div class="facts">
+        <div class="tile fact"><div class="k">SPALTEN</div><div class="v mono small">Quellen · Chat · Studio</div></div>
+        <div class="tile fact"><div class="k">FARBSCHEMA</div><div class="v mono small">Hell · Dunkel · System</div></div>
+        <div class="tile fact"><div class="k">BAUSTEINE</div><div class="v mono small">shadcn/ui + Radix</div></div>
+        <div class="tile fact"><div class="k">DOPPELTER TEXT</div><div class="v mono small">−15 % in der Beleg-Ansicht</div></div>
+        <div class="tile fact"><div class="k">NEUE TESTS</div><div class="v mono small">17 (jetzt 119)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="ablauf">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Ablauf: Ein Klick auf [1] zeigt die Stelle</h2></div>
+    <div class="card">
+      <div class="diagram-tools">
+        <button class="btn" id="playBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg><span>Abspielen</span></button>
+        <button class="btn ghost" id="prevBtn" type="button" aria-label="Vorheriger Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button class="btn ghost" id="nextBtn" type="button" aria-label="Nächster Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        <div class="step-dots" id="dots" role="tablist" aria-label="Schritte im Ablauf"></div>
+      </div>
+      <div class="scroll-x">
+        <svg class="diagram" id="diagram" viewBox="0 0 900 350" role="img" aria-label="Datenfluss der Beleg-Ansicht: Im Browser meldet der Chat den Klick an den Workspace. Der Workspace öffnet das Beleg-Panel. Das Panel fragt die Route nach einer Seite der Quelle. Die Route prüft Login und Rechte und holt die Abschnitte aus Postgres. assembleChunks entfernt die Überlappung. Text und Bereiche gehen als JSON zurück, das Panel markiert die Stelle. OpenAI ist nicht beteiligt.">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0 0 10 5 0 10z"/></marker>
+          </defs>
+
+          <text class="zone" x="10" y="26">IM BROWSER</text>
+          <text class="zone" x="250" y="338">AUF DEM SERVER UND IN SUPABASE</text>
+
+          <!-- edges -->
+          <g class="edge" data-id="e1"><path class="hit" d="M150 76 H250"/><path d="M150 76 H248" marker-end="url(#ah)"/><rect class="label-bg" x="152" y="46" width="96" height="18" rx="9"/><text x="200" y="59" text-anchor="middle">Klick auf [1]</text></g>
+          <g class="edge" data-id="e2"><path class="hit" d="M390 76 H490"/><path d="M390 76 H488" marker-end="url(#ah)"/><rect class="label-bg" x="394" y="46" width="92" height="18" rx="9"/><text x="440" y="59" text-anchor="middle">Quelle, Seite</text></g>
+          <g class="edge" data-id="e3"><path class="hit" d="M600 112 V230"/><path d="M600 112 V228" marker-end="url(#ah)"/><rect class="label-bg" x="606" y="160" width="108" height="18" rx="9"/><text x="660" y="173" text-anchor="middle">GET …?page=3</text></g>
+          <g class="edge" data-id="e4"><path class="hit" d="M630 252 H740"/><path d="M630 252 H738" marker-end="url(#ah)"/><rect class="label-bg" x="646" y="224" width="78" height="18" rx="9"/><text x="685" y="237" text-anchor="middle">Abfrage</text></g>
+          <g class="edge" data-id="e5"><path class="hit" d="M740 284 H630"/><path d="M740 284 H632" marker-end="url(#ah)"/><rect class="label-bg" x="646" y="290" width="78" height="18" rx="9"/><text x="685" y="303" text-anchor="middle">Abschnitte</text></g>
+          <g class="edge" data-id="e6"><path class="hit" d="M490 266 H390"/><path d="M490 266 H392" marker-end="url(#ah)"/><rect class="label-bg" x="396" y="236" width="88" height="18" rx="9"/><text x="440" y="249" text-anchor="middle">der Reihe nach</text></g>
+          <g class="edge" data-id="e7"><path class="hit" d="M320 230 V160 H540 V112"/><path d="M320 230 V160 H540 V114" marker-end="url(#ah)"/><rect class="label-bg" x="340" y="151" width="150" height="18" rx="9"/><text x="415" y="164" text-anchor="middle">Text + Bereiche (JSON)</text></g>
+
+          <!-- nodes -->
+          <g class="node" data-id="n1" tabindex="0" role="button" aria-label="Chat im Browser">
+            <rect x="10" y="40" width="140" height="72" rx="18"/>
+            <path class="ico" d="M27 56h18a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-11l-6 4v-4h-1a3 3 0 0 1-3-3v-9a3 3 0 0 1 3-3z"/>
+            <text x="56" y="68">Chat</text><text class="sub" x="26" y="96">Antwort [1]</text>
+          </g>
+          <g class="node" data-id="n2" tabindex="0" role="button" aria-label="Workspace, der gemeinsame Zustand">
+            <rect x="250" y="40" width="140" height="72" rx="18"/>
+            <rect class="ico" x="266" y="56" width="20" height="16" rx="2"/><path class="ico" d="M273 56v16M280 56v16"/>
+            <text x="294" y="68">Workspace</text><text class="sub" x="266" y="96">openCitation</text>
+          </g>
+          <g class="node" data-id="n3" tabindex="0" role="button" aria-label="Beleg-Panel">
+            <rect x="490" y="40" width="140" height="72" rx="18"/>
+            <rect class="ico" x="506" y="55" width="16" height="20" rx="2"/><path class="ico" d="M510 61h8M510 66h8"/>
+            <text x="532" y="68">Beleg-Panel</text><text class="sub" x="506" y="96">markiert, scrollt</text>
+          </g>
+          <g class="node later" data-id="n7" tabindex="0" role="button" aria-label="OpenAI, hier nicht beteiligt">
+            <rect x="740" y="40" width="140" height="72" rx="18"/>
+            <path class="ico" d="M765 55l2.5 6.5L774 64l-6.5 2.5L765 73l-2.5-6.5L756 64l6.5-2.5z"/>
+            <text x="784" y="68">OpenAI</text><text class="sub" x="756" y="96">nicht beteiligt</text>
+          </g>
+          <g class="node" data-id="n6" tabindex="0" role="button" aria-label="assembleChunks setzt den Text zusammen">
+            <rect x="250" y="230" width="140" height="72" rx="18"/>
+            <path class="ico" d="M266 250h10M266 256h14M272 262h12M266 268h16"/>
+            <text x="292" y="258">Zusammen-</text><text x="292" y="274">setzen</text><text class="sub" x="266" y="292">assembleChunks</text>
+          </g>
+          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="Route auf dem Server">
+            <rect x="490" y="230" width="140" height="72" rx="18"/>
+            <path class="ico" d="M506 245h18v8h-18zM506 257h18v8h-18z"/>
+            <text x="534" y="258">Route</text><text class="sub" x="506" y="286">/api/sources/…</text>
+          </g>
+          <g class="node" data-id="n5" tabindex="0" role="button" aria-label="Postgres, die Datenbank">
+            <rect x="740" y="230" width="140" height="72" rx="18"/>
+            <ellipse class="ico" cx="765" cy="248" rx="9" ry="4"/><path class="ico" d="M756 248v12c0 2 4 4 9 4s9-2 9-4v-12"/>
+            <text x="784" y="258">Postgres</text><text class="sub" x="756" y="286">chunks · RLS</text>
+          </g>
+        </svg>
+      </div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="dateien">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Geänderte Dateien</h2></div>
+    <div class="card">
+      <div class="filter" role="group" aria-label="Dateien filtern">
+        <button type="button" data-f="all" aria-pressed="true">Alle</button>
+        <button type="button" data-f="base" aria-pressed="false">Grundlage</button>
+        <button type="button" data-f="home" aria-pressed="false">Startseite</button>
+        <button type="button" data-f="nb" aria-pressed="false">Notebook</button>
+        <button type="button" data-f="cite" aria-pressed="false">Beleg-Ansicht</button>
+        <button type="button" data-f="conf" aria-pressed="false">Tests und Notizen</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>DATEI</th><th>AUFGABE</th><th>WARUM SO</th></tr></thead>
+          <tbody id="fileRows" data-rich>
+            <tr data-k="base"><td><code>src/app/globals.css</code></td><td>Alle Faden-Farben als [[token|Tokens]], hell und dunkel</td><td>Jede Farbe steht einmal da: [[lightdark|light-dark()]] trägt beide Werte. Die Seiten nutzen nur Namen wie <code>bg-card</code>, keine Farbcodes.</td></tr>
+            <tr data-k="base"><td><code>src/components/ui/*</code></td><td>Knopf, Dialog, Menü, Schublade, Eingabefeld</td><td>Bausteine von [[shadcn|shadcn/ui]], an das Design angepasst: rund, 44 px hoch, deutsche Texte. Der Code liegt bei uns im Repo.</td></tr>
+            <tr data-k="base"><td><code>src/lib/theme.ts</code> · <code>theme-switch.tsx</code></td><td>Hell, Dunkel, System</td><td>Die Wahl steht in einem [[cookie|Cookie]]. Der Server setzt die Klasse gleich im ersten HTML. Die Seite blitzt nie hell auf.</td></tr>
+            <tr data-k="base"><td><code>src/app/layout.tsx</code> · <code>logo.tsx</code></td><td>Liest das Farbschema, Logo aus dem Design</td><td>Ein unbekannter Cookie-Wert wird „System“. So kommt nie fremder Text in die Klasse.</td></tr>
+            <tr data-k="home"><td><code>src/app/notebooks/page.tsx</code></td><td>Startseite mit Begrüßung, „Zuletzt aktiv“ und allen Notebooks</td><td>Zwei Abfragen gleichzeitig. „Zuletzt aktiv“ kommt aus der letzten Frage, nicht aus einem neuen Feld.</td></tr>
+            <tr data-k="home"><td><code>sidebar.tsx</code> · <code>mobile-nav.tsx</code></td><td>Seitenleiste, auf dem Handy als Schublade</td><td>Nur Dinge, die wirklich funktionieren. Ein Knopf ohne Funktion wirkt im Demo unecht.</td></tr>
+            <tr data-k="home"><td><code>notebook-card.tsx</code> · <code>notebook-dialogs.tsx</code></td><td>Karten, Menü, Dialoge für Anlegen, Umbenennen, Löschen</td><td>Der Titel-Link deckt die ganze Karte ab ([[stretched|gestreckter Link]]). Das Menü liegt darüber.</td></tr>
+            <tr data-k="home"><td><code>src/app/notebooks/actions.ts</code></td><td>[[serveraction|Server Actions]] für Notebooks</td><td>Löschen leert zuerst den Ordner in [[storage|Storage]], dann die Zeile. [[cascade|on delete cascade]] erreicht Storage nicht.</td></tr>
+            <tr data-k="home"><td><code>src/lib/format.ts</code> · <code>notebook-overview.ts</code></td><td>Begrüßung, „Heute/Gestern“, Übersicht pro Notebook</td><td>Reine Funktionen ohne Datenbank, darum leicht zu testen. Ein Test fand einen echten Fehler.</td></tr>
+            <tr data-k="nb"><td><code>notebooks/[id]/workspace.tsx</code></td><td>Kopfzeile, Spalten, Handy-Tabs, gemeinsamer [[state|Zustand]]</td><td>Quellen-Spalte und Chat brauchen beide die Auswahl. Der Chat wird nie [[unmount|ausgehängt]], nur versteckt.</td></tr>
+            <tr data-k="nb"><td><code>source-panel.tsx</code> · <code>delete-source-button.tsx</code></td><td>Quellen mit Status, Häkchen, Löschen</td><td>Der Balken bei „In Arbeit“ hat keine Prozentzahl. Wir messen keinen Fortschritt, eine Zahl wäre erfunden.</td></tr>
+            <tr data-k="nb"><td><code>chat.tsx</code> · <code>studio-panel.tsx</code></td><td>Chat im Design, Studio als Platzhalter</td><td>Unter jeder Antwort nur die Belege, die im Text stehen. Antwort weiter nur als Text, nie als HTML.</td></tr>
+            <tr data-k="nb"><td><code>add-source-dialog.tsx</code> · <code>pdf-dropzone.tsx</code></td><td>Der Quellen-Dialog</td><td>Bleibt bei einem Fehler offen und zeigt ihn pro Datei. Bei einer gescannten PDF: „Als Text einfügen“.</td></tr>
+            <tr data-k="nb"><td><code>use-file-drop.ts</code> · <code>use-pdf-uploads.ts</code></td><td>Zwei [[hook|Hooks]]: Dateien ziehen, mehrere PDFs hochladen</td><td>Der Upload lebt im Workspace, nicht im Dialog. Er läuft weiter, wenn jemand den Dialog schließt.</td></tr>
+            <tr data-k="cite"><td><code>src/lib/chat/assemble.ts</code></td><td>Abschnitte wieder zu einem Text zusammensetzen</td><td>Entfernt die [[overlap|Überlappung]] und merkt sich, wo jeder Abschnitt steht. Keine [[migration|Migration]] nötig.</td></tr>
+            <tr data-k="cite"><td><code>api/sources/[id]/text/route.ts</code></td><td>Eine Seite einer Quelle für die Beleg-Ansicht</td><td>Eine [[route|Route]] zum Lesen. Prüft Login, Eingabe und Rechte selbst.</td></tr>
+            <tr data-k="cite"><td><code>citation-panel.tsx</code></td><td>Die Beleg-Ansicht neben dem Chat</td><td>Lädt die Seite, markiert den Abschnitt, scrollt dorthin. Ist die Quelle weg, zeigt sie den gespeicherten Abschnitt.</td></tr>
+            <tr data-k="conf"><td><code>src/lib/**/*.test.ts</code></td><td>17 neue Tests (jetzt 119)</td><td>Farbschema, Datum, Übersicht, Umbenennen und 6 Tests für <code>assembleChunks</code>, darunter ein Rundlauf mit echtem Zerlegen.</td></tr>
+            <tr data-k="conf"><td><code>package.json</code> · <code>NOTIZEN.md</code></td><td>Neue Pakete, Lerntagebuch</td><td><code>radix-ui</code>, <code>lucide-react</code>, <code>cn</code> und weitere von shadcn. Das Paket <code>cn</code> vorher geprüft: echt, von shadcn.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="code">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Wichtigster Code</h2></div>
+    <p class="muted">Zeilen mit Punkt sind anklickbar. Ein Klick zeigt, was die Zeile tut. Die Ausschnitte sind leicht gekürzt.</p>
+    <div class="code-tabs" role="tablist" id="codeTabs"></div>
+    <div class="code-card">
+      <div class="code-head">
+        <span class="file" id="codeFile"></span>
+        <span class="why" id="codeWhy"></span>
+        <button class="copy" id="copyBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Kopieren</span></button>
+      </div>
+      <pre id="codePre" role="tabpanel"></pre>
+      <div class="note" id="codeNote" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo">
+    <div class="sec-head"><span class="sec-num">04b</span><h2>Mini-Demos</h2></div>
+    <div class="card">
+      <div class="seg demo-tabs" id="demoTabs" role="group" aria-label="Demo wählen">
+        <button type="button" data-pane="paneAssemble" aria-pressed="true">Überlappung entfernen</button>
+        <button type="button" data-pane="paneTheme" aria-pressed="false">Hell, Dunkel, System</button>
+      </div>
+
+      <div class="pane" id="paneAssemble">
+        <p class="muted" data-rich>Faden teilt jede Quelle in [[chunk|Abschnitte]]. Jeder Abschnitt beginnt mit den letzten Sätzen des vorigen ([[overlap|Überlappung]]). Für die Beleg-Ansicht muss der Text wieder zusammen. Ändere Text und Regler. Ein Klick auf einen Abschnitt markiert ihn im Ergebnis, wie in der Beleg-Ansicht.</p>
+        <textarea class="demo-text short" id="asmText" aria-label="Text zum Zerteilen"></textarea>
+        <div class="sliders">
+          <div class="slider"><label for="asmSize">Sätze pro Abschnitt <b id="asmSizeVal"></b></label><input type="range" id="asmSize" min="2" max="5" step="1" value="3"></div>
+          <div class="slider"><label for="asmOverlap">Überlappung in Sätzen <b id="asmOverlapVal"></b></label><input type="range" id="asmOverlap" min="0" max="2" step="1" value="1"></div>
+        </div>
+        <div class="demo-label">Die Abschnitte · gelb = Überlappung, die assembleChunks gefunden hat</div>
+        <div class="chunk-list" id="asmChunks"></div>
+        <div class="gates" id="asmCompare"></div>
+        <div class="demo-label">Ergebnis von assembleChunks</div>
+        <div class="answer-preview" id="asmResult" aria-live="polite"></div>
+      </div>
+
+      <div class="pane" id="paneTheme" hidden>
+        <p class="muted" data-rich>Jede Farbe in Faden ist eine Variable mit zwei Werten: <code>light-dark(hell, dunkel)</code>. Welcher gilt, sagt [[colorscheme|color-scheme]]. Ohne Klasse folgt der Browser dem Betriebssystem. Wähle oben eine Einstellung. Die kleine Oberfläche nutzt dieselben Farben wie Faden.</p>
+        <div class="seg" id="themeMode" role="group" aria-label="Farbschema der Vorschau">
+          <button type="button" data-mode="light" aria-pressed="false">Hell</button>
+          <button type="button" data-mode="dark" aria-pressed="false">Dunkel</button>
+          <button type="button" data-mode="system" aria-pressed="true">System</button>
+        </div>
+        <label class="bugtoggle"><input type="checkbox" id="themeBug"> Fehler aus 5c zeigen: aktiver Beleg mit <code>bg-primary</code></label>
+        <div class="ld-demo" id="ldDemo">
+          <div class="ld-card">
+            <div class="ld-title">Chat</div>
+            <p class="ld-text">Hunde sind erlaubt, wenn sie angeleint sind <span class="ld-cite">1</span>. Die zweite Etage ist Ruhezone <span class="ld-cite ld-active" id="ldActive">2</span>.</p>
+            <div class="ld-row"><span class="ld-btn">Frage senden</span><span class="ld-chip">Kommt bald</span></div>
+          </div>
+        </div>
+        <div class="demo-label">Was im Code passiert</div>
+        <pre class="prompt-view" id="themeCode"></pre>
+        <div id="themeVerdict" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="entscheidungen">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Entscheidungen und Alternativen</h2></div>
+    <div class="decisions" data-rich>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Beleg-Ansicht neben dem Chat</h3><p>Auf großen Bildschirmen weichen Quellen und Studio, die Quelle bekommt Platz. Man kann weiterfragen, während sie offen ist. Auf dem Handy legt sie sich über den Tab.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Eine eigene Seite wie im Design. Dann ginge der Zustand des Chats verloren, und eine gerade gestreamte Antwort hat noch keine ID für eine Adresse.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Text aus den Abschnitten zusammensetzen</h3><p>[[assemble|assembleChunks]] findet die Überlappung und hängt nur den neuen Teil an. Jeder Abschnitt bekommt Start und Ende im Text. Das reicht für die Markierung.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Start und Ende beim Einlesen speichern. Genauer, aber eine [[migration|Migration]], und alle vorhandenen Quellen müssten neu verarbeitet werden.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Eine Route zum Lesen</h3><p><code>GET /api/sources/[id]/text</code>. Laut Next.js-Doku sind [[serveraction|Server Actions]] für Änderungen gedacht und laufen nacheinander. Lesen ist ein normales GET.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Eine Server Action, die den Text zurückgibt. Weniger Code, aber zwei schnelle Klicks warten aufeinander.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Farbschema im Cookie, Farben mit light-dark()</h3><p>Der Server liest den [[cookie|Cookie]] und setzt die Klasse im ersten HTML. [[lightdark|light-dark()]] hält beide Werte jeder Farbe an einer Stelle.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Das Paket next-themes oder <code>localStorage</code>. Dann weiß es erst das JavaScript im Browser, und die Seite blitzt kurz hell auf.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>shadcn/ui mit Radix</h3><p>Dialog, Menü und Schublade kümmern sich um Fokus, Escape-Taste und Screenreader. Der Code liegt bei uns und lässt sich frei anpassen.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Alles selbst bauen. Ein guter Dialog ist schwer: Fokus festhalten, zurückgeben, Hintergrund sperren, [[aria|ARIA]]-Angaben.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Zustand eine Ebene höher, Chat nur versteckt</h3><p>Der Workspace hält Auswahl, offenen Beleg und Uploads. Spalten werden per CSS ausgeblendet, nicht entfernt.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Spalten je nach Tab ein- und aushängen. Einfacher zu lesen, aber [[usechat|useChat]] verlöre dabei eine laufende Antwort.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Mehrere PDFs nacheinander</h3><p>Eine Datei nach der anderen, jede mit eigenem Status. Klappt alles, schließt der Dialog. Sonst bleibt er offen.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Alle gleichzeitig. Schneller bei vielen Dateien, aber schwerer nachzuvollziehen, und der Server startet viele Verarbeitungen auf einmal.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Seitenleiste nur mit echten Funktionen</h3><p>Übersicht, zuletzt aktive Notebooks, Neues Notebook, Farbschema, Abmelden. „Zuletzt aktiv“ kommt aus der letzten Frage.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Alles aus dem Design übernehmen: Suche, Benachrichtigungen, Workspaces. Knöpfe ohne Funktion wirken im Live-Test unecht.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="risiken">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Was schiefgehen kann</h2></div>
+    <div class="risks" data-rich>
+      <div class="risk"><span class="chip warn">Qualität</span><h3>Eine Überlappung wird nicht erkannt</h3><p>Dann hängt Faden die Abschnitte mit einer Leerzeile an. Kein Satz geht verloren, einer steht höchstens doppelt. Beim Völkerschlachtdenkmal wurden alle 14 Übergänge erkannt.</p></div>
+      <div class="risk"><span class="chip warn">Qualität</span><h3>Die PDF-Seite ist nur Text</h3><p>Faden zeigt den gelesenen Text, kein Bild der Seite. Tabellen, Spalten und Bilder fehlen. Eine echte PDF-Ansicht mit PDF.js wäre ein nächster Schritt.</p></div>
+      <div class="risk"><span class="chip err">Betrieb</span><h3>Upload während des Löschens</h3><p>Notebooks mit „In Arbeit“-Quellen lassen sich nicht löschen. Eine Quelle auf „Wartet“ schon: Läuft ihr Upload gerade, kann danach noch eine Datei ohne Notebook in [[storage|Storage]] landen.</p></div>
+      <div class="risk"><span class="chip">Betrieb</span><h3>Lange Webseiten</h3><p>Text und Webseiten haben keine Seiten. Die Beleg-Ansicht lädt den ganzen Text, bei Wikipedia „Leipzig“ etwa 230 KB. Das geht, ist aber nicht schlank.</p></div>
+      <div class="risk"><span class="chip">Qualität</span><h3>„Zuletzt aktiv“ ist eine Näherung</h3><p>Faden liest die letzten 100 Fragen. Ist die letzte Frage eines Notebooks älter, zählt sein Erstelldatum.</p></div>
+      <div class="risk"><span class="chip warn">Qualität</span><h3>Farben, die im Dunkeln umschlagen</h3><p><code>primary</code> ist hell schwarz und dunkel hell. Der aktive Beleg war damit im Dunkelmodus unsichtbar. Gefunden im Screenshot, nicht im Test. Die Demo oben zeigt den Fehler.</p></div>
+      <div class="risk"><span class="chip">Barrierefreiheit</span><h3>Tabs auf dem Handy sind Umschalter</h3><p>Die Tabs Quellen, Chat und Studio sind Knöpfe mit <code>aria-pressed</code>, kein vollständiges [[aria|ARIA]]-Tab-Muster mit Pfeiltasten. Einfacher, aber weniger komfortabel für Tastatur-Nutzer.</p></div>
+      <div class="risk"><span class="chip">Sicherheit</span><h3>Die neue Route gibt Quelltext heraus</h3><p>Nur mit Login, und [[rls|RLS]] zeigt nur eigene Quellen. Fremde und gelöschte Quellen sehen gleich aus: [[http404|404]]. Der Text wird als Text gezeigt, nie als HTML.</p></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="interview">
+    <div class="sec-head"><span class="sec-num">07</span><h2>Interview-Check</h2></div>
+    <div class="quiz-top">
+      <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+      <span class="score" id="score">0 von 5 gewusst</span>
+      <button class="btn ghost" id="resetQuiz" type="button">Zurücksetzen</button>
+    </div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <footer>
+    <span>Faden · Erklärung zu Schritt 5</span>
+    <span><a href="schritt-4-chat.html">← Schritt 4</a> · <a href="index.html">Alle Schritte →</a></span>
+  </footer>
+</div>
+
+<div class="pop" id="pop" role="dialog" aria-live="polite" hidden><b id="popT"></b><p id="popD"></p></div>
+
+<!-- Code samples as plain text: no escaping needed -->
+<script type="text/plain" id="src-assemble">export function overlapLength(previous: string, next: string): number {
+  const max = Math.min(previous.length, next.length, MAX_OVERLAP_CHARS);
+  for (let length = max; length > 0; length--) {
+    if (!isSpace(previous[previous.length - length - 1])) continue;
+    if (!isSpace(next[length])) continue;
+    if (previous.endsWith(next.slice(0, length))) return length;
+  }
+  return 0;
+}
+
+export function assembleChunks(chunks: ChunkPiece[]): { text: string; ranges: ChunkRange[] } {
+  let text = "";
+  const ranges: ChunkRange[] = [];
+
+  for (const [i, chunk] of chunks.entries()) {
+    let start: number;
+    if (i === 0) {
+      start = 0;
+      text = chunk.content;
+    } else {
+      const overlap = overlapLength(chunks[i - 1].content, chunk.content);
+      if (overlap > 0) {
+        start = text.length - overlap;
+        text += chunk.content.slice(overlap);
+      } else {
+        start = text.length + NO_OVERLAP_SEPARATOR.length;
+        text += NO_OVERLAP_SEPARATOR + chunk.content;
+      }
+    }
+    ranges.push({ id: chunk.id, start, end: start + chunk.content.length });
+  }
+
+  return { text, ranges };
+}</script>
+<script type="text/plain" id="src-route">export async function GET(request: NextRequest, ctx: RouteContext<"/api/sources/[id]/text">) {
+  const { supabase, userId } = await getUser();
+  if (!userId) return errorResponse("Bitte melde dich an.", 401);
+
+  const { id } = await ctx.params;
+  const parsedId = sourceIdSchema.safeParse(id);
+  if (!parsedId.success) return errorResponse("Diese Quelle gibt es nicht mehr.", 404);
+
+  const pageParam = request.nextUrl.searchParams.get("page");
+  const parsedPage = pageParam === null ? null : pageSchema.safeParse(pageParam);
+  if (parsedPage && !parsedPage.success) return errorResponse("Ungültige Seite.", 400);
+  const page = parsedPage ? parsedPage.data : null;
+
+  const { data: source } = await supabase
+    .from("sources")
+    .select("id, title, type, status, meta")
+    .eq("id", parsedId.data)
+    .maybeSingle();
+  if (!source) return errorResponse("Diese Quelle gibt es nicht mehr.", 404);
+  if (source.status !== "ready") return errorResponse("Diese Quelle ist noch nicht bereit.", 409);
+
+  const query = supabase.from("chunks").select("id, content").eq("source_id", source.id).order("position");
+  const { data: chunks } = await (page === null ? query.is("page", null) : query.eq("page", page));
+
+  const { text, ranges } = assembleChunks(chunks);
+  return Response.json({ title: source.title, type: source.type, page, pageCount, text, ranges });
+}</script>
+<script type="text/plain" id="src-panel">function SourceView({ citation }: { citation: Citation }) {
+  const [page, setPage] = useState(citation.page);
+  const key = `${citation.sourceId}:${page ?? "all"}`;
+  const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const loading = loaded?.key !== key;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const query = page === null ? "" : `?page=${page}`;
+    fetch(`/api/sources/${citation.sourceId}/text${query}`, { signal: controller.signal })
+      .then(async (response) => {
+        const body: unknown = await response.json();
+        if (!response.ok) { setLoaded({ key, error: messageOf(body) }); return; }
+        setLoaded({ key, data: body as SourceText });
+      })
+      .catch(() => { if (!controller.signal.aborted) setLoaded({ key, error: LOAD_ERROR }); });
+    return () => controller.abort();
+  }, [citation.sourceId, page, key]);
+
+  const markRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (loading) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    markRef.current?.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
+  }, [loading]);
+
+  const range = data?.ranges.find((r) => r.id === citation.chunkId);
+  return (
+    <p className="whitespace-pre-wrap">
+      {data.text.slice(0, range.start)}
+      <Mark ref={markRef}>{data.text.slice(range.start, range.end)}</Mark>
+      {data.text.slice(range.end)}
+    </p>
+  );
+}</script>
+<script type="text/plain" id="src-theme">/* globals.css */
+:root { color-scheme: light dark; }
+:root.light { color-scheme: light; }
+:root.dark { color-scheme: dark; }
+
+:root {
+  --card: light-dark(#ffffff, #1a1d21);
+  --foreground: light-dark(#111315, #eceef0);
+  --primary: light-dark(#111315, #eceef0);
+  --highlight: #d6ee57;
+}
+
+// theme.ts
+export function parseTheme(value: string | undefined): Theme {
+  return THEMES.find((theme) => theme === value) ?? "system";
+}
+
+// layout.tsx
+const theme = await getTheme();
+<html lang="de" className={cn(geistSans.variable, "h-full", themeClass(theme))}>
+
+// theme-switch.tsx
+function applyTheme(theme: Theme) {
+  document.cookie = `${THEME_COOKIE}=${theme}; path=/; max-age=${ONE_YEAR_IN_SECONDS}; samesite=lax`;
+  const root = document.documentElement;
+  root.classList.remove("light", "dark");
+  const className = themeClass(theme);
+  if (className) root.classList.add(className);
+}</script>
+<script type="text/plain" id="src-workspace">const [excluded, setExcluded] = useState<Set<string>>(new Set());
+const [openCitation, setOpenCitation] = useState<OpenCitation | null>(null);
+const uploads = usePdfUploads(notebook.id);
+
+const ready = sources.filter((s) => s.status === "ready");
+const selectedIds = ready.filter((s) => !excluded.has(s.id)).map((s) => s.id);
+
+async function uploadFiles(files: File[]) {
+  setAddOpen(true);
+  const allOk = await uploads.upload(files);
+  if (allOk) setAddOpen(false);
+}
+
+const view: Tab | "citation" = openCitation ? "citation" : tab;
+
+return (
+  <div className="flex min-h-0 flex-1 gap-4">
+    <div className={cn(column, view === "sources" ? "flex" : "hidden", openCitation ? "lg:hidden" : "lg:flex")}>
+      <SourcePanel sources={sources} excluded={excluded} onToggle={toggleSource} onFiles={uploadFiles} />
+    </div>
+    <div className={cn(column, "lg:flex", view === "chat" ? "flex" : "hidden")}>
+      <Chat selectedIds={selectedIds} openCitation={openCitation} onOpenCitation={setOpenCitation} />
+    </div>
+    {openCitation && (
+      <CitationPanel open={openCitation} onClose={() => setOpenCitation(null)} />
+    )}
+  </div>
+);</script>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function store(key, val) {
+    try { if (val === undefined) return localStorage.getItem(key); localStorage.setItem(key, val); } catch (e) { return null; }
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* ---------- Begriffe ---------- */
+  var G = {
+    term: ["So funktioniert es", "Genau so: antippen, lesen, irgendwo anders hintippen. Die Erklärung verschwindet wieder."],
+    citation: ["Beleg", "Eine Nummer wie [2] hinter einer Aussage im Chat. Sie zeigt auf den Abschnitt, aus dem die Aussage stammt. Ein Klick öffnet jetzt die Quelle an dieser Stelle."],
+    chunk: ["Abschnitt (Chunk)", "Ein Stück Text aus einer Quelle, höchstens etwa eine Seite lang. Seit Schritt 3 zerlegt Faden jede Quelle in solche Abschnitte."],
+    overlap: ["Überlappung", "Jeder Abschnitt beginnt mit den letzten Sätzen des vorigen, etwa 15 %. So steht eine Antwort an der Grenze trotzdem ganz in einem Abschnitt. Für die Anzeige muss diese Doppelung wieder weg."],
+    assemble: ["assembleChunks", "Unsere Funktion, die Abschnitte wieder zu einem Text zusammensetzt. Sie findet die Überlappung, hängt nur den neuen Teil an und merkt sich, wo jeder Abschnitt steht."],
+    sidebar: ["Seitenleiste", "Die Leiste links auf der Startseite. Auf dem Handy ist sie versteckt und öffnet sich über den Menü-Knopf als Schublade."],
+    dialog: ["Dialog", "Ein Fenster über der Seite, etwa „Quelle hinzufügen“. Solange es offen ist, bleibt der Fokus darin. Escape schließt es."],
+    dragdrop: ["Drag & Drop", "Eine Datei mit der Maus greifen, über das Fenster ziehen und loslassen. Faden nimmt PDFs so an, im Dialog und auf der ganzen Quellen-Spalte."],
+    token: ["Token (Design)", "Ein Name für einen Design-Wert, etwa „card“ für die Kartenfarbe. Der Code nutzt nur den Namen. Den Wert ändert man an einer Stelle."],
+    lightdark: ["light-dark()", "Eine CSS-Funktion mit zwei Farben: light-dark(hell, dunkel). Der Browser nimmt die passende, je nach color-scheme."],
+    colorscheme: ["color-scheme", "Eine CSS-Angabe: hell, dunkel oder beides. Bei „beides“ folgt der Browser der Einstellung des Betriebssystems."],
+    cookie: ["Cookie", "Ein kleiner Wert, den der Browser bei jeder Anfrage an den Server mitschickt. Faden speichert darin nur „light“, „dark“ oder „system“."],
+    shadcn: ["shadcn/ui", "Eine Sammlung fertiger Bausteine für React, etwa Dialog und Menü. Man kopiert den Code ins eigene Projekt und passt ihn an. Darunter arbeitet Radix."],
+    radix: ["Radix", "Eine Bibliothek für das Verhalten von Bausteinen: Fokus, Tastatur, Screenreader. Das Aussehen bestimmen wir selbst."],
+    aria: ["ARIA", "Zusätzliche Angaben im HTML für Screenreader, etwa „dieser Knopf ist gedrückt“ oder „dieser Bereich lädt gerade“."],
+    stretched: ["Gestreckter Link", "Der Link im Titel bekommt eine unsichtbare Fläche über die ganze Karte. So ist die ganze Karte klickbar, und der Menü-Knopf darf trotzdem darauf liegen. Ein Knopf in einem Link wäre ungültiges HTML."],
+    serveraction: ["Server Action", "Eine Funktion auf dem Server, die der Browser direkt aufrufen kann, etwa „Notebook löschen“. Jeder kann sie aufrufen, darum prüft sie Login und Eingaben selbst."],
+    route: ["Route (Route Handler)", "Eine Adresse auf unserem Server, hier /api/sources/…/text. Der Browser holt dort eine Seite der Quelle. Die Route prüft alles selbst."],
+    storage: ["Storage", "Der Dateispeicher von Supabase. Dort liegen die PDFs und die Texte der Quellen, in einem Ordner pro Notebook."],
+    cascade: ["on delete cascade", "Eine Regel in der Datenbank: Wird ein Notebook gelöscht, löscht Postgres seine Quellen, Abschnitte und Nachrichten mit. Dateien in Storage erreicht diese Regel nicht."],
+    migration: ["Migration", "Eine SQL-Datei, die die Datenbank ändert. Für die Beleg-Ansicht brauchten wir keine."],
+    state: ["Zustand (State)", "Werte, die sich eine Komponente im Browser merkt, etwa welche Quellen abgewählt sind. Ändert sich der Zustand, zeichnet React neu."],
+    unmount: ["Aushängen (Unmount)", "React entfernt eine Komponente ganz. Dabei geht ihr Zustand verloren. Nur verstecken mit CSS behält ihn."],
+    hook: ["Hook", "Eine wiederverwendbare Funktion für React-Komponenten. Ihr Name beginnt mit „use“, etwa useFileDrop für Drag & Drop."],
+    usechat: ["useChat", "Ein Baustein aus dem AI SDK. Er hält die Nachrichten im Browser und liest die gestreamte Antwort."],
+    rls: ["Zeilen-Regel (RLS)", "Die Datenbank prüft für jede Zeile, ob die fragende Person sie sehen darf. Ein Nutzer sieht nur Quellen seiner eigenen Notebooks."],
+    zod: ["Zod", "Eine Bibliothek, die Eingaben prüft. Hier: Ist die ID eine echte UUID, ist die Seite eine positive Zahl?"],
+    json: ["JSON", "Ein Textformat für Daten, das Browser und Server beide lesen. Die Route schickt Text und Bereiche als JSON."],
+    abort: ["AbortController", "Ein Werkzeug zum Abbrechen einer laufenden Anfrage. Blättert jemand schnell weiter, wird die alte Anfrage gestoppt."],
+    reducedmotion: ["prefers-reduced-motion", "Eine Einstellung im Betriebssystem: „Bewegung reduzieren“. Dann springt Faden zur Stelle, statt sanft zu scrollen."],
+    workspace: ["Workspace", "Unsere Komponente für die Notebook-Seite. Sie hält den Zustand, den mehrere Spalten brauchen."],
+    signedurl: ["Signierte Upload-URL", "Eine Adresse mit einem Einmal-Schlüssel. Damit lädt der Browser die PDF direkt in Storage, ohne Umweg über unseren Server."],
+    polling: ["Polling", "Regelmäßig nachfragen. Solange eine Quelle verarbeitet wird, lädt die Seite alle 2 Sekunden den Status neu."],
+    http400: ["400", "Der Code für „ungültige Anfrage“, etwa ?page=abc."],
+    http401: ["401", "Der Code für „nicht angemeldet“."],
+    http404: ["404", "Der Code für „nicht gefunden“. Faden zeigt ihn auch bei fremden Quellen. So verrät es nicht, dass es sie gibt."],
+    http409: ["409", "Der Code für „passt gerade nicht“. Hier: Die Quelle ist noch nicht bereit."]
+  };
+  function rich(s) {
+    return esc(s).replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) {
+      return G[k] ? '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>' : t;
+    });
+  }
+  document.querySelectorAll("[data-rich]").forEach(function (el) {
+    el.innerHTML = el.innerHTML.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) {
+      return G[k] ? '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>' : t;
+    });
+  });
+  var pop = document.getElementById("pop"), openTerm = null;
+  function closePop() { if (openTerm) openTerm.setAttribute("aria-expanded", "false"); openTerm = null; pop.hidden = true; }
+  function openPop(btn) {
+    var g = G[btn.getAttribute("data-t")]; if (!g) return;
+    if (openTerm === btn) { closePop(); return; }
+    closePop();
+    document.getElementById("popT").textContent = g[0];
+    document.getElementById("popD").textContent = g[1];
+    pop.hidden = false; openTerm = btn; btn.setAttribute("aria-expanded", "true");
+    place();
+  }
+  function place() {
+    if (!openTerm) return;
+    var r = openTerm.getClientRects()[0] || openTerm.getBoundingClientRect();
+    var pw = pop.offsetWidth, ph = pop.offsetHeight, vw = document.documentElement.clientWidth;
+    if (r.bottom < 0 || r.top > window.innerHeight) { closePop(); return; }
+    var left = Math.min(Math.max(12, r.left + r.width / 2 - pw / 2), vw - pw - 12);
+    var top = r.bottom + 8; if (top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 8);
+    pop.style.left = left + "px"; pop.style.top = top + "px";
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest(".term");
+    if (t) { e.preventDefault(); e.stopPropagation(); openPop(t); return; }
+    if (!e.target.closest(".pop")) closePop();
+  }, true);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closePop(); return; }
+    var t = e.target.closest && e.target.closest(".term");
+    if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); openPop(t); }
+  }, true);
+  window.addEventListener("scroll", place, { passive: true });
+  window.addEventListener("resize", place);
+
+  /* ---------- Theme ---------- */
+  var root = document.documentElement, themeBtn = document.getElementById("themeBtn");
+  var sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var moon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
+  function isDark() { var t = root.getAttribute("data-theme"); return t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches; }
+  function paintThemeBtn() { themeBtn.innerHTML = isDark() ? sun : moon; }
+  var saved = store("faden-doc-theme"); if (saved) root.setAttribute("data-theme", saved);
+  paintThemeBtn();
+  themeBtn.addEventListener("click", function () { var next = isDark() ? "light" : "dark"; root.setAttribute("data-theme", next); store("faden-doc-theme", next); paintThemeBtn(); });
+
+  /* ---------- Diagram ---------- */
+  var steps = [
+    { id: "n1", tag: "1 · Chat", title: "Jemand klickt auf einen Beleg", text: "Unter der Antwort stehen die Belege als Chips, im Text als lime Nummern. Ein Klick auf [1] ist der Start." },
+    { id: "e1", tag: "2 · Klick auf [1]", title: "Der Chat meldet den Klick", text: "Der Chat gibt drei Dinge weiter: welche Antwort, welche Nummer und alle Belege dieser Antwort. Die braucht das Panel für „vorheriger“ und „nächster Beleg“." },
+    { id: "n2", tag: "3 · Workspace", title: "Der Workspace merkt sich den Beleg", text: "Er speichert ihn als [[state|Zustand]] openCitation. Auf großen Bildschirmen weichen Quellen und Studio. Der Chat bleibt, er wird nie [[unmount|ausgehängt]]." },
+    { id: "e2", tag: "4 · Quelle, Seite", title: "Das Panel bekommt den Beleg", text: "Im Beleg stehen Quelle, Seite und die ID des Abschnitts. Das hat der Server schon beim Antworten mitgeschickt." },
+    { id: "e3", tag: "5 · GET", title: "Das Panel fragt nach einer Seite", text: "GET /api/sources/…/text?page=3. Bei Text und Webseiten ohne Seite: der ganze Text. Ein [[abort|AbortController]] bricht die Anfrage ab, wenn man vorher weiterblättert." },
+    { id: "n4", tag: "6 · Route", title: "Die Route prüft alles selbst", text: "Angemeldet? Sonst [[http401|401]]. Gültige ID und Seite? Das prüft [[zod|Zod]], sonst [[http400|400]]. Darf der Nutzer die Quelle sehen? Sonst [[http404|404]]. Ist sie fertig? Sonst [[http409|409]]." },
+    { id: "e4", tag: "7 · Abfrage", title: "Postgres sucht die Abschnitte der Seite", text: "Alle Abschnitte dieser Quelle und Seite, nach Position sortiert. [[rls|RLS]] gilt auch hier. Abschnitte überschreiten nie eine Seitengrenze, das ist seit Schritt 3 so." },
+    { id: "e5", tag: "8 · Abschnitte", title: "Die Texte kommen zurück", text: "Nur ID und Text, keine Embeddings. Die Zahlen braucht die Anzeige nicht." },
+    { id: "e6", tag: "9 · der Reihe nach", title: "Die Abschnitte gehen an assembleChunks", text: "Die Reihenfolge stimmt schon. Jetzt muss nur die [[overlap|Überlappung]] weg." },
+    { id: "n6", tag: "10 · Zusammensetzen", title: "assembleChunks entfernt die Doppelung", text: "Abschnitt 2 beginnt mit dem Ende von Abschnitt 1. Die Funktion findet dieses Stück und hängt nur den Rest an. Für jeden Abschnitt merkt sie sich Start und Ende im Text. Probier es unten in der Demo." },
+    { id: "e7", tag: "11 · JSON", title: "Text und Bereiche gehen zum Browser", text: "Die Route antwortet mit [[json|JSON]]: Titel, Seite, Seitenzahl, der ganze Text und die Bereiche aller Abschnitte." },
+    { id: "n3", tag: "12 · Beleg-Panel", title: "Die Stelle wird markiert", text: "Das Panel sucht den Bereich des Abschnitts aus dem Beleg. Text davor, markierter Teil, Text danach. Dann scrollt es die Markierung in die Mitte, sanft oder sofort bei [[reducedmotion|reduzierter Bewegung]]." }
+  ];
+  var extras = {
+    n5: { tag: "Postgres", title: "Die Abschnitte liegen in der Tabelle chunks", text: "Mit Text, Seite und Position. Für die Anzeige liest die Route nur ID und Text." },
+    n7: { tag: "OpenAI", title: "Hier nicht beteiligt", text: "Die Beleg-Ansicht ruft kein KI-Modell auf. Der Text kommt nur aus unserer Datenbank. Das kostet nichts und geht schnell." }
+  };
+  var diagram = document.getElementById("diagram"), detail = document.getElementById("detail"), dots = document.getElementById("dots");
+  var current = -1, timer = null, playBtn = document.getElementById("playBtn");
+  steps.forEach(function (s, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.setAttribute("aria-label", "Schritt " + (i + 1) + ": " + s.title);
+    b.addEventListener("click", function () { stop(); show(i); });
+    dots.appendChild(b);
+  });
+  function highlight(id) {
+    diagram.querySelectorAll(".is-active").forEach(function (el) { el.classList.remove("is-active"); });
+    var el = diagram.querySelector('[data-id="' + id + '"]'); if (el) el.classList.add("is-active");
+  }
+  function renderDetail(d) {
+    detail.innerHTML = '<span class="badge">' + esc(d.tag) + '</span><div><h3>' + esc(d.title) + '</h3><p>' + rich(d.text) + '</p></div>';
+    detail.classList.remove("swap"); void detail.offsetWidth; detail.classList.add("swap");
+  }
+  function show(i) {
+    current = (i + steps.length) % steps.length;
+    highlight(steps[current].id); renderDetail(steps[current]);
+    Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle("on", k === current); d.setAttribute("aria-current", k === current ? "step" : "false"); });
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } playBtn.querySelector("span").textContent = "Abspielen"; }
+  function play() {
+    if (timer) { stop(); return; }
+    playBtn.querySelector("span").textContent = "Pause";
+    if (current >= steps.length - 1) current = -1;
+    show(current + 1);
+    timer = setInterval(function () { if (current >= steps.length - 1) { stop(); return; } show(current + 1); }, reduce ? 3600 : 2800);
+  }
+  playBtn.addEventListener("click", play);
+  document.getElementById("prevBtn").addEventListener("click", function () { stop(); show(current <= 0 ? steps.length - 1 : current - 1); });
+  document.getElementById("nextBtn").addEventListener("click", function () { stop(); show(current + 1); });
+  function pick(id) {
+    stop();
+    var idx = steps.findIndex(function (s) { return s.id === id; });
+    if (idx >= 0) { show(idx); return; }
+    current = -1; highlight(id); renderDetail(extras[id]);
+    Array.prototype.forEach.call(dots.children, function (d) { d.classList.remove("on"); });
+  }
+  diagram.querySelectorAll(".node, .edge").forEach(function (el) {
+    el.addEventListener("click", function () { pick(el.getAttribute("data-id")); });
+    el.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(el.getAttribute("data-id")); } });
+  });
+  show(0);
+
+  /* ---------- File filter ---------- */
+  document.querySelectorAll(".filter button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".filter button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      var f = b.getAttribute("data-f");
+      document.querySelectorAll("#fileRows tr").forEach(function (tr) { tr.classList.toggle("hidden", f !== "all" && tr.getAttribute("data-k") !== f); });
+    });
+  });
+
+  /* ---------- Code ---------- */
+  function src(id) { return document.getElementById(id).textContent; }
+  // Notes point to a line by its text: "m" is a piece of the line,
+  // "=" at the start means the whole line must match exactly.
+  var snippets = [
+    { file: "assemble.ts", lang: "ts", why: "Abschnitte ohne Doppelung zusammensetzen", code: src("src-assemble"), notes: [
+      { m: "export function overlapLength", t: "Wie lang ist die [[overlap|Überlappung]] zwischen dem Ende von „previous“ und dem Anfang von „next“? 0 heißt: keine." },
+      { m: "MAX_OVERLAP_CHARS", t: "Die Überlappung ist höchstens 120 Tokens lang, etwa 600 Zeichen. Wir suchen bis 2.000 Zeichen, nicht durch den ganzen Abschnitt." },
+      { m: "for (let length = max", t: "Von der längsten möglichen Länge abwärts. Der erste Treffer ist also die längste Überlappung." },
+      { m: "previous[previous.length - length - 1]", t: "Schutz vor Zufallstreffern: Vor dem Stück muss in „previous“ ein Leerzeichen stehen. Die Überlappung beginnt also an einer Satzgrenze." },
+      { m: "if (!isSpace(next[length]))", t: "Und nach dem Stück muss in „next“ ein Leerzeichen kommen. So zählt ein einzelnes „e“ am Ende und am Anfang nicht." },
+      { m: "previous.endsWith(next.slice(0, length))", t: "Der eigentliche Vergleich: Endet „previous“ genau mit dem Anfang von „next“?" },
+      { m: "start = text.length - overlap", t: "Der Abschnitt beginnt mitten im Text, den wir schon haben, genau um die Länge der Überlappung früher." },
+      { m: "text += chunk.content.slice(overlap)", t: "Nur der neue Teil kommt dazu. So steht kein Satz doppelt." },
+      { m: "NO_OVERLAP_SEPARATOR + chunk.content", t: "Keine Überlappung gefunden, etwa am Seitenanfang. Dann eine Leerzeile dazwischen." },
+      { m: "ranges.push", t: "Start und Ende jedes Abschnitts im Gesamttext. Damit markiert das Panel später genau einen Abschnitt." }
+    ] },
+    { file: "route.ts", lang: "ts", why: "Eine Seite der Quelle für die Beleg-Ansicht", code: src("src-route"), notes: [
+      { m: "export async function GET", t: "Eine [[route|Route]] für GET. Zum Lesen besser als eine [[serveraction|Server Action]]: Die sind für Änderungen gedacht und laufen nacheinander. RouteContext ist ein Typ von Next.js 16, er kennt den Teil [id] der Adresse." },
+      { m: "await ctx.params", t: "Die ID aus der Adresse. In Next.js 16 ist params ein Promise, darum await." },
+      { m: "if (!userId)", t: "Ohne Login: [[http401|401]]. Eine Route leitet nicht auf die Login-Seite weiter." },
+      { m: "sourceIdSchema.safeParse(id)", t: "Keine UUID? Dann gibt es die Quelle nicht, ohne die Datenbank zu fragen." },
+      { m: "pageSchema.safeParse(pageParam)", t: "?page kommt als Text aus der Adresse. [[zod|Zod]] macht daraus eine positive ganze Zahl, sonst [[http400|400]]." },
+      { m: ".maybeSingle();", t: "[[rls|RLS]] zeigt nur eigene Quellen. Fremde und gelöschte Quellen sind beide „nicht da“: [[http404|404]]." },
+      { m: "source.status !== \"ready\"", t: "Eine Quelle in Arbeit hat noch keine vollständigen Abschnitte: [[http409|409]]." },
+      { m: "order(\"position\")", t: "Die Abschnitte in Lesereihenfolge. assembleChunks verlässt sich darauf." },
+      { m: "query.is(\"page\", null)", t: "Text und Webseiten haben keine Seiten (page ist null): dann alle Abschnitte. Bei PDFs nur die eine Seite." },
+      { m: "assembleChunks(chunks)", t: "Entfernt die Überlappung und liefert Text und Bereiche." }
+    ] },
+    { file: "citation-panel.tsx", lang: "ts", why: "Laden, markieren, hinscrollen", code: src("src-panel"), notes: [
+      { m: "useState(citation.page)", t: "Die Seite, die man gerade sieht. Sie beginnt bei der Seite des Belegs. Bei PDFs kann man blättern." },
+      { m: "const key =", t: "Ein Schlüssel für „welche Quelle, welche Seite“. Ein Ergebnis gehört immer zu einem Schlüssel." },
+      { m: "const loading", t: "„Lädt“ heißt: Das letzte Ergebnis gehört zu einer anderen Seite. So braucht der Effekt kein setState gleich am Anfang." },
+      { m: "new AbortController()", t: "Blättert jemand schnell weiter, bricht die alte Anfrage ab ([[abort|AbortController]]). Sie kann das neue Ergebnis nicht überschreiben." },
+      { m: "if (!response.ok)", t: "Ein Fehler der Route, etwa 404 bei einer gelöschten Quelle. Dann zeigt das Panel den Abschnitt, der in der Antwort gespeichert ist." },
+      { m: "body as SourceText", t: "Unsere eigene Route, auf beiden Seiten mit demselben Typ. Keine fremde Eingabe." },
+      { m: "return () => controller.abort()", t: "Aufräumen: Ändert sich die Seite oder schließt das Panel, wird die Anfrage abgebrochen." },
+      { m: "prefers-reduced-motion", t: "Wer im System „Bewegung reduzieren“ eingestellt hat, springt sofort zur Stelle ([[reducedmotion|reduzierte Bewegung]])." },
+      { m: "scrollIntoView", t: "Scrollt die Markierung in die Mitte des Panels, nicht nur an den Rand." },
+      { m: "ranges.find((r) => r.id === citation.chunkId)", t: "Der Bereich des Abschnitts aus dem Beleg. Fehlt er, liegt die Stelle auf einer anderen Seite." },
+      { m: "<Mark ref={markRef}>", t: "Text davor, markierter Teil, Text danach. Alles bleibt Text, React wandelt Zeichen wie < um. Nie HTML." }
+    ] },
+    { file: "globals.css · theme", lang: "ts", why: "Hell, Dunkel, System ohne Aufblitzen", code: src("src-theme"), notes: [
+      { m: "=:root { color-scheme: light dark; }", t: "Ohne Klasse: Der Browser folgt dem Betriebssystem. Das ist „System“." },
+      { m: ":root.dark", t: "Mit der Klasse „dark“ gilt immer die dunkle Seite." },
+      { m: "--card: light-dark(", t: "[[lightdark|light-dark()]]: zwei Werte für eine Farbe. Jede Faden-Farbe steht so genau einmal da." },
+      { m: "--primary: light-dark(", t: "Primäre Knöpfe: hell schwarz, dunkel hell. Genau diese Farbe machte den aktiven Beleg im Dunkeln unsichtbar." },
+      { m: "--highlight: #d6ee57", t: "Lime ist in beiden Modi gleich. Es ist die Farbe für Belege, Fortschritt und die wichtigste Aktion." },
+      { m: "?? \"system\"", t: "Der [[cookie|Cookie]] kommt vom Browser und kann alles enthalten. Nur drei Werte sind erlaubt, alles andere wird „System“." },
+      { m: "await getTheme()", t: "Das Layout liest den Cookie auf dem Server. Schon das erste HTML hat die richtige Klasse, nichts blitzt auf." },
+      { m: "document.cookie =", t: "Ein Jahr gültig, für die ganze Seite. samesite=lax: Der Cookie geht nicht bei Anfragen von fremden Seiten mit." },
+      { m: "root.classList.add(className)", t: "Die Farben wechseln sofort, ohne Neuladen. Beim nächsten Laden sorgt der Cookie für dasselbe Ergebnis." }
+    ] },
+    { file: "workspace.tsx", lang: "ts", why: "Gemeinsamer Zustand, drei Spalten", code: src("src-workspace"), notes: [
+      { m: "const [excluded", t: "Die abgewählten Quellen. Wird eine neue Quelle „bereit“, ist sie automatisch ausgewählt." },
+      { m: "const [openCitation", t: "Der offene Beleg oder null. Ist er gesetzt, zeigt der Workspace das Beleg-Panel." },
+      { m: "usePdfUploads(notebook.id)", t: "Der Upload-[[hook|Hook]] lebt hier und nicht im Dialog. So läuft ein Upload weiter, wenn man den Dialog schließt." },
+      { m: "const selectedIds", t: "Nur bereite Quellen, die nicht abgewählt sind. Die bekommt der Chat für jede Frage." },
+      { m: "async function uploadFiles", t: "Für den Dialog und für Dateien, die auf die Quellen-Spalte fallen. Klappt alles, schließt der Dialog." },
+      { m: "const view:", t: "Auf dem Handy: Ein offener Beleg liegt über dem gewählten Tab." },
+      { m: "openCitation ? \"lg:hidden\" : \"lg:flex\"", t: "Auf großen Bildschirmen weicht die Quellen-Spalte, solange ein Beleg offen ist." },
+      { m: "view === \"chat\" ? \"flex\" : \"hidden\"", t: "Der Chat wird nur mit CSS versteckt, nie [[unmount|ausgehängt]]. Sonst verlöre [[usechat|useChat]] eine laufende Antwort." },
+      { m: "{openCitation && (", t: "Das Panel gibt es nur, wenn ein Beleg offen ist. Hier ist Aushängen gewollt: Es soll beim nächsten Beleg frisch starten." }
+    ] }
+  ];
+  var KW_TS = /^(import|from|export|default|const|let|function|async|await|return|type|true|false|for|of|if|else|try|catch|throw|new|break|continue|instanceof|null|unknown)$/;
+  var KW_SQL = /^(create|or|replace|function|returns|table|language|sql|stable|security|invoker|set|as|with|select|from|where|and|order|by|limit|over|row_number|join|full|outer|on|coalesce|desc|any|default|least|integer|text|uuid|bigint|double|precision)$/i;
+  function hlLine(line, lang) {
+    var out = "", last = 0, m, kw = lang === "sql" ? KW_SQL : KW_TS;
+    var re = lang === "sql"
+      ? /(--.*$)|('(?:[^'])*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_][\w]*)()/g
+      : /(\/\/.*$)|("(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(\s*:)?/g;
+    while ((m = re.exec(line))) {
+      out += esc(line.slice(last, m.index));
+      if (m[1]) out += '<span class="tok-com">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="tok-str">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="tok-num">' + m[3] + '</span>';
+      else if (m[4]) {
+        if (kw.test(m[4])) out += '<span class="tok-kw">' + m[4] + '</span>' + esc(m[5] || "");
+        else if (m[5]) out += '<span class="tok-key">' + m[4] + '</span>' + esc(m[5]);
+        else out += esc(m[4]);
+      }
+      last = re.lastIndex;
+    }
+    return out + esc(line.slice(last));
+  }
+  // Turn the list of notes into { lineNumber: text }.
+  snippets.forEach(function (s) {
+    var lines = s.code.split("\n"), byLine = {};
+    s.notes.forEach(function (n) {
+      for (var i = 0; i < lines.length; i++) {
+        var hit = n.m.charAt(0) === "=" ? lines[i] === n.m.slice(1) : lines[i].indexOf(n.m) >= 0;
+        if (hit && !byLine[i + 1]) { byLine[i + 1] = n.t; break; }
+      }
+    });
+    s.lineNotes = byLine;
+  });
+  var tabs = document.getElementById("codeTabs"), pre = document.getElementById("codePre"), note = document.getElementById("codeNote");
+  var active = 0;
+  function defaultNote() { note.innerHTML = '<span class="muted">Klick auf eine Zeile mit Punkt.</span>'; }
+  function renderCode(i) {
+    active = i; var s = snippets[i];
+    Array.prototype.forEach.call(tabs.children, function (t, k) { t.setAttribute("aria-selected", String(k === i)); });
+    document.getElementById("codeFile").textContent = s.file;
+    document.getElementById("codeWhy").textContent = s.why;
+    pre.innerHTML = s.code.split("\n").map(function (l, k) {
+      var n = k + 1, has = s.lineNotes[n] ? " has-note" : "";
+      return '<div class="ln' + has + '" data-n="' + n + '"' + (has ? ' role="button" tabindex="0"' : "") + '><span class="n">' + n + '</span><span class="t">' + (hlLine(l, s.lang) || " ") + '</span></div>';
+    }).join("");
+    defaultNote();
+  }
+  function selectLine(el) {
+    pre.querySelectorAll(".sel").forEach(function (x) { x.classList.remove("sel"); });
+    el.classList.add("sel"); var n = el.getAttribute("data-n");
+    note.innerHTML = '<b>Zeile ' + n + '</b> · ' + rich(snippets[active].lineNotes[n]);
+  }
+  pre.addEventListener("click", function (e) { var el = e.target.closest(".ln.has-note"); if (el) selectLine(el); });
+  pre.addEventListener("keydown", function (e) { var el = e.target.closest(".ln.has-note"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectLine(el); } });
+  snippets.forEach(function (s, i) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = s.file;
+    b.addEventListener("click", function () { renderCode(i); }); tabs.appendChild(b);
+  });
+  renderCode(0);
+  var copyBtn = document.getElementById("copyBtn");
+  copyBtn.addEventListener("click", function () {
+    var text = snippets[active].code, label = copyBtn.querySelector("span");
+    function done() { label.textContent = "Kopiert"; setTimeout(function () { label.textContent = "Kopieren"; }, 1400); }
+    function fallback() { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+  });
+
+  /* ---------- Demo tabs ---------- */
+  var demoTabs = document.getElementById("demoTabs");
+  demoTabs.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-pane]"); if (!b) return;
+    Array.prototype.forEach.call(demoTabs.children, function (x) {
+      var on = x === b; x.setAttribute("aria-pressed", String(on));
+      document.getElementById(x.getAttribute("data-pane")).hidden = !on;
+    });
+  });
+
+  /* ---------- Demo 1: assembleChunks (same rules as src/lib/chat/assemble.ts) ---------- */
+  var ASM_DEFAULT = "Das Faden-Haus öffnet werktags um 7:30 Uhr. Die zweite Etage ist die Ruhezone. Telefonate sind dort nicht erlaubt. Hunde sind erlaubt, wenn sie angeleint sind. Pro Etage dürfen höchstens zwei Hunde da sein. In der Küche sind Hunde nicht erlaubt. Wer zuletzt geht, schließt die Fenster. Ein Fehlalarm kostet 80 Euro.";
+  var asmText = document.getElementById("asmText"), asmSize = document.getElementById("asmSize"), asmOverlap = document.getElementById("asmOverlap");
+  var asmPick = 1;
+  function sentencesOf(t) {
+    return (t.replace(/\s+/g, " ").trim().match(/[^.!?]+[.!?]+|[^.!?]+$/g) || []).map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+  // Simplified chunking: a fixed number of sentences per chunk. The real
+  // chunkPages counts tokens, the idea of the overlap is the same.
+  function makeChunks(sents, size, overlap) {
+    overlap = Math.min(overlap, size - 1);
+    var chunks = [], i = 0;
+    while (i < sents.length) {
+      chunks.push(sents.slice(i, i + size).join(" "));
+      if (i + size >= sents.length) break;
+      i += size - overlap;
+    }
+    return chunks;
+  }
+  function isSpace(c) { return c === undefined || /\s/.test(c); }
+  function overlapLength(prev, next) {
+    var max = Math.min(prev.length, next.length, 2000);
+    for (var len = max; len > 0; len--) {
+      if (!isSpace(prev[prev.length - len - 1])) continue;
+      if (!isSpace(next[len])) continue;
+      if (prev.slice(prev.length - len) === next.slice(0, len)) return len;
+    }
+    return 0;
+  }
+  function assembleChunks(chunks) {
+    var text = "", ranges = [];
+    chunks.forEach(function (c, i) {
+      var start, o = i === 0 ? 0 : overlapLength(chunks[i - 1], c);
+      if (i === 0) { start = 0; text = c; }
+      else if (o > 0) { start = text.length - o; text += c.slice(o); }
+      else { start = text.length + 2; text += "\n\n" + c; }
+      ranges.push({ start: start, end: start + c.length, overlap: o });
+    });
+    return { text: text, ranges: ranges };
+  }
+  function duplicates(text, sents) {
+    var n = 0;
+    sents.forEach(function (s) { var count = text.split(s).length - 1; if (count > 1) n += count - 1; });
+    return n;
+  }
+  function renderAssemble() {
+    var size = Number(asmSize.value), ov = Math.min(Number(asmOverlap.value), size - 1);
+    document.getElementById("asmSizeVal").textContent = size;
+    document.getElementById("asmOverlapVal").textContent = ov + (Number(asmOverlap.value) > ov ? " (höchstens Sätze − 1)" : "");
+    var sents = sentencesOf(asmText.value), chunks = makeChunks(sents, size, ov);
+    var result = assembleChunks(chunks);
+    if (asmPick >= chunks.length) asmPick = Math.max(0, chunks.length - 1);
+    document.getElementById("asmChunks").innerHTML = chunks.length ? chunks.map(function (c, i) {
+      var o = result.ranges[i].overlap;
+      return '<div class="chunk pickable' + (i === asmPick ? " on" : "") + '" role="button" tabindex="0" data-i="' + i + '" aria-pressed="' + (i === asmPick) + '">' +
+        '<div class="ch">Abschnitt ' + (i + 1) + ' · ' + c.length + ' Zeichen' + (i > 0 ? ' · Überlappung ' + o + ' Zeichen' : '') + '</div>' +
+        '<p>' + (o ? '<mark>' + esc(c.slice(0, o)) + '</mark>' : '') + esc(c.slice(o)) + '</p></div>';
+    }).join("") : '<p class="muted small">Kein Text.</p>';
+    var naive = chunks.join(" "), dupNaive = duplicates(naive, sents), dupAsm = duplicates(result.text, sents);
+    document.getElementById("asmCompare").innerHTML =
+      '<div class="gate ' + (dupNaive ? "fail" : "ok") + '"><div class="gh">EINFACH ANEINANDERGEHÄNGT<span class="st">' + naive.length + ' Zeichen</span></div><p>' + (dupNaive ? dupNaive + (dupNaive === 1 ? " Satz steht" : " Sätze stehen") + " doppelt." : "Nichts doppelt, weil es keine Überlappung gibt.") + '</p></div>' +
+      '<div class="gate ' + (dupAsm ? "fail" : "ok") + '"><div class="gh">ASSEMBLECHUNKS<span class="st">' + result.text.length + ' Zeichen</span></div><p>' + (dupAsm ? dupAsm + " doppelt." : "Jeder Satz genau einmal.") + '</p></div>';
+    var r = result.ranges[asmPick];
+    document.getElementById("asmResult").innerHTML = r
+      ? esc(result.text.slice(0, r.start)) + '<mark class="pick">' + esc(result.text.slice(r.start, r.end)) + '</mark>' + esc(result.text.slice(r.end))
+      : '<span class="muted">Kein Text.</span>';
+  }
+  function pickChunk(el) { asmPick = Number(el.getAttribute("data-i")); renderAssemble(); }
+  document.getElementById("asmChunks").addEventListener("click", function (e) { var el = e.target.closest(".chunk"); if (el) pickChunk(el); });
+  document.getElementById("asmChunks").addEventListener("keydown", function (e) { var el = e.target.closest(".chunk"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pickChunk(el); } });
+  [asmText, asmSize, asmOverlap].forEach(function (el) { el.addEventListener("input", renderAssemble); });
+  asmText.value = ASM_DEFAULT;
+  renderAssemble();
+
+  /* ---------- Demo 2: light-dark() and color-scheme ---------- */
+  var themeMode = document.getElementById("themeMode"), ldDemo = document.getElementById("ldDemo"), themeBug = document.getElementById("themeBug");
+  var previewMode = "system";
+  function effectiveDark() { return previewMode === "dark" || (previewMode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches); }
+  function renderTheme() {
+    Array.prototype.forEach.call(themeMode.children, function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-mode") === previewMode)); });
+    ldDemo.style.colorScheme = previewMode === "system" ? "light dark" : previewMode;
+    document.getElementById("ldActive").classList.toggle("bug", themeBug.checked);
+    var dark = effectiveDark();
+    var cls = previewMode === "system" ? "" : ' class="' + previewMode + '"';
+    var scheme = previewMode === "system" ? "light dark   → folgt dem System: " + (dark ? "dunkel" : "hell") : previewMode;
+    document.getElementById("themeCode").textContent =
+      "Cookie:        theme=" + previewMode + "\n" +
+      "Server setzt:  <html" + cls + ">\n" +
+      "CSS:           color-scheme: " + scheme + "\n\n" +
+      "--card:        light-dark(#ffffff, #1a1d21)  → " + (dark ? "#1a1d21" : "#ffffff") + "\n" +
+      "--primary:     light-dark(#111315, #eceef0)  → " + (dark ? "#eceef0" : "#111315") + "\n" +
+      "--highlight:   #d6ee57                       → #d6ee57";
+    var verdict;
+    if (themeBug.checked && dark) verdict = '<div class="verdict out">Lime auf Hellgrau: kaum lesbar<small>Der aktive Beleg nutzte bg-primary. Im Dunkelmodus ist primary hell. Darum nutzt Faden jetzt immer Schwarz mit Lime-Schrift und Lime-Rand.</small></div>';
+    else if (themeBug.checked) verdict = '<div class="verdict warn">Im Hellmodus fällt der Fehler nicht auf<small>Hier ist primary schwarz. Stell die Vorschau auf „Dunkel“, dann siehst du ihn.</small></div>';
+    else verdict = '<div class="verdict in">Aktiver Beleg: immer Schwarz mit Lime<small>Diese Farben schlagen nicht um. So ist der aktive Beleg in beiden Modi gut zu sehen.</small></div>';
+    document.getElementById("themeVerdict").innerHTML = verdict;
+  }
+  themeMode.addEventListener("click", function (e) { var b = e.target.closest("button[data-mode]"); if (!b) return; previewMode = b.getAttribute("data-mode"); renderTheme(); });
+  themeBug.addEventListener("change", renderTheme);
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderTheme);
+  renderTheme();
+
+  /* ---------- Flashcards ---------- */
+  var qa = [
+    { q: "Ein Klick auf [1] springt zur Stelle in der Quelle. Wie funktioniert das, obwohl sich die Abschnitte überlappen?", a: ["Der Beleg kennt Quelle, Seite und die ID des Abschnitts. Das Panel holt über eine [[route|Route]] alle Abschnitte dieser Seite, der Reihe nach. Weil sich Nachbarn um etwa 15 % [[overlap|überlappen]], würde einfaches Aneinanderhängen Sätze doppelt zeigen.", "[[assemble|assembleChunks]] sucht für jeden Übergang das längste Ende von Abschnitt n, das auch der Anfang von n+1 ist, und hängt nur den Rest an. Dabei merkt es sich Start und Ende jedes Abschnitts. Das Panel markiert genau diesen Bereich und scrollt ihn in die Mitte. Damit kein Zufallstreffer zählt, muss die Überlappung an Satzgrenzen liegen. Ein Rundlauf-Test prüft: zerlegen, zusammensetzen, Original kommt heraus. Live waren es 26.036 statt 30.434 Zeichen."] },
+    { q: "Warum eine Route und keine Server Action für den Quelltext, und wie ist sie abgesichert?", a: ["[[serveraction|Server Actions]] sind laut Next.js-Doku für Änderungen gedacht. Der Browser schickt sie nacheinander. Lesen ist ein normales GET, darum eine [[route|Route]]: /api/sources/[id]/text?page=3.", "Die Route prüft alles selbst: Login ([[http401|401]]), ID und Seite mit [[zod|Zod]] ([[http400|400]]), Rechte über [[rls|RLS]] (fremd oder gelöscht: [[http404|404]]) und Status ([[http409|409]]). Im Browser bricht ein [[abort|AbortController]] alte Anfragen ab, wenn man schnell blättert."] },
+    { q: "Wie funktioniert der Dunkelmodus, ohne dass die Seite hell aufblitzt?", a: ["Die Wahl steht in einem [[cookie|Cookie]]: light, dark oder system. Das Layout liest ihn auf dem Server und setzt die Klasse schon im ersten HTML. Mit localStorage wüsste das erst das JavaScript im Browser, die Seite würde kurz hell aufblitzen.", "Die Farben stehen als Variablen mit [[lightdark|light-dark()]] da, jede genau einmal. Welche Seite gilt, bestimmt [[colorscheme|color-scheme]]: Ohne Klasse folgt der Browser dem Betriebssystem. Ein unbekannter Cookie-Wert wird „system“, so kommt nie fremder Text in die Klasse."] },
+    { q: "Quellen-Spalte und Chat brauchen beide die Auswahl. Wie hast du das gelöst, und warum wird der Chat nie ausgehängt?", a: ["Der [[workspace|Workspace]] hält den gemeinsamen [[state|Zustand]] eine Ebene darüber: abgewählte Quellen, offener Beleg, Uploads. Die Spalten bekommen ihn als Props. Für drei Werte auf einer Seite reicht das, ohne Context oder extra Bibliothek.", "Tabs und Beleg-Panel blenden Spalten nur mit CSS aus. Würde React den Chat [[unmount|aushängen]], verlöre [[usechat|useChat]] seinen Zustand, auch eine Antwort, die gerade gestreamt wird. Beim Beleg-Panel ist Aushängen dagegen gewollt: Es soll beim nächsten Beleg frisch starten."] },
+    { q: "Was passiert beim Löschen eines Notebooks, und warum in dieser Reihenfolge?", a: ["Erst prüft die [[serveraction|Server Action]] Login und Rechte. Dann: Wird noch eine Quelle verarbeitet, lehnt sie ab. Der Hintergrundjob könnte sonst später eine Datei speichern, die niemand mehr findet.", "Dann leert sie den Ordner des Notebooks in [[storage|Storage]] und löscht erst danach die Zeile. [[cascade|on delete cascade]] entfernt Quellen, Abschnitte und Nachrichten in Postgres, erreicht aber keine Dateien. Andersherum könnte eine Datei ohne Zeile übrig bleiben, beim Datenschutz das schlechtere Ergebnis. Geprüft mit einem Admin-Skript: kein Ordner ohne Notebook."] }
+  ];
+  var known = {};
+  try { known = JSON.parse(store("faden-doc-s5-quiz") || "{}") || {}; } catch (e) { known = {}; }
+  var cardsEl = document.getElementById("cards");
+  var chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  cardsEl.innerHTML = qa.map(function (c, i) {
+    return '<div class="fc" data-i="' + i + '"><button class="fc-q" type="button" aria-expanded="false"><span class="num">0' + (i + 1) + '</span><span>' + esc(c.q) + '</span>' + chev + '</button>' +
+      '<div class="fc-a"><div><div class="inner">' + c.a.map(function (p) { return "<p>" + rich(p) + "</p>"; }).join("") +
+      '<div class="fc-actions"><button class="btn accent" type="button" data-k="1">Gewusst</button><button class="btn ghost" type="button" data-k="0">Noch nicht</button></div></div></div></div></div>';
+  }).join("");
+  function paintQuiz() {
+    var n = 0;
+    Array.prototype.forEach.call(cardsEl.children, function (el, i) { var k = !!known[i]; el.classList.toggle("known", k); if (k) n++; });
+    document.getElementById("score").textContent = n + " von " + qa.length + " gewusst";
+    document.getElementById("bar").style.width = (n / qa.length * 100) + "%";
+  }
+  cardsEl.addEventListener("click", function (e) {
+    var card = e.target.closest(".fc"); if (!card) return;
+    var i = card.getAttribute("data-i");
+    if (e.target.closest(".fc-q")) {
+      var open = card.classList.toggle("open");
+      card.querySelector(".fc-q").setAttribute("aria-expanded", String(open));
+      return;
+    }
+    var a = e.target.closest("[data-k]");
+    if (a) {
+      if (a.getAttribute("data-k") === "1") known[i] = true; else delete known[i];
+      store("faden-doc-s5-quiz", JSON.stringify(known));
+      card.classList.remove("open"); card.querySelector(".fc-q").setAttribute("aria-expanded", "false");
+      paintQuiz();
+    }
+  });
+  document.getElementById("resetQuiz").addEventListener("click", function () { known = {}; store("faden-doc-s5-quiz", "{}"); paintQuiz(); });
+  paintQuiz();
+})();
+</script>
+</body>
+</html>

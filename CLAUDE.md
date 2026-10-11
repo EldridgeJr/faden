@@ -116,7 +116,7 @@ Vorlage: Design-Artefakt „Faden“ (5 Screens: Startseite, Notebook mit Quelle
 - [x] 2. Supabase: Migration mit Tabellen, pgvector, Indizes, RLS; Supabase-Clients für Server und Browser
 - [x] 3. Einlesen: Upload → Text → Abschnitte → Embeddings (zuerst mit einer PDF testen)
 - [x] 4. Chat: hybride Suche, Prompt, Streaming, Belege
-- [ ] 5. UI nach dem Design: drei Spalten, Beleg-Ansicht, Quellen-Dialog
+- [x] 5. UI nach dem Design: drei Spalten, Beleg-Ansicht, Quellen-Dialog
 - [ ] 6. Podcast + Karteikarten
 - [ ] 7. Tests (Vitest + Playwright), README, Demo-Notebook, Loom
 
