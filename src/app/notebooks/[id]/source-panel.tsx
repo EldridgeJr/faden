@@ -177,10 +177,12 @@ function SourceRow({
           onChange={onToggle}
           className="mt-[9px] size-[18px] shrink-0 accent-foreground"
         />
+        {/* Decoration only, the type is also in the text below. Hidden on
+            medium screens (lg, three narrow columns) to leave room for the title. */}
         <span
           aria-hidden
           className={cn(
-            "inline-flex size-9 shrink-0 items-center justify-center rounded-xl",
+            "inline-flex size-9 shrink-0 items-center justify-center rounded-xl lg:max-xl:hidden",
             isBusy && "bg-busy text-busy-foreground",
             isError && "bg-error text-error-foreground",
             isReady && "bg-card",
@@ -189,7 +191,7 @@ function SourceRow({
           {isError ? <TriangleAlert className="size-[18px]" /> : <Icon className="size-[18px]" />}
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="font-medium break-words">{source.title}</span>
+          <span className="font-medium break-words hyphens-auto">{source.title}</span>
           {isReady && <span className="font-mono text-xs text-muted-foreground">{describe(source)}</span>}
           {isBusy && (
             <span className="flex flex-col gap-1.5 pt-1">
@@ -216,8 +218,8 @@ function SourceRow({
           toggle the checkbox. */}
       {isError && source.type === "pdf" && (
         // pl-[78px]: checkbox 18 + gap 12 + icon 36 + gap 12, so the button
-        // starts below the title.
-        <div className="basis-full pb-1 pl-[78px]">
+        // starts below the title. Without the icon (lg): 30 px.
+        <div className="basis-full pb-1 pl-[78px] lg:max-xl:pl-[30px]">
           <Button variant="outline" size="sm" onClick={onPasteText}>
             Als Text einfügen
           </Button>

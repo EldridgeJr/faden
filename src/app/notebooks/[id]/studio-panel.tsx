@@ -11,7 +11,10 @@ export function StudioPanel() {
       <p className="text-sm text-muted-foreground">
         Hier erstellt Faden bald neue Formate aus deinen Quellen, mit Belegen wie im Chat.
       </p>
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* auto-fit: two tiles side by side only if each gets at least 10rem.
+          In the narrow column they stack, so long words like
+          "Zusammenfassung" fit. */}
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] gap-2.5">
         {[
           { title: "Audio-Zusammenfassung", Icon: Headphones },
           { title: "Karteikarten", Icon: Layers },
@@ -24,7 +27,7 @@ export function StudioPanel() {
               <Icon className="size-4" />
             </span>
             <span className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium">{title}</span>
+              <span className="text-sm font-medium hyphens-auto">{title}</span>
               <span className="text-xs text-muted-foreground">Kommt bald</span>
             </span>
           </div>

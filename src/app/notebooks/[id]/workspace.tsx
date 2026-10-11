@@ -157,7 +157,9 @@ export function Workspace({
           <div
             className={cn(
               column,
-              "flex-[1_1_280px]",
+              // min-w: on large screens the side columns keep 260 px, the
+              // wide chat gives way first.
+              "flex-[1_1_280px] lg:min-w-[280px]",
               view === "sources" ? "flex" : "hidden",
               openCitation ? "lg:hidden" : "lg:flex",
             )}
@@ -198,7 +200,7 @@ export function Workspace({
           <div
             className={cn(
               column,
-              "flex-[1_1_300px]",
+              "flex-[1_1_300px] lg:min-w-[260px]",
               view === "studio" ? "flex" : "hidden",
               openCitation ? "lg:hidden" : "lg:flex",
             )}
