@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
+import { toChatMessages } from "@/lib/chat/messages";
 import { notebookIdSchema, sourceMetaSchema } from "@/lib/schemas";
+import { Chat } from "./chat";
 import { PdfUpload } from "./pdf-upload";
 import { SourceList, type SourceItem } from "./source-list";
 import { TextSourceForm } from "./text-source-form";
@@ -49,6 +51,19 @@ export default async function NotebookPage({ params }: PageProps<"/notebooks/[id
     };
   });
 
+  // The conversation so far: the newest 50 messages, oldest first.
+  const { data: lastMessages, error: messagesError } = await supabase
+    .from("messages")
+    .select("id, role, content, citations")
+    .eq("notebook_id", notebook.id)
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (messagesError) throw messagesError;
+
+  const readySources = sources
+    .filter((source) => source.status === "ready")
+    .map((source) => ({ id: source.id, title: source.title }));
+
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 text-[#111315]">
       <Link href="/notebooks" className="text-sm text-[#6b7078] hover:text-[#111315]">
@@ -71,6 +86,14 @@ export default async function NotebookPage({ params }: PageProps<"/notebooks/[id
           </div>
         </details>
         <SourceList sources={items} />
+      </section>
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold">Chat</h2>
+        <Chat
+          notebookId={notebook.id}
+          sources={readySources}
+          initialMessages={toChatMessages(lastMessages.reverse())}
+        />
       </section>
     </main>
   );

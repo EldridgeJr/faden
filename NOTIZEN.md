@@ -130,6 +130,11 @@
 - **`store: false` bei OpenAI.** OpenAI hebt die Antwort nicht für spätere API-Aufrufe auf. Wir speichern selbst, eine Kopie dort ist unnötig.
 - **Fehlertexte.** Der Browser bekommt nur „Die Antwort ist fehlgeschlagen…“. Details stehen im Server-Log. Im Log stehen pro Antwort nur Token-Zahlen, keine Inhalte.
 - **Bewusste Grenze: Suche nur mit der aktuellen Frage.** Folgefragen wie „Und wer hat es entworfen?“ klappten im Test trotzdem (das Notebook handelt fast nur vom Denkmal, der Verlauf löst „es“ auf). Bei gemischten Notebooks kann die Suche danebenliegen. Lösung für später: Frage vorher umschreiben lassen (ein Modellaufruf mehr).
+- **Chat-Oberfläche vorerst unter den Quellen (4d).** Eine Spalte, schlicht. Drei Spalten, Beleg-Ansicht mit Sprung in die Quelle und Design kommen in Schritt 5.
+- **Abgewählte Quellen merken statt ausgewählte.** Wird eine Quelle während des Chats „bereit“, ist sie automatisch ausgewählt. Getestet: Ohne „hausordnung“ lehnt Faden die Haustier-Frage ab, mit ihr kommt die Antwort mit Beleg.
+- **`[n]` als Knopf, Auszug klappt unter der Antwort auf.** Zahl in Lime: Belege sind laut Design eine der drei Stellen für den Akzent.
+- **Fehler aus der Route als JSON `{ error }`.** `useChat` legt den Rohtext der Antwort in `error.message`. Die Oberfläche liest nur das Feld `error`, alles andere wird zu „Die Antwort ist fehlgeschlagen…“.
+- **Verlauf nach dem Neuladen aus der Datenbank** (`toChatMessages`, letzte 50 Nachrichten). Die gespeicherten Belege werden mit Zod geprüft. Kaputtes JSON heißt: Text ohne Knöpfe, kein Absturz.
 
 ## Echte Zahlen
 - Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.
