@@ -79,6 +79,12 @@ describe("buildPodcastInstructions", () => {
     { sourceTitle: "Notiz", page: null, content: "Der Hof ist offen." },
   ];
 
+  it("asks for a number of turns, not for a number of words", () => {
+    const prompt = buildPodcastInstructions(chunks);
+    expect(prompt).toContain("20 bis 24 Redebeiträge");
+    expect(prompt).toContain("höchstens 40 Wörter");
+  });
+
   it("names the valid numbers and contains the numbered sources", () => {
     const prompt = buildPodcastInstructions(chunks);
     expect(prompt).toContain("nur die Nummern 1 bis 2");

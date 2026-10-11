@@ -12,9 +12,13 @@ export const SPEAKERS = {
 } as const;
 export type Speaker = keyof typeof SPEAKERS;
 
-// About 5 minutes. Measured in step 6d: the voices speak about 120 words per
-// minute (779 words = 6:31 min), and the model writes a bit more than asked.
-export const TARGET_WORDS = 600;
+// About 5 minutes. The voices speak about 120 words per minute (measured in
+// step 6d). A word count alone did not work: asked for 600 words, the model
+// wrote 701 and once 962 (8 min). It cannot count its own words, but it can
+// keep a number of turns. So the prompt asks for 20 to 24 turns of at most
+// 40 words: about 500 to 700 words, 4 to 6 minutes.
+export const TARGET_TURNS = { min: 20, max: 24 };
+export const MAX_WORDS_PER_TURN = 40;
 // Upper limit after the check: keeps the number of speech calls (one per
 // turn) and so time and cost of the audio step small.
 export const MAX_TURNS = 50;
@@ -74,8 +78,8 @@ Rollen:
 - Tom erklärt die Inhalte sachlich und anschaulich.
 
 Regeln:
-1. Etwa ${TARGET_WORDS} Wörter, also etwa 5 Minuten. Haben die Quellen weniger Inhalt, wird die Folge kürzer. Erfinde nichts dazu.
-2. Lea und Tom wechseln sich ab. Jeder Redebeitrag hat ein bis vier kurze Sätze.
+1. Schreibe ${TARGET_TURNS.min} bis ${TARGET_TURNS.max} Redebeiträge, das sind etwa 5 Minuten. Haben die Quellen weniger Inhalt, schreibe weniger. Erfinde nichts dazu.
+2. Lea und Tom wechseln sich ab. Jeder Redebeitrag hat ein bis drei kurze Sätze und höchstens ${MAX_WORDS_PER_TURN} Wörter.
 3. Sprich über alle Quellen. Haben sie verschiedene Themen, behandle sie nacheinander, jeweils mit einer kurzen Überleitung.
 4. Lea beginnt mit „Willkommen bei Faden“ und nennt die Themen. Am Ende fasst Tom die wichtigsten Punkte kurz zusammen. Danach bedankt sich Lea fürs Zuhören und verabschiedet sich mit einem kurzen Satz.
 5. Nutze nur Informationen aus den Quellen unten. Nutze kein eigenes Wissen, auch wenn du mehr weißt.

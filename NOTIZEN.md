@@ -66,6 +66,8 @@
 - **12.10.2026 · Neue CSS-Farben kamen nicht im Browser an (6e).** Sprecher-Leiste unsichtbar, aktiver Redebeitrag ohne Lime. Gemessen: Die Tokens `--player` usw. waren im Browser leer, die ausgelieferte CSS-Datei enthielt sie nicht, obwohl `globals.css` auf der Platte richtig war. Neuladen half nicht, keine Fehler im Log. Gelöst: Entwicklungsserver neu gestartet. Turbopack hatte die geänderte CSS-Datei nicht neu gebaut. Lehre: Erst prüfen, was wirklich ausgeliefert wird, bevor man am Code sucht.
 - **12.10.2026 · `Content-Disposition` im Browser `null` (6e), kein Fehler.** Der Test per `fetch` im Browser zeigte keinen Download-Header. Grund: Bei Anfragen an eine andere Domain gibt der Browser dem Skript nur wenige Header frei (CORS). Per Node-Skript geprüft: `attachment; filename=hausregeln-und-ein-leipziger-monument.mp3`.
 - **12.10.2026 · Steuerzeile brach auf dem Handy in drei Zeilen (6e).** Sprecher, Knöpfe und Tempo mit `flex-wrap` und Mindestbreiten passten nicht in ca. 295 px. Gemerkt im Screenshot. Gelöst: CSS-Grid, auf dem Handy oben die Knöpfe, darunter Sprecher und Tempo, ab `sm` eine Zeile.
+- **12.10.2026 · Wortzahl im Prompt wurde ignoriert (6, Live-Test).** Annahme: „Etwa 600 Wörter“ reicht für ca. 5 Minuten. Falsch: lokal 701 Wörter, live mit anderen Quellen 962 Wörter und 37 Redebeiträge (8:04 Min.). Ein Modell kann seine eigenen Wörter nicht zählen. Die Wörter pro Redebeitrag waren aber stabil (26–35). Gelöst: Der Prompt verlangt 20 bis 24 Redebeiträge mit höchstens 40 Wörtern. Gleiche Quellen danach: 604 Wörter, 27 Redebeiträge, 4:54 Min. Ganz exakt hält es die Grenzen nicht (27 statt 24, ein Beitrag mit 70 Wörtern), aber die Länge stimmt.
+- **12.10.2026 · `timeout` gibt es unter macOS nicht.** Beim Lesen der Vercel-Logs brach der Befehl mit „command not found“ ab, der leere Filter sah aus wie „keine Logs“. Gelöst: `perl -e 'alarm 60; exec @ARGV' vercel logs …`. Für die Job-Meldungen braucht es `--query "podcast" --expand`.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -240,7 +242,9 @@
 - Erster echter Podcast (6d, lokal): **39 s** vom Klick bis „Bereit“. Skript ca. 20 s (8.257 Eingabe-, 2.304 Ausgabe-Tokens, davon 474 Reasoning), Sprache 16,7 s für 22 Redebeiträge mit 4 parallelen Aufrufen. Ergebnis: 6:31 Min., 6,26 MB, 779 Wörter. Dauer laut unserem Parser und laut `afinfo`: beide 391,008 s.
 - Preise Text-to-Speech (OpenAI-Preisseite, 12.10.2026): `gpt-4o-mini-tts` 0,60 $ pro 1 Mio. Text-Tokens, 12,00 $ pro 1 Mio. Audio-Tokens. `generateSpeech` meldet keine Token-Zahlen (Antwort ist reine Audiodatei), echte Kosten pro Minute deshalb nur im OpenAI-Nutzungs-Dashboard ablesbar.
 - Podcast mit Ziel 600 Wörter (6e): 701 Wörter, 27 Redebeiträge, 5:50 Min., 5,6 MB, erstellt in 37 s. Das Modell schreibt etwa 15 % mehr als verlangt.
-- Dauer Podcast-Erstellung: 37–39 s (lokal, 3 Quellen).
+- Live auf Vercel (`fra1`, 12.10.2026): Karteikarten in unter 26 s, Podcast in 47 s (Skript 8.271 Eingabe-/3.032 Ausgabe-Tokens, Sprache 23,9 s für 37 Redebeiträge). Kein Fehler im Log, weit unter dem Limit von 300 s.
+- Mit der Regel „20 bis 24 Redebeiträge“ (gleiche Quellen wie live): 604 Wörter, 27 Redebeiträge, 4:54 Min., 58 s.
+- Dauer Podcast-Erstellung: 37–58 s (lokal und live, 3 Quellen).
 
 ## Schwierigstes Problem
 <!-- Problem · woran gemerkt · was probiert · Lösung · was ich mitnehme -->
