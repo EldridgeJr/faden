@@ -33,6 +33,10 @@
 - **11.10.2026 · Readability liefert auch bei leeren Seiten Text.** Ohne Artikel nimmt es den ganzen `body` (z. B. „Menü“). Gemerkt im Test. Gelöst: Mindestlänge 200 Zeichen (`MIN_READABLE_CHARS`), sonst Fehler „kein lesbarer Text“.
 - **11.10.2026 · Typen von `undici` passen nicht zu `lib.dom`.** `ReadableStream` aus dem Browser-Typ hat keinen Async-Iterator. Gemerkt beim Typecheck (Tests liefen grün, Vitest prüft keine Typen). Gelöst: Typ `Response["body"]` aus `undici`. Lehre: Vitest grün heißt nicht Typecheck grün.
 - **11.10.2026 · Unnützer Test fast eingecheckt.** Ein Test startete einen lokalen Server auf einem Zufallsport, die URL nutzte aber Port 80. Der Server bewies nichts. Beim Durchlesen bemerkt und entfernt.
+- **11.10.2026 · `hnsw.iterative_scan` ließ sich nicht setzen (4a).** Die Migration brach ab mit „permission denied to set parameter“. Grund: Postgres kennt den Parameter erst, wenn die pgvector-Bibliothek in der Sitzung geladen ist. Unbekannte Parameter darf nur ein Superuser setzen. Gemerkt: Fehler beim ersten `apply_migration`. Gelöst: Die Migration liest vorher einen Vektor (`select '[1]'::extensions.vector`), das lädt die Bibliothek. Danach steht der Parameter in `pg_settings` mit `context = user`, jeder darf ihn setzen.
+- **11.10.2026 · Volltextsuche fand bei echten Fragen nichts (4a).** Annahme: `websearch_to_tsquery` passt für Fragen. Falsch: Es verknüpft alle Wörter mit UND. „Wann ist Ruhezeit im Haus?“ wird zu `'wann' & 'ruhezeit' & 'haus'`, kein Abschnitt enthält alle drei. Die hybride Suche war damit praktisch nur eine Vektorsuche. Gemerkt beim Live-Test: Alle Scores lagen bei höchstens 1/61, also kam nichts aus der zweiten Liste. Gelöst: zweite Migration, `&` wird zu `|` (ODER). Ein Test im Prüfskript sichert das ab. Preis: Häufige Wörter (z. B. „Völkerschlachtdenkmal“ in einem Artikel darüber) zählen mit, die Rangfolge wird unschärfer.
+- **11.10.2026 · `npm run db:types` hat die Typdatei geleert.** Die Supabase-CLI hat keinen Zugriff auf die neue Organisation. Die Umleitung `> database.types.ts` leert die Datei aber schon, bevor der Befehl startet. Gemerkt an `git diff` (339 Zeilen gelöscht). Gelöst: `git checkout` der Datei, Typen über den Supabase-Connector erzeugt und den neuen Teil von Hand eingetragen.
+- **11.10.2026 · `${!name}` in zsh.** Die Claude-Shell ist zsh, die Schreibweise gibt es nur in bash („bad substitution“). Beim Eintragen der Upstash-Variablen in Vercel. Es wurde nichts angelegt. Gelöst: Schleife mit `bash -c`.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -97,6 +101,13 @@
 - **Keine Löschung während der Verarbeitung.** Sonst könnte der Hintergrundjob danach noch die `.txt` einer Webseite speichern (verwaiste Datei). Ausnahme: Quelle hängt seit über 10 Minuten in „In Arbeit“ – länger als `maxDuration` (300 s) kann die Verarbeitung nicht laufen. Regel als reine Funktion `canDeleteSource` mit Tests.
 - **Rückfrage vorerst mit `window.confirm`.** Einfach und barrierefrei. In Schritt 5 kommt ein Dialog im Faden-Design.
 - **Merkpunkt für Schritt 5: `on delete cascade` erreicht Storage nicht.** Beim Löschen eines Notebooks muss die App den Ordner `<notebook_id>/` in Storage selbst leeren, sonst bleiben alle Dateien liegen.
+- **Upstash Redis in AWS eu-central-1 (Frankfurt).** Gleiche Cloud und Region wie Vercel `fra1` und Supabase. Eviction aus: Redis soll keine Rate-Limit-Zähler löschen. Free-Plan. Werte per stdin an `vercel env add` übergeben, nicht als Argument (sonst stehen sie in der Prozessliste).
+- **RRF in SQL statt in TypeScript (4a).** Eine Funktion `match_chunks`, eine Anfrage an die Datenbank. Alternative: zwei Abfragen und Zusammenführen in TypeScript. Leichter mit Vitest zu testen, aber zwei Netzwerk-Wege. Getestet wird stattdessen mit `supabase/checks/match_chunks.sql`.
+- **`security invoker`.** Die Funktion läuft mit den Rechten des Aufrufers, RLS gilt. Ein Nutzer findet nur Abschnitte eigener Notebooks, auch wenn er eine fremde Notebook-ID schickt. Alternative `security definer` würde RLS umgehen, dann müsste die Funktion den Besitzer selbst prüfen.
+- **`set search_path = ''`.** Jeder Name in der Funktion steht mit Schema (`public.chunks`, `operator(extensions.<=>)`). Niemand kann durch ein gleichnamiges Objekt ändern, was die Funktion aufruft. Empfehlung des Supabase-Advisors.
+- **Iterativer HNSW-Scan (`relaxed_order`).** Ohne ihn liefert der Index die ca. 40 global nächsten Vektoren, danach filtert Postgres nach Notebook und Quellen. Bei vielen Nutzern blieben für ein Notebook zu wenige übrig. Mit ihm sucht der Index weiter, bis 20 Treffer den Filter erfüllen. Bei wenigen Daten nimmt Postgres sowieso den Index auf `(source_id, notebook_id)` und sortiert exakt, per `explain` geprüft. Der Advisor meldet den HNSW-Index deshalb noch als „unused“.
+- **Top 20 je Liste, k = 60, Top 8 ans Modell.** k = 60 ist der Wert aus dem RRF-Paper. Ein Abschnitt in beiden Listen schlägt fast immer einen, der nur in einer Liste steht.
+- **Kein Mindest-Score.** RRF liefert immer bis zu 8 Abschnitte, auch für Fragen ohne passende Quelle. RRF-Scores sagen nur etwas über die Rangfolge, nicht über die Relevanz, ein fester Grenzwert wäre geraten. Ob die Abschnitte die Frage beantworten, entscheidet das Modell (Regel im Prompt, 4b).
 
 ## Echte Zahlen
 - Kosten pro Frage:
@@ -105,6 +116,7 @@
 - Test-PDF „Hausordnung“ (3 Seiten): 3 Abschnitte, 874 Tokens. Unsere Zählung (`cl100k_base`) und die Abrechnung von OpenAI stimmen exakt überein. Kosten bei 0,02 $ pro 1 Mio. Tokens: ca. 0,00002 $.
 - Upload bis „Bereit“ für diese PDF: wenige Sekunden (lokal).
 - Wikipedia „Leipzig“ als URL: 1,5 MB HTML → 230 KB Text → 120 Abschnitte, 80.346 Tokens (ca. 0,0016 $), ca. 10–20 s bis „Bereit“.
+- Suche (4a, lokal → Frankfurt): Frage einbetten 140–290 ms (erster Aufruf 2,2 s), `match_chunks` 100–180 ms bei 38 Abschnitten.
 - Dauer Podcast-Erstellung:
 
 ## Schwierigstes Problem
