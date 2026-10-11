@@ -11,7 +11,8 @@ Faden antwortet **nur aus diesen Quellen** – mit klickbaren Belegen, die direk
 
 - Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS 4
 - Supabase (Postgres + pgvector, Storage, Auth, RLS)
-- Vercel AI SDK · OpenAI (Embeddings, Text-to-Speech)
+- Vercel AI SDK · OpenAI (Embeddings `text-embedding-3-small`, Chat `gpt-6-luna`, Text-to-Speech)
+- Upstash Redis (Rate Limiting pro Nutzer)
 - Vitest · Playwright
 
 ## Lokal starten
@@ -44,6 +45,7 @@ Supabase-Projekt `faden` in Frankfurt (eu-central-1).
 
 - `supabase/migrations/` – das komplette Schema als SQL. Dateiname = Versionsnummer in der Datenbank.
 - `supabase/checks/rls.sql` – prüft mit zwei Testnutzern, dass niemand fremde Daten sieht oder ändert. Läuft im SQL-Editor, endet mit `rollback`.
+- `supabase/checks/match_chunks.sql` – prüft die hybride Suche (Rangfolge, Quellenfilter, fremde Nutzer). Ebenfalls mit `rollback`.
 - `src/lib/supabase/` – Clients für Browser (`client.ts`) und Server (`server.ts`), Session-Erneuerung (`proxy.ts`), erzeugte Typen.
 
 Zugriff ist doppelt geschützt: `grant` legt fest, welche Rolle eine Tabelle überhaupt benutzen darf (`anon` gar nicht), Row Level Security legt fest, welche Zeilen.
@@ -55,4 +57,8 @@ Zugriff ist doppelt geschützt: `grant` legt fest, welche Rolle eine Tabelle üb
 
 ## Nächste Schritte
 
-_folgt_
+- **Folgefragen besser suchen:** Die Suche nutzt nur die aktuelle Frage. Bei „Und wer hat es entworfen?“ könnte ein Modell die Frage vorher mit dem Verlauf umschreiben (ein Aufruf mehr).
+- **Reranking:** Die 20 + 20 Treffer mit einem Reranking-Modell neu sortieren, bevor die besten 8 ans Modell gehen.
+- **OCR** für gescannte PDFs.
+- **Echte Warteschlange** statt `after()` für das Einlesen.
+- Video, Mind Maps, Teilen, Teams/Workspaces, Lernquiz, Briefing.

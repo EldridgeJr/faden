@@ -115,7 +115,7 @@ Vorlage: Design-Artefakt „Faden“ (5 Screens: Startseite, Notebook mit Quelle
 - [x] 1. Next.js-Projekt aufsetzen (Hinweis: `create-next-app` bricht in Ordnern mit vorhandenen Dateien ab – in einen Unterordner erzeugen und die Dateien hierher verschieben, `CLAUDE.md` und `NOTIZEN.md` behalten), Git, GitHub, Vercel verbinden
 - [x] 2. Supabase: Migration mit Tabellen, pgvector, Indizes, RLS; Supabase-Clients für Server und Browser
 - [x] 3. Einlesen: Upload → Text → Abschnitte → Embeddings (zuerst mit einer PDF testen)
-- [ ] 4. Chat: hybride Suche, Prompt, Streaming, Belege
+- [x] 4. Chat: hybride Suche, Prompt, Streaming, Belege
 - [ ] 5. UI nach dem Design: drei Spalten, Beleg-Ansicht, Quellen-Dialog
 - [ ] 6. Podcast + Karteikarten
 - [ ] 7. Tests (Vitest + Playwright), README, Demo-Notebook, Loom

@@ -138,7 +138,7 @@
 
 ## Echte Zahlen
 - Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.
-- Antwortzeit bis zum ersten Text (lokal → Frankfurt, Dev-Server): 1,4–2,5 s, erster Aufruf 3,8 s (Kompilieren). Auf Vercel in `fra1` sollte es schneller sein, die Datenbank liegt dort nebenan.
+- Antwortzeit bis zum ersten Text (lokal → Frankfurt, Dev-Server): 1,4–2,5 s, erster Aufruf 3,8 s (Kompilieren). Live auf Vercel (`fra1`), gemessen von zu Hause: 3,0 s bis zum ersten Text bei einer Zusammenfassung über alle Quellen. Nicht schneller als lokal: Den größten Teil der Zeit braucht das Modell, nicht die Datenbank.
 - Abschnitte im Demo-Notebook:
 - Test-PDF „Hausordnung“ (3 Seiten): 3 Abschnitte, 874 Tokens. Unsere Zählung (`cl100k_base`) und die Abrechnung von OpenAI stimmen exakt überein. Kosten bei 0,02 $ pro 1 Mio. Tokens: ca. 0,00002 $.
 - Upload bis „Bereit“ für diese PDF: wenige Sekunden (lokal).
