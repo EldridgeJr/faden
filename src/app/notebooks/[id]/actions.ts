@@ -5,6 +5,7 @@ import { after } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { parsePublicUrl, UrlFetchError } from "@/lib/ingest/fetch-url";
 import { processSource } from "@/lib/ingest/process";
+import { canDeleteSource } from "@/lib/ingest/status";
 import {
   pdfUploadSchema,
   sourceIdSchema,
@@ -183,6 +184,52 @@ export async function createUrlSource(
   }
 
   after(() => processSource(sourceId));
+  refresh();
+  return { error: null };
+}
+
+export type DeleteSourceResult = { error: string | null };
+
+// Deletes a source: file in storage, row in sources, and through
+// "on delete cascade" all its chunks with their embeddings.
+export async function deleteSource(sourceId: unknown): Promise<DeleteSourceResult> {
+  const { supabase } = await requireUser();
+
+  const parsed = sourceIdSchema.safeParse(sourceId);
+  if (!parsed.success) return { error: "Diese Quelle wurde nicht gefunden." };
+
+  // RLS: finds only sources in the user's notebooks. Unknown and foreign
+  // sources give the same answer.
+  const { data: source } = await supabase
+    .from("sources")
+    .select("id, status, storage_path, created_at")
+    .eq("id", parsed.data)
+    .maybeSingle();
+  if (!source) return { error: "Diese Quelle wurde nicht gefunden." };
+
+  if (!canDeleteSource(source.status, source.created_at, new Date())) {
+    return { error: "Die Quelle wird gerade verarbeitet. Bitte warte, bis sie fertig ist." };
+  }
+
+  // File first, then the row. If the file cannot be deleted, nothing is
+  // deleted, and no file stays behind without a row that points to it.
+  // Removing a file that does not exist (failed upload) is not an error.
+  if (source.storage_path) {
+    const { error: storageError } = await supabase.storage
+      .from("sources")
+      .remove([source.storage_path]);
+    if (storageError) {
+      console.error("deleteSource: storage failed", storageError);
+      return { error: "Die Datei konnte nicht gelöscht werden. Bitte versuche es erneut." };
+    }
+  }
+
+  const { error: deleteError } = await supabase.from("sources").delete().eq("id", source.id);
+  if (deleteError) {
+    console.error("deleteSource: delete failed", deleteError);
+    return { error: "Die Quelle konnte nicht gelöscht werden. Bitte versuche es erneut." };
+  }
+
   refresh();
   return { error: null };
 }

@@ -93,6 +93,10 @@
 - **Jede Quelle hat eine Datei in Storage.** PDF wie hochgeladen, Text als `.txt`, Webseite als bereinigter `.txt`-Text. Die Pipeline lädt immer aus Storage, und die Beleg-Ansicht kann später das zeigen, was Faden wirklich gelesen hat – auch wenn sich die Webseite ändert.
 - **Webseite im Hintergrund abrufen.** `createUrlSource` speichert nur die Adresse, der Abruf läuft in `processSource` (`after()`). Eine sofortige Vorprüfung (`parsePublicUrl`) gibt bei offensichtlich falschen Adressen direkt eine Meldung.
 - **Text bis 200.000 Zeichen.** Server Actions nehmen höchstens 1 MB an. 200.000 Zeichen bleiben auch mit vielen Umlauten deutlich darunter. Alternative: `bodySizeLimit` erhöhen.
+- **Quelle löschen: erst Datei, dann Zeile (3e).** Scheitert die Datei, wird nichts gelöscht. Scheitert danach die Zeile, hilft ein zweiter Versuch (eine fehlende Datei zu löschen ist bei Supabase kein Fehler). Andersherum könnte eine Datei ohne Zeile übrig bleiben, die niemand mehr findet – beim Datenschutz das schlechtere Ergebnis. Abschnitte und Embeddings löscht Postgres per `on delete cascade`.
+- **Keine Löschung während der Verarbeitung.** Sonst könnte der Hintergrundjob danach noch die `.txt` einer Webseite speichern (verwaiste Datei). Ausnahme: Quelle hängt seit über 10 Minuten in „In Arbeit“ – länger als `maxDuration` (300 s) kann die Verarbeitung nicht laufen. Regel als reine Funktion `canDeleteSource` mit Tests.
+- **Rückfrage vorerst mit `window.confirm`.** Einfach und barrierefrei. In Schritt 5 kommt ein Dialog im Faden-Design.
+- **Merkpunkt für Schritt 5: `on delete cascade` erreicht Storage nicht.** Beim Löschen eines Notebooks muss die App den Ordner `<notebook_id>/` in Storage selbst leeren, sonst bleiben alle Dateien liegen.
 
 ## Echte Zahlen
 - Kosten pro Frage:

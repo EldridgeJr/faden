@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { DeleteSourceButton } from "./delete-source-button";
 
 export type SourceItem = {
   id: string;
@@ -49,11 +50,14 @@ export function SourceList({ sources }: { sources: SourceItem[] }) {
         const status = STATUS[source.status] ?? STATUS.pending;
         return (
           <li key={source.id} className="flex flex-col gap-1 rounded-[18px] bg-white px-5 py-4">
-            <div className="flex items-center justify-between gap-4">
-              <span className="truncate font-medium">{source.title}</span>
-              <span className={`shrink-0 rounded-full px-3 py-1 text-sm ${status.className}`}>
-                {status.label}
-              </span>
+            <div className="flex items-start justify-between gap-4">
+              <span className="truncate py-1 font-medium">{source.title}</span>
+              <div className="flex shrink-0 items-start gap-2">
+                <span className={`rounded-full px-3 py-1 text-sm ${status.className}`}>
+                  {status.label}
+                </span>
+                <DeleteSourceButton sourceId={source.id} title={source.title} />
+              </div>
             </div>
             {source.status === "ready" && source.chunks !== undefined && (
               <span className="font-mono text-sm text-[#6b7078]">
