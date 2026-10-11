@@ -44,6 +44,8 @@
 - **11.10.2026 · `shadcn init` hat die Schrift kaputt gemacht (5a).** Es schrieb `--font-sans: var(--font-sans)` in `globals.css`, also eine Variable, die auf sich selbst zeigt. Geist wäre nicht mehr angekommen. Gemerkt beim Lesen des Diffs nach `init`. Gelöst: `globals.css` neu geschrieben, `--font-sans: var(--font-geist-sans)`. Lehre: Den Diff von Generatoren immer ganz lesen.
 - **11.10.2026 · `shadcn init` installiert ein Paket namens `cn` (5a).** Annahme: shadcn nutzt `clsx` + `tailwind-merge`. Neu in Version 4 ist ein eigenes Paket `cn`. Kurze, allgemeine Paketnamen sind ein typisches Ziel für untergeschobene Pakete. Geprüft: Maintainer `shadcn`, Repo `shadcn-ui/cn`, keine Abhängigkeiten, keine Install-Skripte. Behalten.
 - **11.10.2026 · Lint verbietet `document.cookie = …` in einer Komponente (5a).** Die React-Compiler-Regel `react-hooks/immutability` meldet das auch in einem Klick-Handler. Gelöst: eigene Funktion `applyTheme` außerhalb der Komponente. Die Komponente hält nur den Zustand.
+- **11.10.2026 · Begrüßung war immer „Guten Abend“ (5b).** `Intl.DateTimeFormat("de-DE", { hour: "numeric" })` liefert „09 Uhr“, nicht „09“. `Number("09 Uhr")` ist `NaN`, jeder Vergleich ist falsch, also immer der letzte Fall. Gemerkt: Test rot. Gelöst: `formatToParts()` und nur den Teil `hour` lesen.
+- **11.10.2026 · `shadcn add` wollte den angepassten Button überschreiben (5b).** Jeder neue Baustein bringt `button.tsx` als Abhängigkeit mit. Mit `< /dev/null` blieb die Rückfrage hängen und nur ein Baustein wurde angelegt. Gelöst: `yes n | npx shadcn add …` beantwortet die Frage mit „nein“.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -143,6 +145,14 @@
 - **shadcn-Namen auf Faden-Farben gemappt.** `--card`, `--primary`, `--muted` usw. zeigen auf die Faden-Werte. Achtung: `accent` heißt bei shadcn „Hover-Farbe“. Unser Lime heißt deshalb `highlight`.
 - **Farbschema im Cookie, nicht in `localStorage` (5a).** Der Server liest den Cookie und setzt die Klasse schon im ersten HTML. Mit `localStorage` wüsste das erst das JavaScript im Browser, die Seite würde kurz hell aufblitzen. Alternative: Paket `next-themes` (setzt ein Skript in den `<head>`). Unser Weg braucht kein Paket, und `parseTheme` lässt unbekannte Cookie-Werte nie in die Klasse.
 - **Lucide-Strich 1,8 px per CSS.** Eine Regel `svg.lucide { stroke-width: 1.8 }` statt `strokeWidth` an jedem Icon.
+- **Seitenleiste nur mit echten Funktionen (5b, meine Vorgabe).** Übersicht, „Zuletzt aktiv“, Neues Notebook, Farbschema, Konto mit Abmelden, Hinweis zum Datenschutz. Workspace-Wechsel, Suche, Benachrichtigungen und Notizen aus dem Design fallen weg: Ein Knopf, der nichts tut, wirkt im Demo unecht. Auf dem Handy öffnet ein Menü-Knopf dieselbe Leiste als Schublade (`Sheet`).
+- **„Zuletzt aktiv“ statt „Zuletzt geöffnet“.** Wann ein Notebook geöffnet wurde, speichern wir nicht. Die letzte Frage steht schon in `messages`. Wir lesen die letzten 100 Fragen und nehmen pro Notebook die neueste (`summarizeNotebooks`, mit Tests). Grenze: Liegt die letzte Frage eines Notebooks weiter zurück, zählt sein Erstelldatum.
+- **„x Quellen brauchen deine Hilfe“.** Zählt Quellen mit Status „Fehler“ in allen Notebooks und verlinkt das erste betroffene. Echt statt Deko.
+- **Nach dem Anlegen direkt ins neue Notebook.** `redirect()` in der Server Action. Ein leeres Notebook braucht als Nächstes Quellen.
+- **Notebook löschen: erst alle Dateien im Ordner `<notebook_id>/`, dann die Zeile.** Löst den Merkpunkt aus 3e. `list()` liefert höchstens 100 Namen pro Aufruf, wir blättern. Wie bei einer Quelle: nicht löschen, solange eine Quelle verarbeitet wird. Geprüft mit einem Admin-Skript: kein Storage-Ordner ohne Notebook.
+- **Umbenennen erkennt fremde Notebooks.** `update(...).select("id")` gibt die geänderten Zeilen zurück. 0 Zeilen heißt: nicht gefunden (RLS), gleiche Meldung wie bei einer unbekannten ID.
+- **Karte mit Menü: „gestreckter Link“.** Der Titel-Link bekommt `after:absolute after:inset-0` und deckt die ganze Karte ab. Der Menü-Knopf liegt mit `z-10` darüber. Ein Knopf **in** einem Link wäre ungültiges HTML, Screenreader und Tastatur kämen durcheinander.
+- **Dialoge außerhalb des Menüs.** Das Menü schließt sich beim Klick. Ein Dialog darin würde mit verschwinden. Das Menü setzt nur einen Zustand, die Dialoge hängen daneben.
 
 ## Echte Zahlen
 - Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.

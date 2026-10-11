@@ -1,0 +1,29 @@
+import { describe, expect, it } from "vitest";
+import { formatDay, greeting } from "./format";
+
+describe("greeting", () => {
+  // October: Germany is UTC+2 (summer time).
+  it("uses German time, not UTC", () => {
+    expect(greeting(new Date("2026-10-11T07:30:00Z"))).toBe("Guten Morgen"); // 09:30
+    expect(greeting(new Date("2026-10-11T09:00:00Z"))).toBe("Guten Tag"); // 11:00
+    expect(greeting(new Date("2026-10-11T16:00:00Z"))).toBe("Guten Abend"); // 18:00
+    expect(greeting(new Date("2026-10-11T01:00:00Z"))).toBe("Guten Abend"); // 03:00
+  });
+});
+
+describe("formatDay", () => {
+  const now = new Date("2026-10-11T18:00:00Z"); // 20:00 in Berlin
+
+  it("says Heute and Gestern for calendar days", () => {
+    expect(formatDay(new Date("2026-10-11T06:00:00Z"), now)).toBe("Heute");
+    // 23:30 in Berlin on the 10th is yesterday, although it is less than 24 h ago.
+    expect(formatDay(new Date("2026-10-10T21:30:00Z"), now)).toBe("Gestern");
+    // 00:30 in Berlin on the 11th is today, although it is the 10th in UTC.
+    expect(formatDay(new Date("2026-10-10T22:30:00Z"), now)).toBe("Heute");
+  });
+
+  it("shows a short date, with the year only for other years", () => {
+    expect(formatDay(new Date("2026-10-06T10:00:00Z"), now)).toBe("6. Okt.");
+    expect(formatDay(new Date("2025-10-06T10:00:00Z"), now)).toBe("6. Okt. 2025");
+  });
+});

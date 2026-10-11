@@ -27,6 +27,11 @@ export const notebookTitleSchema = z
 // before it reaches Postgres (which would answer with a type error).
 export const notebookIdSchema = z.uuid();
 
+export const renameNotebookSchema = z.object({
+  notebookId: notebookIdSchema,
+  title: notebookTitleSchema,
+});
+
 // Same limit as file_size_limit of the storage bucket "sources".
 export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 

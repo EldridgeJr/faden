@@ -3,6 +3,7 @@ import {
   chatRequestSchema,
   notebookIdSchema,
   notebookTitleSchema,
+  renameNotebookSchema,
   signInSchema,
   textSourceSchema,
   urlSourceSchema,
@@ -68,6 +69,20 @@ describe("notebookIdSchema", () => {
     expect(notebookIdSchema.safeParse("'; drop table notebooks;--").success).toBe(
       false,
     );
+  });
+});
+
+describe("renameNotebookSchema", () => {
+  it("trims the new title", () => {
+    expect(renameNotebookSchema.parse({ notebookId, title: "  Neu  " })).toEqual({
+      notebookId,
+      title: "Neu",
+    });
+  });
+
+  it("rejects an empty title or a bad id", () => {
+    expect(renameNotebookSchema.safeParse({ notebookId, title: " " }).success).toBe(false);
+    expect(renameNotebookSchema.safeParse({ notebookId: "x", title: "Neu" }).success).toBe(false);
   });
 });
 

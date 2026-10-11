@@ -8,13 +8,17 @@ import { createClient } from "@/lib/supabase/server";
 export async function getUser() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
-  return { supabase, userId: data?.claims.sub ?? null };
+  return {
+    supabase,
+    userId: data?.claims.sub ?? null,
+    email: data?.claims.email ?? null,
+  };
 }
 
 // For pages and Server Actions that need a login.
 // Not logged in: redirect to /login. Otherwise: the client and the user id.
 export async function requireUser() {
-  const { supabase, userId } = await getUser();
+  const { supabase, userId, email } = await getUser();
   if (!userId) redirect("/login");
-  return { supabase, userId };
+  return { supabase, userId, email };
 }
