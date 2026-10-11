@@ -140,3 +140,14 @@
     stroke-width: 1.8;
   }
 }
+
+/* A bar that moves from left to right: "something is happening".
+   Used where we have no real percentage (source processing). */
+@keyframes progress {
+  from {
+    left: -33%;
+  }
+  to {
+    left: 100%;
+  }
+}

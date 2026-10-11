@@ -1,10 +1,13 @@
 "use client";
 
+import { Upload } from "lucide-react";
 import { useState } from "react";
+import { buttonVariants } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 import { createPdfSource, startProcessing } from "./actions";
 
-export function PdfUpload({ notebookId }: { notebookId: string }) {
+export function PdfUpload({ notebookId, onDone }: { notebookId: string; onDone?: () => void }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,6 +38,7 @@ export function PdfUpload({ notebookId }: { notebookId: string }) {
       // 3. Server: start processing. Also after a failed upload: the server
       // then finds no file and sets the status "Fehler" with a clear message.
       await startProcessing(result.sourceId);
+      if (!uploadError) onDone?.();
     } catch {
       setError("Der Upload ist fehlgeschlagen.");
     } finally {
@@ -44,10 +48,12 @@ export function PdfUpload({ notebookId }: { notebookId: string }) {
 
   return (
     <div className="flex flex-col gap-2">
+      {/* A label that looks like a button: a click opens the file picker. */}
       <label
-        className={`inline-flex w-fit cursor-pointer items-center rounded-full bg-primary px-5 py-2.5 font-medium text-primary-foreground ${uploading ? "pointer-events-none opacity-60" : ""}`}
+        className={cn(buttonVariants(), "w-fit", uploading && "pointer-events-none opacity-60")}
       >
-        {uploading ? "Lade hoch …" : "PDF hochladen"}
+        <Upload aria-hidden />
+        {uploading ? "Lade hoch …" : "PDF auswählen"}
         <input
           type="file"
           accept="application/pdf,.pdf"

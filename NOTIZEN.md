@@ -46,6 +46,8 @@
 - **11.10.2026 · Lint verbietet `document.cookie = …` in einer Komponente (5a).** Die React-Compiler-Regel `react-hooks/immutability` meldet das auch in einem Klick-Handler. Gelöst: eigene Funktion `applyTheme` außerhalb der Komponente. Die Komponente hält nur den Zustand.
 - **11.10.2026 · Begrüßung war immer „Guten Abend“ (5b).** `Intl.DateTimeFormat("de-DE", { hour: "numeric" })` liefert „09 Uhr“, nicht „09“. `Number("09 Uhr")` ist `NaN`, jeder Vergleich ist falsch, also immer der letzte Fall. Gemerkt: Test rot. Gelöst: `formatToParts()` und nur den Teil `hour` lesen.
 - **11.10.2026 · `shadcn add` wollte den angepassten Button überschreiben (5b).** Jeder neue Baustein bringt `button.tsx` als Abhängigkeit mit. Mit `< /dev/null` blieb die Rückfrage hängen und nur ein Baustein wurde angelegt. Gelöst: `yes n | npx shadcn add …` beantwortet die Frage mit „nein“.
+- **11.10.2026 · Aktiver Beleg im Dunkelmodus unsichtbar (5c).** Der aktive Beleg hatte `bg-primary` mit Lime-Schrift. Im Dunkelmodus ist `primary` hell, Lime auf Hellgrau ist kaum lesbar. Gemerkt im Screenshot. Gelöst: immer Schwarz (`highlight-foreground`) mit Lime-Schrift und Lime-Rand. Lehre: Farbtokens, die im Dunkelmodus umschlagen, nicht für Stellen nehmen, die in beiden Modi gleich aussehen sollen.
+- **11.10.2026 · Falscher Alarm beim Testen (5c).** Ein Screenshot direkt nach dem Wechsel auf „Hell“ zeigte schwarze Knöpfe. Ursache: `transition-all` blendet die Farbe weich über, der Screenshot kam mitten in der Animation. Erst die berechnete Farbe geprüft (`getComputedStyle`), dann neu fotografiert. Der Code war richtig.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -153,6 +155,13 @@
 - **Umbenennen erkennt fremde Notebooks.** `update(...).select("id")` gibt die geänderten Zeilen zurück. 0 Zeilen heißt: nicht gefunden (RLS), gleiche Meldung wie bei einer unbekannten ID.
 - **Karte mit Menü: „gestreckter Link“.** Der Titel-Link bekommt `after:absolute after:inset-0` und deckt die ganze Karte ab. Der Menü-Knopf liegt mit `z-10` darüber. Ein Knopf **in** einem Link wäre ungültiges HTML, Screenreader und Tastatur kämen durcheinander.
 - **Dialoge außerhalb des Menüs.** Das Menü schließt sich beim Klick. Ein Dialog darin würde mit verschwinden. Das Menü setzt nur einen Zustand, die Dialoge hängen daneben.
+- **Gemeinsamer Zustand in `workspace.tsx` (5c).** Quellen-Auswahl, offener Beleg und Handy-Tab liegen eine Ebene über Quellen-Spalte und Chat. Beide brauchen die Auswahl. Alternative: Context oder Zustands-Bibliothek. Für drei Werte und eine Seite reicht `useState` mit Props.
+- **Chat wird nie ausgehängt, nur versteckt.** Tabs und Beleg-Panel blenden Spalten per CSS (`hidden`/`lg:flex`) aus. Würde React den Chat aushängen, verlöre `useChat` seinen Zustand, auch eine laufende Antwort.
+- **Beleg-Panel neben dem Chat (5c, von mir freigegeben).** Auf großen Bildschirmen weichen Quellen und Studio, das Panel bekommt Platz. Auf dem Handy legt es sich über den aktiven Tab. In 5c zeigt es den Abschnitt, in 5e den ganzen Text mit Markierung.
+- **Feste Höhe (`h-dvh`), jede Spalte scrollt für sich.** Das Eingabefeld bleibt immer sichtbar, wie in NotebookLM. `dvh` statt `vh`: Auf dem Handy zählt die Adressleiste mit.
+- **Beleg-Chips nur für benutzte Belege.** Die Route schickt alle 8 Abschnitte vorab. Unter der Antwort erscheinen nur die Nummern, die im Text stehen (aus `splitCitations`). Während des Streamings kommen sie nach und nach dazu.
+- **Fortschrittsbalken ohne Prozent.** Wir messen keinen Fortschritt. Ein wandernder Balken zeigt nur „es passiert etwas“, mit `motion-reduce:animate-none`. Ein erfundener Prozentwert wäre unehrlich.
+- **Quellen-Dialog in 5c noch schlicht.** Die drei Formulare aus Schritt 3 im Faden-Look, mit `onDone` zum Schließen. Drag & Drop und mehrere Dateien folgen in 5d.
 
 ## Echte Zahlen
 - Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.

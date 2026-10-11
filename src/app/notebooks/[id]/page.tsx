@@ -1,17 +1,16 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { toChatMessages } from "@/lib/chat/messages";
 import { notebookIdSchema, sourceMetaSchema } from "@/lib/schemas";
-import { Chat } from "./chat";
-import { PdfUpload } from "./pdf-upload";
-import { SourceList, type SourceItem } from "./source-list";
-import { TextSourceForm } from "./text-source-form";
-import { UrlSourceForm } from "./url-source-form";
+import type { SourceItem } from "./source-panel";
+import { Workspace } from "./workspace";
 
 // Applies to all Server Actions of this page, and so to the processing in
 // after(). 300 seconds is the maximum on the Vercel Hobby plan.
 export const maxDuration = 300;
+
+export const metadata: Metadata = { title: "Notebook · Faden" };
 
 export default async function NotebookPage({ params }: PageProps<"/notebooks/[id]">) {
   // Login first: a logged-out visitor goes to /login, not to a 404.
@@ -34,7 +33,7 @@ export default async function NotebookPage({ params }: PageProps<"/notebooks/[id
 
   const { data: sources, error: sourcesError } = await supabase
     .from("sources")
-    .select("id, title, status, error, meta")
+    .select("id, type, title, status, error, meta")
     .eq("notebook_id", notebook.id)
     .order("created_at", { ascending: true });
   if (sourcesError) throw sourcesError;
@@ -43,6 +42,7 @@ export default async function NotebookPage({ params }: PageProps<"/notebooks/[id
     const meta = sourceMetaSchema.safeParse(source.meta);
     return {
       id: source.id,
+      type: source.type,
       title: source.title,
       status: source.status,
       error: source.error,
@@ -60,41 +60,11 @@ export default async function NotebookPage({ params }: PageProps<"/notebooks/[id
     .limit(50);
   if (messagesError) throw messagesError;
 
-  const readySources = sources
-    .filter((source) => source.status === "ready")
-    .map((source) => ({ id: source.id, title: source.title }));
-
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 text-foreground">
-      <Link href="/notebooks" className="text-sm text-muted-foreground hover:text-foreground">
-        ← Alle Notebooks
-      </Link>
-      <h1 className="text-3xl font-semibold tracking-tight">{notebook.title}</h1>
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Quellen</h2>
-        <PdfUpload notebookId={notebook.id} />
-        <details className="rounded-tile bg-card px-5 py-3">
-          <summary className="cursor-pointer font-medium">Text einfügen</summary>
-          <div className="pt-3">
-            <TextSourceForm notebookId={notebook.id} />
-          </div>
-        </details>
-        <details className="rounded-tile bg-card px-5 py-3">
-          <summary className="cursor-pointer font-medium">Webseite hinzufügen</summary>
-          <div className="pt-3">
-            <UrlSourceForm notebookId={notebook.id} />
-          </div>
-        </details>
-        <SourceList sources={items} />
-      </section>
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Chat</h2>
-        <Chat
-          notebookId={notebook.id}
-          sources={readySources}
-          initialMessages={toChatMessages(lastMessages.reverse())}
-        />
-      </section>
-    </main>
+    <Workspace
+      notebook={notebook}
+      sources={items}
+      initialMessages={toChatMessages(lastMessages.reverse())}
+    />
   );
 }
