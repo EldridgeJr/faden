@@ -214,7 +214,10 @@ function Mark({ ref, children }: { ref?: Ref<HTMLElement>; children: string }) {
   return (
     <mark
       ref={ref}
-      className="scroll-my-8 rounded bg-highlight/45 px-0.5 text-foreground [box-decoration-break:clone]"
+      // No horizontal padding: with box-decoration-break every line gets its
+      // own padding, and an empty line between paragraphs would show as a
+      // small lime bar.
+      className="scroll-my-8 rounded-sm bg-highlight/45 text-foreground [box-decoration-break:clone]"
     >
       {children}
     </mark>

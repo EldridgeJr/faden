@@ -50,6 +50,7 @@
 - **11.10.2026 · Falscher Alarm beim Testen (5c).** Ein Screenshot direkt nach dem Wechsel auf „Hell“ zeigte schwarze Knöpfe. Ursache: `transition-all` blendet die Farbe weich über, der Screenshot kam mitten in der Animation. Erst die berechnete Farbe geprüft (`getComputedStyle`), dann neu fotografiert. Der Code war richtig.
 - **11.10.2026 · Beleg-Ansicht scrollte im Test nicht (5e), kein Fehler im Code.** `scrollIntoView({ behavior: "smooth" })` blieb bei `scrollTop = 0`. Ursache: Das Browser-Fenster des Test-Werkzeugs war ausgeblendet, ohne sichtbare Frames spielt der Browser keine Scroll-Animation ab. Mit `behavior: "auto"` sprang es sofort richtig. Gemerkt durch Messen statt Raten (`scrollTop`, `offsetTop`).
 - **11.10.2026 · Wikipedia-Fußnoten zerreißen Sätze.** Ein Abschnitt beginnt mit „24] Der Einsatz …“. `Intl.Segmenter` trennt nach „Bauzeit.“, die Fußnote „[24]“ landet halb im nächsten Satz. Nur kosmetisch, die Suche funktioniert. Besser wäre: Fußnoten-Marken beim Einlesen von Webseiten entfernen.
+- **11.10.2026 · Lime-Striche zwischen markierten Absätzen (5e).** Die Markierung hatte `px-0.5` und `box-decoration-break: clone`. Mit `clone` bekommt jede Zeile eigenen Innenabstand, auch die leere Zeile zwischen zwei Absätzen. Die bestand dann nur aus Abstand und wurde zum Strich. Gemerkt im Screenshot. Gelöst: kein seitlicher Innenabstand.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
