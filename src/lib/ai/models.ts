@@ -35,3 +35,11 @@ export const textProviderOptions = {
     reasoningSummary: null,
   } satisfies OpenAILanguageModelResponsesOptions,
 };
+
+// Text to speech for the podcast. The voices per host are in
+// src/lib/studio/podcast.ts (SPEAKERS). The voices are tuned for English,
+// the instructions keep them on German without an accent (listening test,
+// step 6a).
+export const speechModel = openai.speech("gpt-4o-mini-tts");
+export const SPEECH_INSTRUCTIONS =
+  "Sprich natürliches Hochdeutsch ohne englischen Akzent. Locker, freundlich und lebendig, wie in einem Podcast.";

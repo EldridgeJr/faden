@@ -1,6 +1,6 @@
-import { formatDay } from "@/lib/format";
+import { formatDay, formatDuration } from "@/lib/format";
 import { flashcardsDataSchema } from "./flashcards";
-import { podcastDataSchema } from "./podcast";
+import { describeProgress, podcastDataSchema } from "./podcast";
 import { STUCK_MESSAGE, studioState, type StudioState } from "./status";
 
 // What the studio column shows for one item.
@@ -9,8 +9,10 @@ export type StudioItemSummary = {
   kind: string;
   state: StudioState;
   title: string;
-  // "12 Karten" or "24 Redebeiträge", only when ready.
+  // "12 Karten" or "5:12 Min.", only when ready.
   detail: string | null;
+  // "Sprache wird erzeugt: 12 von 29", only while busy (podcast).
+  progress: string | null;
   error: string | null;
   // "Heute", "Gestern", "6. Okt.": computed on the server, so server and
   // browser render the same text.
@@ -36,6 +38,7 @@ export function summarizeStudioItem(row: StudioRow, now: Date): StudioItemSummar
   const label = KIND_LABELS[row.kind] ?? "Studio";
   let title = label;
   let detail: string | null = null;
+  let progress: string | null = null;
 
   if (row.kind === "flashcards") {
     // data is free JSON from the database: check it, never trust it.
@@ -50,9 +53,9 @@ export function summarizeStudioItem(row: StudioRow, now: Date): StudioItemSummar
   if (row.kind === "podcast") {
     const data = podcastDataSchema.safeParse(row.data);
     if (data.success && data.data.title) title = data.data.title;
-    if (state === "ready" && data.success && data.data.turns) {
-      const count = data.data.turns.length;
-      detail = `${count} ${count === 1 ? "Redebeitrag" : "Redebeiträge"}`;
+    if (state === "busy" && data.success) progress = describeProgress(data.data.progress);
+    if (state === "ready" && data.success && data.data.durationSeconds !== undefined) {
+      detail = `${formatDuration(data.data.durationSeconds)} Min.`;
     }
   }
 
@@ -62,6 +65,7 @@ export function summarizeStudioItem(row: StudioRow, now: Date): StudioItemSummar
     state,
     title,
     detail,
+    progress,
     // A stuck job has no error text in the database.
     error: state === "error" ? (row.error ?? STUCK_MESSAGE) : null,
     day: formatDay(new Date(row.created_at), now),

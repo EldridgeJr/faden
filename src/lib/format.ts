@@ -47,3 +47,18 @@ export function formatDay(date: Date, now: Date): string {
   const sameYear = dayKeyFormat.format(date).slice(0, 4) === dayKeyFormat.format(now).slice(0, 4);
   return (sameYear ? shortDateFormat : longDateFormat).format(date);
 }
+
+// Seconds as "m:ss" for the audio player: 312.4 → "5:12", 9 → "0:09".
+// Rounded down, so the player never shows a second that has not started.
+export function formatDuration(seconds: number): string {
+  const whole = Math.max(0, Math.floor(seconds));
+  const minutes = Math.floor(whole / 60);
+  return `${minutes}:${String(whole % 60).padStart(2, "0")}`;
+}
+
+const megabyteFormat = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 });
+
+// Bytes as "4,8 MB" (1 MB = 1,000,000 bytes, as on a phone or in Finder).
+export function formatMegabytes(bytes: number): string {
+  return `${megabyteFormat.format(bytes / 1_000_000)} MB`;
+}

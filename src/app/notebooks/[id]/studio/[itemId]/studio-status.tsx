@@ -14,9 +14,15 @@ export function StudioStatus({ item }: { item: StudioItemSummary }) {
       {item.state === "busy" ? (
         <>
           <StatusChip tone="busy">In Arbeit</StatusChip>
+          {/* aria-live: screen readers hear the progress when it changes. */}
+          {item.progress && (
+            <p aria-live="polite" className="font-mono text-sm">
+              {item.progress}
+            </p>
+          )}
           <p className="max-w-[44ch] text-sm text-muted-foreground">
-            Faden liest deine Quellen und erstellt gerade „{item.title}“. Das dauert meist unter einer
-            Minute. Die Seite aktualisiert sich von selbst.
+            Faden liest deine Quellen und erstellt gerade „{item.title}“. Das dauert meist ein bis
+            zwei Minuten. Die Seite aktualisiert sich von selbst.
           </p>
         </>
       ) : (

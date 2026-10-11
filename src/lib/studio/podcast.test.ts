@@ -3,6 +3,7 @@ import {
   buildPodcastInstructions,
   cleanScript,
   countWords,
+  describeProgress,
   MAX_TURNS,
   scriptCitations,
   spokenText,
@@ -86,5 +87,14 @@ describe("buildPodcastInstructions", () => {
     const prompt = buildPodcastInstructions(chunks);
     expect(prompt.indexOf("Regeln:")).toBeLessThan(prompt.indexOf("<quelle"));
     expect(prompt.indexOf("Rollen:")).toBeLessThan(prompt.indexOf("Regeln:"));
+  });
+});
+
+describe("describeProgress", () => {
+  it("names the stage and counts the spoken turns", () => {
+    expect(describeProgress(undefined)).toBeNull();
+    expect(describeProgress({ stage: "script" })).toBe("Skript wird geschrieben …");
+    expect(describeProgress({ stage: "audio", done: 12, total: 29 })).toBe("Sprache wird erzeugt: 12 von 29");
+    expect(describeProgress({ stage: "upload" })).toBe("MP3 wird gespeichert …");
   });
 });

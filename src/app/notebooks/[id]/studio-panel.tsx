@@ -144,9 +144,12 @@ function StudioItemRow({ notebookId, item }: { notebookId: string; item: StudioI
       <div className="flex min-w-0 flex-1 flex-col gap-1 text-sm">
         {title}
         {item.state === "busy" && (
-          <StatusChip tone="busy" className="self-start">
-            In Arbeit
-          </StatusChip>
+          <>
+            <StatusChip tone="busy" className="self-start">
+              In Arbeit
+            </StatusChip>
+            {item.progress && <span className="text-xs text-muted-foreground">{item.progress}</span>}
+          </>
         )}
         {item.state === "error" && (
           <>

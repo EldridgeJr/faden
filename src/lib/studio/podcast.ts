@@ -12,8 +12,9 @@ export const SPEAKERS = {
 } as const;
 export type Speaker = keyof typeof SPEAKERS;
 
-// About 5 minutes. German speech is roughly 140 words per minute.
-export const TARGET_WORDS = 700;
+// About 5 minutes. Measured in step 6d: the voices speak about 120 words per
+// minute (779 words = 6:31 min), and the model writes a bit more than asked.
+export const TARGET_WORDS = 600;
 // Upper limit after the check: keeps the number of speech calls (one per
 // turn) and so time and cost of the audio step small.
 export const MAX_TURNS = 50;
@@ -32,19 +33,36 @@ export const podcastOutputSchema = z.object({
 });
 export type PodcastOutput = z.infer<typeof podcastOutputSchema>;
 
-export type Turn = { speaker: Speaker; text: string };
+// start: second in the MP3 where the turn begins (set by the audio step).
+export type Turn = { speaker: Speaker; text: string; start?: number };
 
-// studio_items.data of a podcast. sourceIds is set when the item is created,
-// the script when it is written. length and focus are planned options for
-// later (not in the UI yet), so they are optional from the start.
+// Where the job is, for the progress display. done/total: spoken turns.
+export const podcastProgressSchema = z.object({
+  stage: z.enum(["script", "audio", "upload"]),
+  done: z.number().int().optional(),
+  total: z.number().int().optional(),
+});
+export type PodcastProgress = z.infer<typeof podcastProgressSchema>;
+
+// studio_items.data of a podcast. Fields are added while the job runs:
+// sourceIds when the item is created, then progress, the script, and at the
+// end the audio facts. length and focus are planned options for later (not
+// in the UI yet), so they are optional from the start.
 export const podcastDataSchema = z.object({
   sourceIds: z.array(z.uuid()),
   length: z.enum(["short", "standard"]).optional(),
   focus: z.string().optional(),
+  progress: podcastProgressSchema.optional(),
   title: z.string().optional(),
   summary: z.string().optional(),
-  turns: z.array(z.object({ speaker: z.enum(["lea", "tom"]), text: z.string() })).optional(),
+  turns: z
+    .array(z.object({ speaker: z.enum(["lea", "tom"]), text: z.string(), start: z.number().optional() }))
+    .optional(),
   citations: z.array(citationSchema).optional(),
+  durationSeconds: z.number().optional(),
+  sizeBytes: z.number().int().optional(),
+  // How long the whole job took, for "Erstellt in 48 s".
+  buildSeconds: z.number().optional(),
 });
 export type PodcastData = z.infer<typeof podcastDataSchema>;
 
@@ -94,4 +112,17 @@ export function spokenText(text: string): string {
 // Words of the whole script, for "1.240 Wörter" in the transcript.
 export function countWords(turns: Turn[]): number {
   return turns.reduce((sum, turn) => sum + spokenText(turn.text).split(" ").filter(Boolean).length, 0);
+}
+
+// The progress as text: "Sprache wird erzeugt: 12 von 29".
+export function describeProgress(progress: PodcastProgress | undefined): string | null {
+  if (!progress) return null;
+  switch (progress.stage) {
+    case "script":
+      return "Skript wird geschrieben …";
+    case "audio":
+      return `Sprache wird erzeugt: ${progress.done ?? 0} von ${progress.total ?? "?"}`;
+    case "upload":
+      return "MP3 wird gespeichert …";
+  }
 }

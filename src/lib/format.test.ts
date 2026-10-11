@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDay, greeting } from "./format";
+import { formatDay, formatDuration, formatMegabytes, greeting } from "./format";
 
 describe("greeting", () => {
   // October: Germany is UTC+2 (summer time).
@@ -25,5 +25,25 @@ describe("formatDay", () => {
   it("shows a short date, with the year only for other years", () => {
     expect(formatDay(new Date("2026-10-06T10:00:00Z"), now)).toBe("6. Okt.");
     expect(formatDay(new Date("2025-10-06T10:00:00Z"), now)).toBe("6. Okt. 2025");
+  });
+});
+
+describe("formatDuration", () => {
+  it("writes minutes and two-digit seconds", () => {
+    expect(formatDuration(312.4)).toBe("5:12");
+    expect(formatDuration(9)).toBe("0:09");
+    expect(formatDuration(0)).toBe("0:00");
+  });
+
+  it("rounds down and never goes below zero", () => {
+    expect(formatDuration(59.99)).toBe("0:59");
+    expect(formatDuration(-3)).toBe("0:00");
+  });
+});
+
+describe("formatMegabytes", () => {
+  it("writes megabytes with a German decimal comma", () => {
+    expect(formatMegabytes(4_812_345)).toBe("4,8 MB");
+    expect(formatMegabytes(6_000_000)).toBe("6 MB");
   });
 });

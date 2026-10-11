@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { canDeleteSource } from "@/lib/ingest/status";
 import { notebookIdSchema, notebookTitleSchema, renameNotebookSchema } from "@/lib/schemas";
+import { studioState } from "@/lib/studio/status";
 
 export type NotebookFormState = { error: string | null };
 
@@ -70,17 +71,18 @@ export async function renameNotebook(
   return { error: null };
 }
 
-// Lists every file in the notebook's storage folder "<notebook_id>/".
+// Lists every file in the notebook's folder "<notebook_id>/" of a bucket.
 // list() returns at most `limit` names per call, so we page through.
 async function listNotebookFiles(
   supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
+  bucket: string,
   notebookId: string,
 ): Promise<string[]> {
   const pageSize = 100;
   const paths: string[] = [];
   for (let offset = 0; ; offset += pageSize) {
     const { data, error } = await supabase.storage
-      .from("sources")
+      .from(bucket)
       .list(notebookId, { limit: pageSize, offset });
     if (error) throw error;
     paths.push(...data.map((file) => `${notebookId}/${file.name}`));
@@ -97,7 +99,7 @@ export async function deleteNotebook(notebookId: unknown): Promise<NotebookFormS
   // RLS: finds only the user's own notebooks.
   const { data: notebook } = await supabase
     .from("notebooks")
-    .select("id, sources(status, created_at)")
+    .select("id, sources(status, created_at), studio_items(status, created_at)")
     .eq("id", parsed.data)
     .maybeSingle();
   if (!notebook) return { error: NOT_FOUND };
@@ -108,15 +110,21 @@ export async function deleteNotebook(notebookId: unknown): Promise<NotebookFormS
   if (notebook.sources.some((source) => !canDeleteSource(source.status, source.created_at, now))) {
     return { error: "Eine Quelle wird gerade verarbeitet. Bitte warte, bis sie fertig ist." };
   }
+  // The same for a podcast: its job would upload the MP3 into the emptied folder.
+  if (notebook.studio_items.some((item) => studioState(item.status, item.created_at, now) === "busy")) {
+    return { error: "Im Studio wird gerade etwas erstellt. Bitte warte, bis es fertig ist." };
+  }
 
-  // Files first, then the row. "on delete cascade" removes sources, chunks
-  // and messages in Postgres, but it cannot reach Storage.
+  // Files first, then the row. "on delete cascade" removes sources, chunks,
+  // messages and studio items in Postgres, but it cannot reach Storage.
   try {
-    const paths = await listNotebookFiles(supabase, notebook.id);
-    // remove() takes at most 1000 paths per call.
-    for (let start = 0; start < paths.length; start += 1000) {
-      const { error } = await supabase.storage.from("sources").remove(paths.slice(start, start + 1000));
-      if (error) throw error;
+    for (const bucket of ["sources", "studio"]) {
+      const paths = await listNotebookFiles(supabase, bucket, notebook.id);
+      // remove() takes at most 1000 paths per call.
+      for (let start = 0; start < paths.length; start += 1000) {
+        const { error } = await supabase.storage.from(bucket).remove(paths.slice(start, start + 1000));
+        if (error) throw error;
+      }
     }
   } catch (error) {
     console.error("deleteNotebook: storage failed", error);

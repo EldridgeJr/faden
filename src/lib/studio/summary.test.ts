@@ -55,17 +55,21 @@ describe("summarizeStudioItem", () => {
     expect(summary).toMatchObject({ title: "Karteikarten", detail: null });
   });
 
-  it("shows title and turn count of a ready podcast", () => {
+  it("shows title and duration of a ready podcast", () => {
     const data = {
       sourceIds: [sourceId],
       title: "Die Hausordnung im Gespräch",
-      turns: [
-        { speaker: "lea", text: "Willkommen bei Faden!" },
-        { speaker: "tom", text: "Ruhe ab 22 Uhr [1]." },
-      ],
+      turns: [{ speaker: "lea", text: "Willkommen bei Faden!", start: 0 }],
       citations: [],
+      durationSeconds: 312.4,
     };
     const summary = summarizeStudioItem(row({ kind: "podcast", data }), now);
-    expect(summary).toMatchObject({ title: "Die Hausordnung im Gespräch", detail: "2 Redebeiträge" });
+    expect(summary).toMatchObject({ title: "Die Hausordnung im Gespräch", detail: "5:12 Min.", progress: null });
+  });
+
+  it("shows the progress of a podcast that is being made", () => {
+    const data = { sourceIds: [sourceId], progress: { stage: "audio", done: 12, total: 29 } };
+    const summary = summarizeStudioItem(row({ kind: "podcast", status: "processing", data }), now);
+    expect(summary).toMatchObject({ state: "busy", progress: "Sprache wird erzeugt: 12 von 29" });
   });
 });
