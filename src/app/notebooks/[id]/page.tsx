@@ -4,6 +4,8 @@ import { requireUser } from "@/lib/auth";
 import { notebookIdSchema, sourceMetaSchema } from "@/lib/schemas";
 import { PdfUpload } from "./pdf-upload";
 import { SourceList, type SourceItem } from "./source-list";
+import { TextSourceForm } from "./text-source-form";
+import { UrlSourceForm } from "./url-source-form";
 
 // Applies to all Server Actions of this page, and so to the processing in
 // after(). 300 seconds is the maximum on the Vercel Hobby plan.
@@ -56,6 +58,18 @@ export default async function NotebookPage({ params }: PageProps<"/notebooks/[id
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Quellen</h2>
         <PdfUpload notebookId={notebook.id} />
+        <details className="rounded-[18px] bg-white px-5 py-3">
+          <summary className="cursor-pointer font-medium">Text einfügen</summary>
+          <div className="pt-3">
+            <TextSourceForm notebookId={notebook.id} />
+          </div>
+        </details>
+        <details className="rounded-[18px] bg-white px-5 py-3">
+          <summary className="cursor-pointer font-medium">Webseite hinzufügen</summary>
+          <div className="pt-3">
+            <UrlSourceForm notebookId={notebook.id} />
+          </div>
+        </details>
         <SourceList sources={items} />
       </section>
     </main>

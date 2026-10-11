@@ -45,7 +45,43 @@ export const pdfUploadSchema = z.object({
 
 export const sourceIdSchema = z.uuid();
 
-// sources.meta is free JSON. Only these fields are read by the UI.
+// Pasted text. 200,000 characters stay below the 1 MB body limit of
+// Server Actions, even with many multi-byte characters (umlauts).
+export const MAX_TEXT_CHARS = 200_000;
+
+export const textSourceSchema = z.object({
+  notebookId: z.uuid(),
+  title: z
+    .string({ error: "Bitte gib einen Titel ein." })
+    .trim()
+    .min(1, "Bitte gib einen Titel ein.")
+    .max(500, "Der Titel darf höchstens 500 Zeichen lang sein."),
+  text: z
+    .string({ error: "Bitte füge einen Text ein." })
+    .trim()
+    .min(1, "Bitte füge einen Text ein.")
+    .max(MAX_TEXT_CHARS, "Der Text ist länger als 200.000 Zeichen."),
+});
+
+// A web page. "example.com" without a scheme becomes "https://example.com".
+// The full SSRF check (private addresses, DNS) runs when the page is fetched.
+export const urlSourceSchema = z.object({
+  notebookId: z.uuid(),
+  url: z
+    .string({ error: "Bitte gib eine Adresse ein." })
+    .trim()
+    .min(1, "Bitte gib eine Adresse ein.")
+    .max(2000, "Die Adresse ist zu lang.")
+    .transform((value) => (/^[a-z][a-z0-9+.-]*:/i.test(value) ? value : `https://${value}`))
+    .pipe(
+      z.url({
+        protocol: /^https?$/,
+        error: "Bitte gib eine Adresse mit http:// oder https:// ein.",
+      }),
+    ),
+});
+
+// sources.meta is free JSON. Only these fields are read by the app.
 export const sourceMetaSchema = z
-  .object({ pages: z.number(), chunks: z.number() })
+  .object({ pages: z.number(), chunks: z.number(), url: z.string() })
   .partial();

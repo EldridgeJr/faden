@@ -36,7 +36,11 @@ export function SourceList({ sources }: { sources: SourceItem[] }) {
   }, [busy, router]);
 
   if (sources.length === 0) {
-    return <p className="text-[#6b7078]">Noch keine Quellen. Lade eine PDF hoch.</p>;
+    return (
+      <p className="text-[#6b7078]">
+        Noch keine Quellen. Lade eine PDF hoch, füge Text ein oder eine Webseite.
+      </p>
+    );
   }
 
   return (
@@ -53,7 +57,9 @@ export function SourceList({ sources }: { sources: SourceItem[] }) {
             </div>
             {source.status === "ready" && source.chunks !== undefined && (
               <span className="font-mono text-sm text-[#6b7078]">
-                {source.pages} Seiten · {source.chunks} Abschnitte
+                {source.pages !== undefined &&
+                  `${source.pages} ${source.pages === 1 ? "Seite" : "Seiten"} · `}
+                {source.chunks} {source.chunks === 1 ? "Abschnitt" : "Abschnitte"}
               </span>
             )}
             {source.status === "error" && source.error && (

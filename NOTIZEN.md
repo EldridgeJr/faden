@@ -29,6 +29,10 @@
 - **11.10.2026 · Null-Zeichen in PDFs.** Postgres speichert `\u0000` nicht in `text`. Manche PDFs enthalten es, der Insert wäre gescheitert. Vorab beim Durchdenken bemerkt, nicht erst im Fehlerfall. Gelöst in `normalizeText`, mit Test.
 - **11.10.2026 · PDF-Absätze gehen verloren.** PDF.js liefert Zeilenenden, aber keine Leerzeilen. Für uns ist jede PDF-Seite ein einziger Absatz, die Absatzregel greift nur bei Text und Webseiten. Gemerkt beim Ausgeben der Abschnitte der Test-PDF. Bewusst nicht gelöst. Besser wäre: Absätze an größeren Zeilenabständen erkennen (`extractTextItems` liefert Positionen).
 - **11.10.2026 · Vercel-Funktionen liefen in Washington, die Datenbank steht in Frankfurt.** Annahme: Vercel wählt die Region passend. Falsch: Standard ist `iad1` (Washington). Jede Datenbankabfrage ging über den Atlantik (ca. 80–100 ms extra), und Nutzertexte wurden unnötig in den USA verarbeitet. Gemerkt im Build-Log („Running build in Washington“) und am Header `x-vercel-id: fra1::iad1`. Gelöst: `vercel.json` mit `"regions": ["fra1"]` (Hobby erlaubt eine frei gewählte Region).
+- **11.10.2026 · SSRF-Schutz blockierte jede öffentliche IPv4-Adresse (3d).** Annahme: Eine Regel für „IPv4 in IPv6“ (`::ffff:0:0/96`) sperrt nur versteckte Adressen wie `::ffff:127.0.0.1`. Falsch: Nodes `BlockList` prüft IPv4-Adressen intern auch in dieser Form. Die Regel traf damit **jede** IPv4-Adresse, Faden hätte keine Webseite laden können. Gemerkt: Test „erlaubt 8.8.8.8“ wurde rot. Gelöst: Verhalten in Node nachgeprüft, Regel entfernt. `::ffff:127.0.0.1` bleibt gesperrt, über die normale Regel `127.0.0.0/8`.
+- **11.10.2026 · Readability liefert auch bei leeren Seiten Text.** Ohne Artikel nimmt es den ganzen `body` (z. B. „Menü“). Gemerkt im Test. Gelöst: Mindestlänge 200 Zeichen (`MIN_READABLE_CHARS`), sonst Fehler „kein lesbarer Text“.
+- **11.10.2026 · Typen von `undici` passen nicht zu `lib.dom`.** `ReadableStream` aus dem Browser-Typ hat keinen Async-Iterator. Gemerkt beim Typecheck (Tests liefen grün, Vitest prüft keine Typen). Gelöst: Typ `Response["body"]` aus `undici`. Lehre: Vitest grün heißt nicht Typecheck grün.
+- **11.10.2026 · Unnützer Test fast eingecheckt.** Ein Test startete einen lokalen Server auf einem Zufallsport, die URL nutzte aber Port 80. Der Server bewies nichts. Beim Durchlesen bemerkt und entfernt.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -81,6 +85,14 @@
 - **Polling alle 2 Sekunden statt Supabase Realtime.** `router.refresh()`, solange eine Quelle „Wartet“ oder „In Arbeit“ ist. Einfach und ohne extra Einrichtung. Realtime wäre schneller und spart Anfragen.
 - **Auch nach fehlgeschlagenem Upload `startProcessing` aufrufen.** Der Server findet dann keine Datei und setzt „Fehler“ mit klarer Meldung. Sonst bliebe die Quelle für immer auf „Wartet“.
 - **Funktionen in `fra1` (Frankfurt),** dieselbe Region wie Supabase. Kurze Wege zur Datenbank, Daten bleiben in der EU (außer bei OpenAI). Datei `vercel.json`, weil sie im Repo steht und man sie sehen kann. Alternative: Einstellung im Vercel-Dashboard (unsichtbar im Code).
+- **SSRF-Schutz in drei Schichten (3d).** 1. `parsePublicUrl`: nur http(s), keine Zugangsdaten in der URL, keine eigenen Ports, keine privaten IP-Adressen in der URL. 2. Eigene `lookup`-Funktion in `undici`: prüft die IP, mit der **wirklich** verbunden wird (schützt vor DNS-Rebinding). 3. Weiterleitungen selbst folgen (`redirect: "manual"`), jedes Ziel geht wieder durch Schicht 1 und 2. Dazu: 15 s Zeitlimit, 5 MB Größenlimit beim Lesen, höchstens 5 Weiterleitungen.
+- **`undici` statt globalem `fetch`.** Nur so lässt sich die DNS-Prüfung in den Verbindungsaufbau einbauen. Alternative: vorher `dns.lookup` und dann `fetch` – hat eine Lücke (Name kann beim zweiten Nachschlagen woanders hinzeigen).
+- **`@mozilla/readability` + `linkedom`.** Readability ist der Lesemodus von Firefox, findet den Haupttext. `linkedom` ist ein leichter DOM für den Server. Skripte der Seite laufen nie. Alternative: `jsdom` (schwerer) oder eigener HTML-Parser (fehleranfällig).
+- **Eigener `serializer` für Readability.** Block-Elemente (`p`, `li`, `h2` …) bekommen Leerzeilen. Ohne ihn klebt `textContent` alle Absätze zusammen, und die Absatzregel beim Zerteilen greift nicht.
+- **Zeichensatz selbst erkennen.** `response.text()` nimmt immer UTF-8 an. Wir lesen `charset` aus dem Header oder `<meta charset>`, sonst UTF-8. Ältere deutsche Seiten (ISO-8859-1) zeigen so richtige Umlaute.
+- **Jede Quelle hat eine Datei in Storage.** PDF wie hochgeladen, Text als `.txt`, Webseite als bereinigter `.txt`-Text. Die Pipeline lädt immer aus Storage, und die Beleg-Ansicht kann später das zeigen, was Faden wirklich gelesen hat – auch wenn sich die Webseite ändert.
+- **Webseite im Hintergrund abrufen.** `createUrlSource` speichert nur die Adresse, der Abruf läuft in `processSource` (`after()`). Eine sofortige Vorprüfung (`parsePublicUrl`) gibt bei offensichtlich falschen Adressen direkt eine Meldung.
+- **Text bis 200.000 Zeichen.** Server Actions nehmen höchstens 1 MB an. 200.000 Zeichen bleiben auch mit vielen Umlauten deutlich darunter. Alternative: `bodySizeLimit` erhöhen.
 
 ## Echte Zahlen
 - Kosten pro Frage:
@@ -88,6 +100,7 @@
 - Abschnitte im Demo-Notebook:
 - Test-PDF „Hausordnung“ (3 Seiten): 3 Abschnitte, 874 Tokens. Unsere Zählung (`cl100k_base`) und die Abrechnung von OpenAI stimmen exakt überein. Kosten bei 0,02 $ pro 1 Mio. Tokens: ca. 0,00002 $.
 - Upload bis „Bereit“ für diese PDF: wenige Sekunden (lokal).
+- Wikipedia „Leipzig“ als URL: 1,5 MB HTML → 230 KB Text → 120 Abschnitte, 80.346 Tokens (ca. 0,0016 $), ca. 10–20 s bis „Bereit“.
 - Dauer Podcast-Erstellung:
 
 ## Schwierigstes Problem

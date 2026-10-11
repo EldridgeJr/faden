@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { notebookIdSchema, notebookTitleSchema, signInSchema } from "./schemas";
+import {
+  notebookIdSchema,
+  notebookTitleSchema,
+  signInSchema,
+  textSourceSchema,
+  urlSourceSchema,
+} from "./schemas";
+
+const notebookId = "1ce9dbd8-d4db-4023-bee1-f70220058102";
 
 describe("signInSchema", () => {
   it("accepts a valid email and normalizes it", () => {
@@ -60,4 +68,39 @@ describe("notebookIdSchema", () => {
       false,
     );
   });
+});
+
+describe("textSourceSchema", () => {
+  it("accepts title and text and trims both", () => {
+    const result = textSourceSchema.parse({ notebookId, title: " Notiz ", text: " Inhalt " });
+    expect(result).toEqual({ notebookId, title: "Notiz", text: "Inhalt" });
+  });
+
+  it("rejects empty text and text over 200,000 characters", () => {
+    expect(textSourceSchema.safeParse({ notebookId, title: "T", text: "  " }).success).toBe(false);
+    expect(
+      textSourceSchema.safeParse({ notebookId, title: "T", text: "a".repeat(200_001) }).success,
+    ).toBe(false);
+  });
+});
+
+describe("urlSourceSchema", () => {
+  it("adds https:// when the scheme is missing", () => {
+    expect(urlSourceSchema.parse({ notebookId, url: "example.com/seite" }).url).toBe(
+      "https://example.com/seite",
+    );
+  });
+
+  it("keeps http:// and https://", () => {
+    expect(urlSourceSchema.parse({ notebookId, url: "http://example.com" }).url).toBe(
+      "http://example.com",
+    );
+  });
+
+  it.each(["ftp://example.com", "javascript:alert(1)", "file:///etc/passwd"])(
+    "rejects %s",
+    (url) => {
+      expect(urlSourceSchema.safeParse({ notebookId, url }).success).toBe(false);
+    },
+  );
 });
