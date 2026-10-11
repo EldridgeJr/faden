@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schritt 3 · Einlesen</title>
+<meta name="description" content="Faden, Schritt 3: Wie aus PDFs, Texten und Webseiten suchbare Abschnitte werden – einfach erklärt, mit Begriffen zum Antippen und zwei Mini-Demos.">
+<style>
+  :root {
+    --bg: #E9EBEE; --surface: #F6F7F8; --card: #FFFFFF; --tile: #F3F4F6; --line: #E3E5E8;
+    --text: #111315; --muted: #6B7078; --accent: #D6EE57; --on-accent: #111315;
+    --ok: #6E9A1C; --warn-bg: #FDF0D5; --warn: #8A5A00; --err-bg: #FDE4DB; --err: #A3361A;
+    --primary: #111315; --on-primary: #FFFFFF;
+    --c-kw: #8B3FA8; --c-str: #3B7A12; --c-num: #B25A00; --c-com: #8A9099; --c-key: #1F5FA8;
+    --shadow: 0 1px 2px rgba(17,19,21,.04), 0 8px 24px rgba(17,19,21,.06);
+    --r-card: 28px; --r-tile: 18px; --r-pill: 999px;
+    --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+      --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+      --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+      --primary: #EDEFF1; --on-primary: #111315;
+      --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+    --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+    --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+    --primary: #EDEFF1; --on-primary: #111315;
+    --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  code, .mono { font-family: var(--mono); }
+  :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 6px; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 96px; }
+  .topbar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .topbar-in { max-width: 980px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; text-decoration: none; }
+  .brand-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+  .crumb { color: var(--muted); font-size: 14px; }
+  .spacer { flex: 1; }
+  .icon-btn { border: 1px solid var(--line); background: var(--card); color: var(--text); width: 36px; height: 36px; border-radius: var(--r-pill); display: grid; place-items: center; cursor: pointer; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .toc { display: flex; gap: 6px; overflow-x: auto; padding: 14px 0 4px; scrollbar-width: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc a { flex: none; text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); color: var(--muted); transition: color .2s, border-color .2s; }
+  .toc a:hover { color: var(--text); border-color: var(--muted); }
+
+  .hero { padding: 40px 0 8px; }
+  .eyebrow { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+  h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.05; letter-spacing: -0.03em; margin: 10px 0 14px; font-weight: 650; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 640px; margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); }
+  .chip.ok::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+  .chip.err { background: var(--err-bg); color: var(--err); border-color: transparent; }
+
+  section { margin-top: 56px; scroll-margin-top: 70px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .sec-num { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  h2 { font-size: 26px; letter-spacing: -0.02em; margin: 0; font-weight: 620; }
+  h3 { font-size: 17px; margin: 0 0 6px; font-weight: 600; }
+  p { margin: 0 0 12px; }
+  .card { background: var(--card); border-radius: var(--r-card); padding: 28px; box-shadow: var(--shadow); }
+  .tile { background: var(--tile); border-radius: var(--r-tile); padding: 18px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+
+  /* 1. Was funktioniert */
+  .facts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 20px; }
+  .fact .k { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .fact .v { font-weight: 600; margin-top: 2px; word-break: break-word; }
+
+  /* 2. Diagramm */
+  .diagram-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer; font: 500 14px var(--sans); padding: 10px 16px; border-radius: var(--r-pill); background: var(--primary); color: var(--on-primary); transition: transform .15s; }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: var(--tile); color: var(--text); }
+  .btn.accent { background: var(--accent); color: var(--on-accent); }
+  .btn svg { width: 16px; height: 16px; }
+  .scroll-x { overflow-x: auto; margin: 0 -8px; padding: 0 8px; }
+  .diagram { display: block; width: 100%; min-width: 760px; height: auto; }
+  .diagram .node rect { fill: var(--tile); stroke: var(--line); stroke-width: 1.5; transition: fill .25s, stroke .25s; }
+  .diagram .node text { fill: var(--text); font: 600 13px var(--sans); }
+  .diagram .node .sub { fill: var(--muted); font: 400 11px var(--mono); }
+  .diagram .node .ico { stroke: var(--text); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .diagram .node, .diagram .edge { cursor: pointer; }
+  .diagram .node.later rect { fill: none; stroke-dasharray: 5 5; }
+  .diagram .node.later text, .diagram .node.later .ico { opacity: .55; }
+  .diagram .edge path { stroke: var(--muted); stroke-width: 1.8; fill: none; transition: stroke .25s; }
+  .diagram .edge .hit { stroke: transparent; stroke-width: 18; }
+  .diagram .edge.later path { stroke-dasharray: 4 5; opacity: .6; }
+  .diagram .edge text { fill: var(--muted); font: 500 11px var(--mono); }
+  .diagram .edge .label-bg { fill: var(--surface); }
+  .diagram .arrowhead { fill: var(--muted); }
+  .diagram .is-active rect { fill: var(--accent); stroke: var(--accent); }
+  .diagram .is-active text, .diagram .is-active .sub { fill: #111315; }
+  .diagram .is-active .ico { stroke: #111315; }
+  .diagram .edge.is-active path:not(.hit) { stroke: var(--text); stroke-width: 2.4; stroke-dasharray: 7 6; animation: flow .8s linear infinite; }
+  .diagram .edge.is-active text { fill: var(--text); }
+  @keyframes flow { to { stroke-dashoffset: -13; } }
+  .detail { margin-top: 14px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; min-height: 92px; }
+  .detail .badge { font-family: var(--mono); font-size: 12px; background: var(--accent); color: var(--on-accent); padding: 4px 10px; border-radius: var(--r-pill); white-space: nowrap; }
+  .detail h3 { margin-bottom: 4px; }
+  .detail p { margin: 0; color: var(--muted); }
+  .detail.swap { animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 520px) { .detail { grid-template-columns: 1fr; gap: 8px; } .detail .badge { justify-self: start; } }
+  .step-dots { display: flex; gap: 6px; margin-left: auto; }
+  .step-dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; transition: background .2s, transform .2s; }
+  .step-dots button.on { background: var(--text); transform: scale(1.25); }
+
+  /* 3. Dateien */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; font-size: 12px; font-weight: 500; color: var(--muted); font-family: var(--mono); padding: 0 12px 10px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { white-space: nowrap; }
+  td code { font-size: 13px; background: var(--tile); padding: 2px 7px; border-radius: 6px; }
+  .filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter button { font: 500 13px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 6px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .filter button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  tr.hidden { display: none; }
+
+  /* 4. Code */
+  .code-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .code-tabs button { font: 500 13px var(--mono); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 7px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .code-tabs button[aria-selected="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .code-card { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .code-head { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .code-head .file { font: 500 13px var(--mono); }
+  .code-head .why { color: var(--muted); font-size: 14px; flex: 1; min-width: 0; }
+  .copy { font: 500 12px var(--sans); border: 1px solid var(--line); background: var(--tile); color: var(--text); border-radius: var(--r-pill); padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .copy svg { width: 14px; height: 14px; }
+  pre { margin: 0; padding: 14px 0; overflow-x: auto; font: 13.5px/1.7 var(--mono); }
+  .ln { display: flex; padding: 0 20px 0 0; }
+  .ln .n { width: 44px; flex: none; text-align: right; padding-right: 16px; color: var(--c-com); user-select: none; }
+  .ln .t { white-space: pre; }
+  .ln.has-note { cursor: pointer; position: relative; }
+  .ln.has-note .n { color: var(--text); }
+  .ln.has-note .n::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 6px; vertical-align: middle; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .ln.has-note:hover { background: var(--tile); }
+  .ln.sel { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+  .note { margin: 0 20px 18px; padding: 14px 16px; border-radius: var(--r-tile); background: var(--tile); font-size: 15px; min-height: 52px; }
+  .note b { font-family: var(--mono); font-weight: 500; font-size: 13px; }
+  .tok-kw { color: var(--c-kw); } .tok-str { color: var(--c-str); } .tok-num { color: var(--c-num); }
+  .tok-com { color: var(--c-com); font-style: italic; } .tok-key { color: var(--c-key); } .tok-neg { color: var(--ok); font-weight: 600; }
+
+  /* Demo */
+  .demo-grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .demo-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; gap: 8px; }
+  .field input { flex: 1; min-width: 0; font: 15px var(--mono); padding: 12px 16px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); color: var(--text); }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .presets button { font: 12px var(--mono); border: 1px dashed var(--line); background: transparent; color: var(--muted); padding: 5px 10px; border-radius: var(--r-pill); cursor: pointer; }
+  .presets button:hover { color: var(--text); border-color: var(--muted); }
+  .verdict { margin-top: 16px; padding: 16px; border-radius: var(--r-tile); font-weight: 600; transition: background .25s, color .25s; }
+  .verdict.in { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+  .verdict.out { background: var(--err-bg); color: var(--err); }
+  .verdict small { display: block; font-weight: 400; color: var(--text); margin-top: 4px; font-size: 14px; }
+  .rules { list-style: none; margin: 0; padding: 0; font: 13.5px var(--mono); }
+  .rules li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 12px; border-radius: 10px; transition: background .2s; }
+  .rules li .hint { color: var(--muted); font-family: var(--sans); font-size: 12px; }
+  .rules li.hit { background: var(--tile); }
+  .rules li.win { background: var(--accent); color: #111315; }
+  .rules li.win .hint { color: #111315; }
+
+  /* Entscheidungen */
+  .decisions { display: grid; gap: 12px; }
+  .decision { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--card); border-radius: var(--r-card); overflow: hidden; box-shadow: var(--shadow); }
+  .decision > div { padding: 20px 24px; }
+  .decision .alt { background: var(--tile); }
+  .decision .lbl { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .decision .pick .lbl::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .decision p { margin: 0; font-size: 15px; }
+  @media (max-width: 640px) { .decision { grid-template-columns: 1fr; } }
+
+  /* Risiken */
+  .risks { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .risk { background: var(--card); border-radius: var(--r-tile); padding: 18px 20px; box-shadow: var(--shadow); }
+  .risk .chip { margin-bottom: 10px; }
+  .risk p { margin: 0; font-size: 15px; color: var(--muted); }
+
+  /* Lernkarten */
+  .quiz-top { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .progress { flex: 1; min-width: 160px; height: 10px; background: var(--card); border-radius: var(--r-pill); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+  .progress span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: var(--r-pill); transition: width .4s ease; }
+  .score { font: 500 14px var(--mono); }
+  .cards { display: grid; gap: 12px; }
+  .fc { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .fc-q { width: 100%; text-align: left; border: 0; background: transparent; color: var(--text); font: 600 17px/1.4 var(--sans); padding: 22px 24px; display: flex; gap: 14px; align-items: flex-start; cursor: pointer; }
+  .fc-q .num { font: 500 12px var(--mono); color: var(--muted); padding-top: 4px; }
+  .fc-q .chev { margin-left: auto; flex: none; width: 20px; height: 20px; transition: transform .3s; color: var(--muted); }
+  .fc.open .fc-q .chev { transform: rotate(180deg); }
+  .fc-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  .fc.open .fc-a { grid-template-rows: 1fr; }
+  .fc-a > div { overflow: hidden; }
+  .fc-a .inner { padding: 0 24px 22px 58px; }
+  .fc-a p { color: var(--text); }
+  .fc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .fc.known { box-shadow: var(--shadow), inset 0 0 0 2px var(--accent); }
+  .fc.known .num { color: var(--ok); }
+  @media (max-width: 520px) { .fc-a .inner { padding-left: 24px; } .card { padding: 22px; } }
+
+  footer { margin-top: 72px; color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+
+  /* Schritt 2: RLS-Demo */
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 8px 14px; border-radius: var(--r-pill); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .2s, color .2s, border-color .2s; }
+  .seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .seg .av { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 600 11px var(--sans); background: var(--tile); color: var(--text); }
+  .seg button[aria-pressed="true"] .av { background: var(--accent); color: #111315; }
+  .demo-label { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; }
+  .demo-label:first-child { margin-top: 0; }
+  .actions { display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .actions button { text-align: left; font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 10px 14px; border-radius: var(--r-tile); cursor: pointer; transition: border-color .2s, background .2s; }
+  .actions button small { display: block; color: var(--muted); font: 12px var(--mono); margin-top: 2px; }
+  .actions button[aria-pressed="true"] { border-color: var(--text); background: var(--tile); }
+  .uid { display: inline-flex; gap: 6px; align-items: center; font: 13px var(--mono); color: var(--muted); margin-top: 10px; }
+  .uid b { color: var(--text); font-weight: 500; }
+  .demo-sql { margin: 18px 0 0; padding: 14px 18px; background: var(--tile); border-radius: var(--r-tile); font: 13.5px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .gates { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; margin-top: 12px; }
+  @media (max-width: 640px) { .gates { grid-template-columns: 1fr; } }
+  .gate { border-radius: var(--r-tile); padding: 14px 16px; border: 1px solid var(--line); transition: background .25s, border-color .25s; }
+  .gate .gh { display: flex; align-items: center; gap: 8px; font: 500 12px var(--mono); color: var(--muted); }
+  .gate .st { margin-left: auto; font: 600 12px var(--mono); padding: 2px 9px; border-radius: var(--r-pill); background: var(--tile); color: var(--muted); }
+  .gate p { margin: 8px 0 0; font-size: 14.5px; }
+  .gate.ok { border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+  .gate.ok .st { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .gate.fail { border-color: color-mix(in srgb, var(--err) 45%, transparent); }
+  .gate.fail .st { background: var(--err-bg); color: var(--err); }
+  .gate.skip { opacity: .55; }
+  .rowtable { margin-top: 12px; }
+  .rowtable td, .rowtable th { font-size: 14px; }
+  .rowtable td:first-child { font-family: var(--mono); font-size: 13px; }
+  .rowtable tr { transition: opacity .25s; }
+  .rowtable tr.off td:not(:last-child) { opacity: .38; text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+  .state { font: 500 12px var(--mono); padding: 2px 9px; border-radius: var(--r-pill); white-space: nowrap; background: var(--tile); color: var(--muted); }
+  .state.on { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .state.hit { background: var(--accent); color: #111315; }
+  .state.bad { background: var(--err-bg); color: var(--err); }
+  .verdict.warn { background: var(--warn-bg); color: var(--warn); }
+  .result-swap { animation: fade .3s ease; }
+
+  /* Begriffe zum Antippen */
+  .term { display: inline; cursor: help; padding: 0 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; text-decoration: underline dotted; text-decoration-color: var(--muted); text-decoration-thickness: 1.5px; text-underline-offset: 3px; border-radius: 4px; transition: background .2s; }
+  .term:hover, .term[aria-expanded="true"] { background: color-mix(in srgb, var(--accent) 45%, transparent); text-decoration-color: transparent; }
+  .detail .badge .term, .lbl .term { text-decoration: none; }
+  .pop { position: fixed; z-index: 50; width: max-content; max-width: min(320px, calc(100vw - 24px)); background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: var(--r-tile); box-shadow: 0 12px 32px rgba(17,19,21,.18); padding: 12px 14px; font: 14.5px/1.5 var(--sans); text-align: left; animation: fade .18s ease; }
+  .pop[hidden] { display: none; }
+  .pop b { display: block; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 4px; letter-spacing: .02em; }
+  .pop p { margin: 0; color: var(--text); }
+  .hint { font-size: 14px; color: var(--muted); margin-top: 14px; }
+
+  /* ---------- Step 3: demos ---------- */
+  .demo-tabs { margin-bottom: 18px; }
+  .pane[hidden] { display: none; }
+  .demo-text { width: 100%; min-height: 150px; font: 14px/1.6 var(--sans); padding: 14px 16px; border-radius: var(--r-tile); border: 1px solid var(--line); background: var(--surface); color: var(--text); resize: vertical; }
+  .sliders { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; margin-top: 14px; }
+  .slider label { display: flex; justify-content: space-between; gap: 8px; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 6px; }
+  .slider label b { color: var(--text); font-weight: 600; }
+  .slider input[type=range] { width: 100%; accent-color: var(--text); }
+  .chunk-sum { margin-top: 18px; font-size: 14px; color: var(--muted); }
+  .chunk-sum b { color: var(--text); }
+  .chunk-list { display: grid; gap: 10px; margin-top: 10px; }
+  .chunk { border: 1px solid var(--line); border-radius: var(--r-tile); padding: 12px 14px; animation: fade .3s ease; }
+  .chunk .ch { display: flex; align-items: center; gap: 10px; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 6px; }
+  .chunk .meter { flex: 1; height: 6px; border-radius: var(--r-pill); background: var(--tile); overflow: hidden; }
+  .chunk .meter span { display: block; height: 100%; border-radius: var(--r-pill); background: var(--text); transition: width .3s ease; }
+  .chunk p { margin: 0; font-size: 14px; line-height: 1.6; }
+  .chunk mark { background: var(--warn-bg); color: var(--warn); border-radius: 4px; padding: 0 2px; }
+  .chunk .para { color: var(--muted); font-family: var(--mono); }
+  .gates.three { grid-template-columns: repeat(3, 1fr); margin-top: 16px; }
+  @media (max-width: 760px) { .sliders, .gates.three { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html" aria-label="Zur Übersicht aller Schritte">
+      <span class="brand-dot" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#111315" stroke-width="2.4" stroke-linecap="round"><path d="M4 12c4-8 12 8 16 0"/></svg></span>
+      Faden
+    </a>
+    <span class="crumb">/ Erklärungen / Schritt 3</span>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten"></button>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Abschnitte">
+    <a href="#funktioniert">Was funktioniert</a>
+    <a href="#ablauf">Ablauf</a>
+    <a href="#dateien">Dateien</a>
+    <a href="#code">Code</a>
+    <a href="#demo">Demo</a>
+    <a href="#entscheidungen">Entscheidungen</a>
+    <a href="#risiken">Was schiefgehen kann</a>
+    <a href="#interview">Interview-Check</a>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">SCHRITT 3 VON 7 · 11.10.2026</div>
+    <h1>Einlesen: Aus Dateien werden suchbare Abschnitte</h1>
+    <p class="lead" data-rich>Faden kann jetzt Quellen aufnehmen: PDFs, eingefügten Text und Webseiten. Es holt den Text heraus, teilt ihn in [[chunk|Abschnitte]] und speichert zu jedem Abschnitt seine Bedeutung als [[embedding|Embedding]].</p>
+    <div class="chips">
+      <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test 77/77</span><span class="chip ok">auf Vercel getestet</span><span class="chip ok">SSRF-Schutz geprüft</span>
+    </div>
+    <div class="hint" data-rich>Tipp: [[term|Gepunktet unterstrichene Wörter]] antippen. Dann erscheint eine kurze Erklärung.</div>
+  </header>
+
+  <!-- 1 -->
+  <section id="funktioniert">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Was jetzt funktioniert</h2></div>
+    <div class="card" data-rich>
+      <p>Man meldet sich an, legt ein Notebook an und fügt Quellen hinzu. Eine PDF geht direkt vom Browser in die [[storage|Dateiablage]]. Danach liest Faden im Hintergrund den Text, teilt ihn in Abschnitte und lässt von [[openai|OpenAI]] für jeden Abschnitt ein Embedding berechnen. Die Liste zeigt den [[status|Status]] live: wartet, in Arbeit, bereit oder Fehler. Gescannte PDFs und interne Webadressen lehnt Faden mit einer klaren Meldung ab.</p>
+      <p class="muted small" style="margin:0">Die Seiten sind noch schlicht. Das Design nach der Vorlage kommt in Schritt 5. Fragen stellen kann man ab Schritt 4.</p>
+      <div class="facts">
+        <div class="tile fact"><div class="k">QUELLEN</div><div class="v mono small">PDF · Text · Webseite</div></div>
+        <div class="tile fact"><div class="k">ABSCHNITT</div><div class="v mono small">max. 800 Tokens · 120 Überlappung</div></div>
+        <div class="tile fact"><div class="k">BEISPIEL</div><div class="v mono small">Wikipedia „Leipzig“ → 120 Abschnitte</div></div>
+        <div class="tile fact"><div class="k">LÄUFT IN</div><div class="v mono small">Frankfurt, neben der Datenbank</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="ablauf">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Ablauf: Eine PDF wird eingelesen</h2></div>
+    <div class="card">
+      <div class="diagram-tools">
+        <button class="btn" id="playBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg><span>Abspielen</span></button>
+        <button class="btn ghost" id="prevBtn" type="button" aria-label="Vorheriger Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button class="btn ghost" id="nextBtn" type="button" aria-label="Nächster Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        <div class="step-dots" id="dots" role="tablist" aria-label="Schritte im Ablauf"></div>
+      </div>
+      <div class="scroll-x">
+        <svg class="diagram" id="diagram" viewBox="0 0 900 340" role="img" aria-label="Datenfluss beim Einlesen: Der Browser meldet die Datei beim Server an, bekommt eine Upload-Adresse und lädt die PDF direkt in Storage. Der Server startet die Verarbeitung im Hintergrund. Sie holt die Datei, bildet Abschnitte, lässt OpenAI Embeddings berechnen und speichert alles in Postgres. Der Browser fragt alle zwei Sekunden nach dem Status.">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0 0 10 5 0 10z"/></marker>
+          </defs>
+
+          <!-- edges -->
+          <g class="edge" data-id="e1"><path class="hit" d="M150 158 H250"/><path d="M150 158 H248" marker-end="url(#ah)"/><rect class="label-bg" x="156" y="128" width="88" height="18" rx="9"/><text x="200" y="141" text-anchor="middle">Name, Größe</text></g>
+          <g class="edge" data-id="e3"><path class="hit" d="M250 188 H150"/><path d="M250 188 H152" marker-end="url(#ah)"/><rect class="label-bg" x="160" y="194" width="80" height="18" rx="9"/><text x="200" y="207" text-anchor="middle">Upload-URL</text></g>
+          <g class="edge" data-id="e4"><path class="hit" d="M80 134 V56 H250"/><path d="M80 134 V56 H248" marker-end="url(#ah)"/><rect class="label-bg" x="88" y="70" width="80" height="18" rx="9"/><text x="128" y="83" text-anchor="middle">PDF direkt</text></g>
+          <g class="edge" data-id="e2"><path class="hit" d="M320 206 V248"/><path d="M320 206 V246" marker-end="url(#ah)"/><rect class="label-bg" x="328" y="218" width="92" height="18" rx="9"/><text x="374" y="231" text-anchor="middle">Zeile: wartet</text></g>
+          <g class="edge" data-id="e6"><path class="hit" d="M390 170 H490"/><path d="M390 170 H488" marker-end="url(#ah)"/><rect class="label-bg" x="408" y="144" width="62" height="18" rx="9"/><text x="439" y="157" text-anchor="middle">after()</text></g>
+          <g class="edge" data-id="e7"><path class="hit" d="M540 134 V56 H390"/><path d="M540 134 V56 H392" marker-end="url(#ah)"/><rect class="label-bg" x="418" y="62" width="84" height="18" rx="9"/><text x="460" y="75" text-anchor="middle">Datei holen</text></g>
+          <g class="edge" data-id="e9"><path class="hit" d="M600 134 V56 H740"/><path d="M600 134 V56 H738" marker-end="url(#ah)"/><rect class="label-bg" x="626" y="62" width="88" height="18" rx="9"/><text x="670" y="75" text-anchor="middle">Abschnitte</text></g>
+          <g class="edge" data-id="e8"><path class="hit" d="M630 170 H740"/><path d="M630 170 H738" marker-end="url(#ah)"/><rect class="label-bg" x="640" y="144" width="88" height="18" rx="9"/><text x="684" y="157" text-anchor="middle">sicher laden</text></g>
+          <g class="edge" data-id="e10"><path class="hit" d="M560 206 V284 H390"/><path d="M560 206 V284 H392" marker-end="url(#ah)"/><rect class="label-bg" x="412" y="290" width="132" height="18" rx="9"/><text x="478" y="303" text-anchor="middle">speichern · bereit</text></g>
+          <g class="edge" data-id="e11"><path class="hit" d="M80 206 V284 H250"/><path d="M80 206 V284 H248" marker-end="url(#ah)"/><rect class="label-bg" x="92" y="290" width="124" height="18" rx="9"/><text x="154" y="303" text-anchor="middle">alle 2 s: Status?</text></g>
+
+          <!-- nodes -->
+          <g class="node" data-id="n1" tabindex="0" role="button" aria-label="Browser">
+            <rect x="10" y="134" width="140" height="72" rx="18"/>
+            <circle class="ico" cx="35" cy="158" r="9"/><path class="ico" d="M26 158h18M35 149c-4 5-4 13 0 18M35 149c4 5 4 13 0 18"/>
+            <text x="54" y="162">Browser</text><text class="sub" x="26" y="190">wählt die PDF</text>
+          </g>
+          <g class="node" data-id="n2" tabindex="0" role="button" aria-label="Server, Server Action">
+            <rect x="250" y="134" width="140" height="72" rx="18"/>
+            <path class="ico" d="M266 149h18v8h-18zM266 161h18v8h-18z"/>
+            <text x="294" y="162">Server</text><text class="sub" x="266" y="190">Server Action</text>
+          </g>
+          <g class="node" data-id="n3" tabindex="0" role="button" aria-label="Storage, die Dateiablage">
+            <rect x="250" y="20" width="140" height="72" rx="18"/>
+            <path class="ico" d="M266 39a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-16a2 2 0 0 1-2-2z"/>
+            <text x="294" y="48">Storage</text><text class="sub" x="266" y="76">Dateiablage</text>
+          </g>
+          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="Postgres, die Datenbank">
+            <rect x="250" y="248" width="140" height="72" rx="18"/>
+            <ellipse class="ico" cx="275" cy="266" rx="9" ry="4"/><path class="ico" d="M266 266v12c0 2 4 4 9 4s9-2 9-4v-12"/>
+            <text x="294" y="276">Postgres</text><text class="sub" x="266" y="304">Datenbank</text>
+          </g>
+          <g class="node" data-id="n5" tabindex="0" role="button" aria-label="Verarbeitung im Hintergrund">
+            <rect x="490" y="134" width="140" height="72" rx="18"/>
+            <circle class="ico" cx="515" cy="158" r="5"/><path class="ico" d="M515 147v3M515 166v3M504 158h3M523 158h3M507 150l2 2M521 164l2 2M507 166l2-2M521 152l2-2"/>
+            <text x="534" y="162">Verarbeitung</text><text class="sub" x="506" y="190">im Hintergrund</text>
+          </g>
+          <g class="node" data-id="n6" tabindex="0" role="button" aria-label="OpenAI">
+            <rect x="740" y="20" width="140" height="72" rx="18"/>
+            <path class="ico" d="M765 35l2.5 6.5L774 44l-6.5 2.5L765 53l-2.5-6.5L756 44l6.5-2.5z"/>
+            <text x="784" y="48">OpenAI</text><text class="sub" x="756" y="76">rechnet Embeddings</text>
+          </g>
+          <g class="node" data-id="n7" tabindex="0" role="button" aria-label="Webseite im Internet">
+            <rect x="740" y="134" width="140" height="72" rx="18"/>
+            <rect class="ico" x="756" y="149" width="18" height="16" rx="2"/><path class="ico" d="M756 154h18"/>
+            <text x="784" y="162">Webseite</text><text class="sub" x="756" y="190">nur bei URL</text>
+          </g>
+        </svg>
+      </div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="dateien">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Geänderte Dateien</h2></div>
+    <div class="card">
+      <div class="filter" role="group" aria-label="Dateien filtern">
+        <button type="button" data-f="all" aria-pressed="true">Alle</button>
+        <button type="button" data-f="ingest" aria-pressed="false">Einlesen</button>
+        <button type="button" data-f="app" aria-pressed="false">Seiten und Actions</button>
+        <button type="button" data-f="test" aria-pressed="false">Tests</button>
+        <button type="button" data-f="conf" aria-pressed="false">Einstellungen und Doku</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>DATEI</th><th>AUFGABE</th><th>WARUM SO</th></tr></thead>
+          <tbody id="fileRows" data-rich>
+            <tr data-k="ingest"><td><code>src/lib/ingest/chunk.ts</code></td><td>Text säubern, in Sätze und dann in Abschnitte teilen</td><td>Reine Funktionen ohne Netz und Datenbank. Darum gut testbar und leicht zu erklären.</td></tr>
+            <tr data-k="ingest"><td><code>src/lib/ingest/tokens.ts</code></td><td>Zählt [[token|Tokens]]</td><td>Mit derselben Zählweise wie das Embedding-Modell (<code>cl100k_base</code>). Unsere Zahl stimmte im Test exakt mit OpenAI überein.</td></tr>
+            <tr data-k="ingest"><td><code>src/lib/ingest/pdf.ts</code></td><td>Text pro PDF-Seite lesen, [[scan|Scans]] erkennen</td><td>[[pdfjs|unpdf]] läuft auch auf Vercel. Die Seitenzahl bleibt erhalten, für Belege später.</td></tr>
+            <tr data-k="ingest"><td><code>src/lib/ingest/embed.ts</code></td><td>Embeddings bei OpenAI holen</td><td>In [[batch|Paketen]] zu 100 Abschnitten. OpenAI nimmt pro Anfrage nur eine begrenzte Menge Text an.</td></tr>
+            <tr data-k="ingest"><td><code>src/lib/ingest/process.ts</code></td><td>Die ganze Verarbeitung: laden, teilen, Embeddings, speichern</td><td>Ganz oder gar nicht: Bei einem Fehler löscht sie alle schon gespeicherten Abschnitte wieder.</td></tr>
+            <tr data-k="ingest"><td><code>src/lib/ingest/fetch-url.ts</code></td><td>Webseiten sicher laden</td><td>Schutz gegen [[ssrf|SSRF]] in drei Schichten. Dazu Zeitlimit, Größenlimit und der richtige Zeichensatz.</td></tr>
+            <tr data-k="ingest"><td><code>src/lib/ingest/readable.ts</code></td><td>Aus HTML den Haupttext holen</td><td>[[readability|Readability]] ist der Lesemodus von Firefox. Menü, Werbung und Fußzeile fallen weg.</td></tr>
+            <tr data-k="ingest"><td><code>src/lib/ingest/status.ts</code></td><td>Regel: Wann darf man eine Quelle löschen?</td><td>Nicht, solange die Verarbeitung noch laufen könnte. Sonst bliebe eine Datei ohne Besitzer übrig.</td></tr>
+            <tr data-k="ingest"><td><code>src/lib/ai/models.ts</code></td><td>Die eine Stelle für das KI-Modell</td><td>Wer das Modell wechselt, ändert nur diese Datei.</td></tr>
+            <tr data-k="ingest"><td><code>src/lib/supabase/admin.ts</code></td><td>Verbindung mit dem [[secret|geheimen Schlüssel]]</td><td>Nur für die Arbeit im Hintergrund, nur auf dem Server. Der Build bricht ab, wenn Browser-Code die Datei lädt.</td></tr>
+            <tr data-k="app"><td><code>src/app/login/…</code> · <code>src/lib/auth.ts</code></td><td>Anmelden, abmelden, Login prüfen</td><td>Jede Seite und jede [[action|Server Action]] ruft <code>requireUser()</code> auf.</td></tr>
+            <tr data-k="app"><td><code>src/app/notebooks/…</code></td><td>Notebooks anzeigen und anlegen</td><td>Fremde Notebooks ergeben [[http404|404]]. So erfährt niemand, welche es gibt.</td></tr>
+            <tr data-k="app"><td><code>src/app/notebooks/[id]/actions.ts</code></td><td>PDF anmelden, Verarbeitung starten, Text und URL anlegen, Quelle löschen</td><td>Jede Action prüft Login, Eingabe ([[zod|Zod]]) und Rechte ([[rls|RLS]]) selbst.</td></tr>
+            <tr data-k="app"><td><code>src/app/notebooks/[id]/*.tsx</code></td><td>Upload, Formulare, Quellenliste, Löschen-Knopf</td><td>Die Liste fragt per [[polling|Polling]] nach dem Status, solange etwas in Arbeit ist.</td></tr>
+            <tr data-k="app"><td><code>src/lib/schemas.ts</code></td><td>Alle Regeln für Eingaben</td><td>Getrennt von den Actions, damit Tests sie ohne Next.js prüfen können.</td></tr>
+            <tr data-k="test"><td><code>src/lib/**/*.test.ts</code></td><td>77 Tests für Abschnitte, PDF, Webseiten, Schutz und Eingaben</td><td>Die Tests haben zwei echte Fehler gefunden, bevor sie live gingen (siehe „Was schiefgehen kann“).</td></tr>
+            <tr data-k="test"><td><code>src/test/make-pdf.ts</code></td><td>Baut kleine Test-PDFs von Hand</td><td>Keine Binärdateien im Repo. Eine „gescannte“ Seite ist eine graue Fläche ohne Text.</td></tr>
+            <tr data-k="conf"><td><code>vercel.json</code></td><td>Funktionen laufen in Frankfurt</td><td>Standard war Washington. Jede Datenbank-Anfrage ging über den Atlantik.</td></tr>
+            <tr data-k="conf"><td><code>package.json</code></td><td>8 neue Pakete</td><td>Zod, AI SDK, OpenAI, Tokenizer, unpdf, undici, Readability, linkedom.</td></tr>
+            <tr data-k="conf"><td><code>.env.example</code> · <code>NOTIZEN.md</code></td><td>Namen der Umgebungsvariablen, Lerntagebuch</td><td>Der OpenAI-Schlüssel steht nur in <code>.env.local</code> und in Vercel, nie im Repo.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="code">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Wichtigster Code</h2></div>
+    <p class="muted">Zeilen mit Punkt sind anklickbar. Ein Klick zeigt, was die Zeile tut. Die Ausschnitte sind leicht gekürzt.</p>
+    <div class="code-tabs" role="tablist" id="codeTabs"></div>
+    <div class="code-card">
+      <div class="code-head">
+        <span class="file" id="codeFile"></span>
+        <span class="why" id="codeWhy"></span>
+        <button class="copy" id="copyBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Kopieren</span></button>
+      </div>
+      <pre id="codePre" role="tabpanel"></pre>
+      <div class="note" id="codeNote" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo">
+    <div class="sec-head"><span class="sec-num">04b</span><h2>Mini-Demo</h2></div>
+    <div class="card">
+      <div class="seg demo-tabs" id="demoTabs" role="group" aria-label="Demo wählen">
+        <button type="button" data-pane="paneChunks" aria-pressed="true">Text in Abschnitte teilen</button>
+        <button type="button" data-pane="paneUrl" aria-pressed="false">Adresse prüfen</button>
+      </div>
+
+      <div class="pane" id="paneChunks">
+        <p class="muted" data-rich>Ändere den Text oder die Regler. Du siehst sofort, wie Faden ihn in [[chunk|Abschnitte]] teilt. Gelb markiert ist die [[overlap|Überlappung]]: Text, der schon im Abschnitt davor stand.</p>
+        <textarea class="demo-text" id="chunkText" aria-label="Text für die Demo"></textarea>
+        <div class="sliders">
+          <div class="slider"><label for="maxRange">Höchstens pro Abschnitt <b id="maxVal"></b></label><input type="range" id="maxRange" min="25" max="150" step="5" value="70"></div>
+          <div class="slider"><label for="ovRange">Überlappung <b id="ovVal"></b></label><input type="range" id="ovRange" min="0" max="40" step="5" value="15"></div>
+        </div>
+        <p class="muted small" data-rich style="margin:10px 0 0">Die Demo schätzt die [[token|Tokens]] (etwa 3,6 Zeichen pro Token bei deutschem Text). Faden zählt sie in echt. Im echten Faden sind es 800 Tokens und 15 %.</p>
+        <div class="chunk-sum" id="chunkSum" aria-live="polite"></div>
+        <div class="chunk-list" id="chunkList"></div>
+      </div>
+
+      <div class="pane" id="paneUrl" hidden>
+        <p class="muted" data-rich>Gib eine Adresse ein oder wähle ein Beispiel. Du siehst, welche der drei Schutzschichten gegen [[ssrf|SSRF]] greift. Die [[dns|DNS-Antworten]] sind hier nachgestellt.</p>
+        <div class="field"><input id="urlInput" type="text" spellcheck="false" autocomplete="off" aria-label="Webadresse"><button class="btn" id="urlBtn" type="button">Prüfen</button></div>
+        <div class="presets" id="urlPresets"></div>
+        <div id="urlResult" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="entscheidungen">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Entscheidungen und Alternativen</h2></div>
+    <div class="decisions" data-rich>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Die Datei geht direkt in die Ablage</h3><p>Der Browser lädt die PDF mit einer [[signed|signierten Upload-URL]] direkt in [[storage|Storage]]. Unser Server sieht nur Name und Größe.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Datei durch unseren Server schicken. Einfacher, aber [[vercel|Vercel]] nimmt pro Anfrage nur etwa 4,5 MB an.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Verarbeitung mit [[after|after()]]</h3><p>Die Antwort geht sofort zurück. Die Arbeit läuft danach weiter, bis zu 300 Sekunden.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Eine echte [[queue|Warteschlange]]. Robuster bei Abstürzen, aber ein weiterer Dienst. Steht unter „Später“.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Abschnitte aus ganzen Sätzen</h3><p>Ein Satz wird nie zerschnitten. Abschnitte enden möglichst an Absätzen.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Feste Stücke aus genau 800 [[token|Tokens]]. Einfacher, schneidet aber mitten im Wort, manchmal sogar mitten in einem Umlaut.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Kein Abschnitt über eine Seitengrenze</h3><p>So stimmt die Seitenzahl immer. Ein Beleg springt später auf die richtige Seite.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Abschnitte über Seiten hinweg. Mehr Zusammenhang, aber die Seitenzahl wäre ungenau.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Adresse beim Verbinden prüfen</h3><p>Die Prüfung sitzt im Verbindungsaufbau ([[undici|undici]]). Geprüft wird genau die Adresse, mit der Faden verbindet.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Erst nachschlagen, dann laden. Das hat eine Lücke: [[rebinding|DNS-Rebinding]].</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Beim Löschen: erst Datei, dann Zeile</h3><p>Scheitert die Datei, bleibt alles, wie es war. Abschnitte verschwinden per [[cascade|cascade]].</p></div><div class="alt"><div class="lbl">Alternative</div><p>Erst die Zeile. Scheitert dann die Datei, bleibt sie für immer liegen, und niemand findet sie mehr.</p></div></div>
+      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Funktionen in Frankfurt</h3><p>Eine Zeile in <code>vercel.json</code>. Server und Datenbank stehen nun in derselben [[region|Region]].</p></div><div class="alt"><div class="lbl">Alternative</div><p>Der Standard: Washington. Jede Datenbank-Anfrage reiste über den Atlantik und zurück.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="risiken">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Was schiefgehen kann</h2></div>
+    <div class="risks" data-rich>
+      <div class="risk"><span class="chip err">Kosten</span><h3>Noch keine Bremse</h3><p>Jeder angemeldete Nutzer kann große Dateien einlesen. Das kostet bei OpenAI Geld. Ein [[ratelimit|Rate Limit]] kommt in Schritt 4.</p></div>
+      <div class="risk"><span class="chip err">Sicherheit</span><h3>Anweisungen im Dokument</h3><p>Eine Quelle kann Text wie „Ignoriere alle Regeln“ enthalten ([[injection|Prompt Injection]]). Ab Schritt 4 gilt Quelltext im Prompt nur als Daten.</p></div>
+      <div class="risk"><span class="chip warn">Betrieb</span><h3>Verarbeitung kann hängen bleiben</h3><p>Bricht Vercel die Funktion ab, bleibt die Quelle auf „In Arbeit“. Nach 10 Minuten kann man sie löschen und neu hochladen.</p></div>
+      <div class="risk"><span class="chip warn">Datenschutz</span><h3>Notebook löschen leert die Ablage nicht</h3><p>[[cascade|cascade]] reicht nur in der Datenbank. Beim Löschen eines Notebooks (Schritt 5) muss Faden den Ordner in Storage selbst leeren.</p></div>
+      <div class="risk"><span class="chip warn">Grenzen</span><h3>Teilweise gescannte PDFs</h3><p>Faden erkennt nur PDFs, die fast ganz ohne Text sind. Einzelne gescannte Seiten fehlen still. [[ocr|OCR]] steht unter „Später“.</p></div>
+      <div class="risk"><span class="chip">Grenzen</span><h3>Webseiten, die JavaScript brauchen</h3><p>Faden führt kein JavaScript aus. Solche Seiten liefern kaum Text und bekommen die Meldung „kein lesbarer Text“.</p></div>
+      <div class="risk"><span class="chip">Qualität</span><h3>PDF-Absätze gehen verloren</h3><p>[[pdfjs|PDF.js]] liefert Zeilen, aber keine Leerzeilen. Bei PDFs greift die Absatzregel darum nicht. Sätze bleiben trotzdem ganz.</p></div>
+      <div class="risk"><span class="chip">Last</span><h3>Ständiges Nachfragen</h3><p>Solange eine Quelle in Arbeit ist, fragt der Browser alle 2 Sekunden. Bei vielen Nutzern wäre [[realtime|Realtime]] sparsamer.</p></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="interview">
+    <div class="sec-head"><span class="sec-num">07</span><h2>Interview-Check</h2></div>
+    <div class="quiz-top">
+      <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+      <span class="score" id="score">0 von 5 gewusst</span>
+      <button class="btn ghost" id="resetQuiz" type="button">Zurücksetzen</button>
+    </div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <footer>
+    <span>Faden · Erklärung zu Schritt 3</span>
+    <span><a href="schritt-2-datenbank.html">← Schritt 2</a> · <a href="index.html">Alle Schritte →</a></span>
+  </footer>
+</div>
+
+<div class="pop" id="pop" role="dialog" aria-live="polite" hidden><b id="popT"></b><p id="popD"></p></div>
+
+<!-- Code samples as plain text: no escaping needed -->
+<script type="text/plain" id="src-chunk">export function chunkPages(pages: PageText[], { maxTokens, overlapTokens } = DEFAULT_CHUNK_OPTIONS): Chunk[] {
+  const chunks: Chunk[] = [];
+
+  for (const { page, text } of pages) {
+    let current: Unit[] = [];
+    let currentTokens = 0;
+    let hasNewText = false;
+
+    const closeChunk = () => {
+      if (!hasNewText) return;
+      const content = joinUnits(current);
+      chunks.push({ content, page, position: chunks.length, tokenCount: countTokens(content) });
+
+      const overlap: Unit[] = [];
+      let overlapSize = 0;
+      for (let i = current.length - 1; i >= 0; i--) {
+        if (overlapSize + current[i].tokens > overlapTokens) break;
+        overlap.unshift(current[i]);
+        overlapSize += current[i].tokens;
+      }
+      current = overlap;
+      currentTokens = overlapSize;
+      hasNewText = false;
+    };
+
+    for (const unit of toUnits(text, maxTokens)) {
+      if (currentTokens + unit.tokens > maxTokens) {
+        closeChunk();
+        if (currentTokens + unit.tokens > maxTokens) {
+          current = [];
+          currentTokens = 0;
+        }
+      }
+      current.push(unit);
+      currentTokens += unit.tokens;
+      hasNewText = true;
+
+      if (unit.endsParagraph && currentTokens >= maxTokens * 0.75) {
+        closeChunk();
+      }
+    }
+    closeChunk();
+  }
+
+  return chunks;
+}</script>
+<script type="text/plain" id="src-process">export async function processSource(sourceId: string): Promise<void> {
+  const supabase = createAdminClient();
+
+  const { data: source } = await supabase
+    .from("sources")
+    .update({ status: "processing", error: null })
+    .eq("id", sourceId)
+    .eq("status", "pending")
+    .select("id, notebook_id, type, storage_path, meta")
+    .maybeSingle();
+  if (!source) return;
+
+  try {
+    const loaded = await loadSource(supabase, source);
+    const chunks = chunkPages(loaded.pages);
+    const { embeddings, tokens } = await embedTexts(chunks.map((c) => c.content));
+
+    const rows = chunks.map((chunk, i) => ({
+      source_id: source.id,
+      notebook_id: source.notebook_id,
+      content: chunk.content,
+      page: chunk.page,
+      position: chunk.position,
+      token_count: chunk.tokenCount,
+      embedding: JSON.stringify(embeddings[i]),
+    }));
+    for (let start = 0; start < rows.length; start += INSERT_BATCH_SIZE) {
+      await supabase.from("chunks").insert(rows.slice(start, start + INSERT_BATCH_SIZE));
+    }
+
+    await supabase
+      .from("sources")
+      .update({ status: "ready", meta: { chunks: chunks.length, embeddingTokens: tokens } })
+      .eq("id", source.id);
+  } catch (error) {
+    await supabase.from("chunks").delete().eq("source_id", source.id);
+    await supabase
+      .from("sources")
+      .update({
+        status: "error",
+        error: error instanceof IngestError ? error.message : "Die Verarbeitung ist fehlgeschlagen. …",
+      })
+      .eq("id", source.id);
+  }
+}</script>
+<script type="text/plain" id="src-upload">export async function createPdfSource(input: unknown): Promise<CreatePdfSourceResult> {
+  const { supabase } = await requireUser();
+
+  const parsed = pdfUploadSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+  const { notebookId, fileName } = parsed.data;
+
+  const sourceId = crypto.randomUUID();
+  const path = `${notebookId}/${sourceId}.pdf`;
+
+  const { error: insertError } = await supabase.from("sources").insert({
+    id: sourceId, notebook_id: notebookId, type: "pdf", title: fileName, storage_path: path,
+  });
+  if (insertError) return { ok: false, error: "Die Quelle konnte nicht angelegt werden." };
+
+  const { data, error } = await supabase.storage.from("sources").createSignedUploadUrl(path);
+  if (error) return { ok: false, error: "Der Upload konnte nicht vorbereitet werden." };
+
+  return { ok: true, sourceId, path: data.path, token: data.token };
+}
+
+export async function startProcessing(sourceId: unknown): Promise<void> {
+  const { supabase } = await requireUser();
+  const parsed = sourceIdSchema.safeParse(sourceId);
+  if (!parsed.success) return;
+
+  const { data: source } = await supabase
+    .from("sources").select("id, status").eq("id", parsed.data).maybeSingle();
+  if (!source || source.status !== "pending") return;
+
+  after(() => processSource(source.id));
+  refresh();
+}</script>
+<script type="text/plain" id="src-ssrf">export function parsePublicUrl(raw: string): URL {
+  const url = new URL(raw);
+  if (url.protocol !== "http:" && url.protocol !== "https:") throw new UrlFetchError("…");
+  if (url.username || url.password) throw new UrlFetchError("…");
+  if (url.port !== "") throw new UrlFetchError("…");
+
+  const host = url.hostname.replace(/^\[|\]$/g, "");
+  if (isIP(host) !== 0 && isBlockedAddress(host)) {
+    throw new UrlFetchError("Diese Adresse ist nicht öffentlich erreichbar.");
+  }
+  return url;
+}
+
+const safeLookup: LookupFunction = (hostname, options, callback) => {
+  lookup(hostname, { ...options, all: true }, (error, addresses) => {
+    if (error) return callback(error, "", 4);
+    if (addresses.length === 0 || addresses.some((a) => isBlockedAddress(a.address))) {
+      return callback(new UrlFetchError("Diese Adresse ist nicht öffentlich erreichbar."), "", 4);
+    }
+    if (options.all) return callback(null, addresses);
+    callback(null, addresses[0].address, addresses[0].family);
+  });
+};
+
+const agent = new Agent({ connect: { lookup: safeLookup } });
+
+// inside fetchPage(), for every hop:
+response = await fetch(url, { dispatcher: agent, redirect: "manual", signal });
+if (response.status >= 300 && response.status < 400 && location) {
+  url = parsePublicUrl(new URL(location, url).href);
+  continue;
+}</script>
+<script type="text/plain" id="src-delete">export async function deleteSource(sourceId: unknown): Promise<DeleteSourceResult> {
+  const { supabase } = await requireUser();
+  const parsed = sourceIdSchema.safeParse(sourceId);
+  if (!parsed.success) return { error: "Diese Quelle wurde nicht gefunden." };
+
+  const { data: source } = await supabase
+    .from("sources")
+    .select("id, status, storage_path, created_at")
+    .eq("id", parsed.data)
+    .maybeSingle();
+  if (!source) return { error: "Diese Quelle wurde nicht gefunden." };
+
+  if (!canDeleteSource(source.status, source.created_at, new Date())) {
+    return { error: "Die Quelle wird gerade verarbeitet. …" };
+  }
+
+  if (source.storage_path) {
+    const { error } = await supabase.storage.from("sources").remove([source.storage_path]);
+    if (error) return { error: "Die Datei konnte nicht gelöscht werden. …" };
+  }
+
+  const { error } = await supabase.from("sources").delete().eq("id", source.id);
+  if (error) return { error: "Die Quelle konnte nicht gelöscht werden. …" };
+
+  refresh();
+  return { error: null };
+}</script>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function store(key, val) {
+    try { if (val === undefined) return localStorage.getItem(key); localStorage.setItem(key, val); } catch (e) { return null; }
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* ---------- Begriffe ---------- */
+  var G = {
+    term: ["So funktioniert es", "Genau so: antippen, lesen, irgendwo anders hintippen. Die Erklärung verschwindet wieder."],
+    chunk: ["Abschnitt (Chunk)", "Ein Stück Text aus einer Quelle, höchstens etwa eine Seite lang. Faden sucht später in Abschnitten statt in ganzen Dokumenten. So findet es genau die passende Stelle."],
+    embedding: ["Embedding", "Eine Liste aus 1.536 Zahlen, die die Bedeutung eines Textes beschreibt. Texte mit ähnlicher Bedeutung bekommen ähnliche Zahlen. So findet Faden passende Stellen, auch wenn andere Wörter darin stehen."],
+    token: ["Token", "Die Einheit, in der KI-Modelle Text lesen. Ein Token ist ein Wort oder ein Wortteil. Ein deutscher Satz mit 15 Wörtern hat etwa 25 Tokens. OpenAI rechnet nach Tokens ab."],
+    overlap: ["Überlappung", "Der neue Abschnitt beginnt mit den letzten Sätzen des vorigen. Steht eine Antwort genau an der Grenze, ist sie so trotzdem in einem Abschnitt vollständig."],
+    storage: ["Storage", "Die Dateiablage von Supabase, ähnlich wie ein Online-Laufwerk. Dort liegen die PDFs und die Texte der Quellen."],
+    openai: ["OpenAI", "Die Firma hinter ChatGPT. Faden schickt ihr die Abschnitte und bekommt die Embeddings zurück. Dafür braucht der Server einen geheimen Schlüssel."],
+    status: ["Status", "Steht in der Datenbank bei jeder Quelle: wartet, in Arbeit, bereit oder Fehler. Die Seite liest ihn immer wieder neu und zeigt ihn an."],
+    signed: ["Signierte Upload-URL", "Eine Webadresse mit eingebautem Einmal-Schlüssel. Wer sie hat, darf genau eine Datei an genau einen Ort hochladen. Sie gilt zwei Stunden."],
+    action: ["Server Action", "Eine Funktion auf dem Server, die die Seite wie eine normale Funktion aufruft. Technisch ist es eine öffentliche Adresse. Darum prüft jede Action Login und Eingaben selbst."],
+    after: ["after()", "Eine Funktion von Next.js. Code darin läuft erst, nachdem die Antwort an den Browser gegangen ist. So wartet niemand auf die lange Verarbeitung."],
+    queue: ["Warteschlange", "Ein eigener Dienst, der Aufgaben sammelt und nacheinander abarbeitet. Stürzt etwas ab, versucht er es noch einmal."],
+    zod: ["Zod", "Eine Bibliothek, die Daten prüft. Zum Beispiel: „Ist das wirklich eine PDF unter 20 MB?“ Alles, was von außen kommt, geht zuerst durch Zod."],
+    rls: ["Zeilen-Regel (RLS)", "Die Datenbank prüft für jede Zeile, ob die fragende Person sie sehen oder ändern darf. Seit Schritt 2 aktiv."],
+    secret: ["Geheimer Schlüssel (Secret Key)", "Ein Schlüssel mit allen Rechten. Er umgeht die Zeilen-Regeln. Darum nutzt Faden ihn nur auf dem Server und erst, nachdem die Rechte geprüft sind."],
+    http404: ["404", "Der Code für „nicht gefunden“. Faden zeigt ihn auch bei fremden Notebooks. So verrät es nicht, dass es sie gibt."],
+    polling: ["Polling", "Immer wieder nachfragen: „Ist es schon fertig?“ Bei uns alle 2 Sekunden, solange eine Quelle in Arbeit ist."],
+    realtime: ["Realtime", "Die Datenbank meldet sich selbst, wenn sich etwas ändert. Der Browser muss dann nicht ständig nachfragen."],
+    scan: ["Gescannte PDF", "Eine PDF, die nur aus Bildern besteht, etwa ein eingescannter Brief. Darin steckt kein lesbarer Text, nur Pixel."],
+    ocr: ["OCR", "Texterkennung: Ein Programm liest Buchstaben aus einem Bild. Damit könnte Faden später auch gescannte PDFs lesen."],
+    pdfjs: ["unpdf / PDF.js", "PDF.js ist der PDF-Leser von Firefox. unpdf ist eine Ausgabe davon, die auch auf Servern wie Vercel läuft. Faden holt damit den Text jeder Seite."],
+    batch: ["Paket (Batch)", "Mehrere Aufgaben auf einmal schicken statt einzeln. Faden schickt 100 Abschnitte pro Anfrage an OpenAI."],
+    ssrf: ["SSRF", "Server-Side Request Forgery. Ein Angreifer bringt unseren Server dazu, eine interne Adresse aufzurufen, die von außen gesperrt ist. Zum Beispiel den Dienst, der in der Cloud geheime Zugangsdaten verrät."],
+    dns: ["DNS", "Das Telefonbuch des Internets. Es übersetzt einen Namen wie wikipedia.org in eine IP-Adresse, also die Nummer des Rechners."],
+    ip: ["IP-Adresse", "Die Nummer eines Rechners im Netz, etwa 185.15.59.224. Manche Nummern sind nur intern erreichbar, zum Beispiel 127.0.0.1 (der eigene Rechner)."],
+    rebinding: ["DNS-Rebinding", "Ein Trick: Ein Name zeigt beim ersten Nachschlagen auf eine harmlose Adresse und beim zweiten auf eine interne. Wer nur beim ersten Mal prüft, wird getäuscht."],
+    undici: ["undici", "Der Baustein, mit dem Node.js Webseiten lädt. Man kann ihm eine eigene Prüfung für das Nachschlagen im DNS mitgeben."],
+    redirect: ["Weiterleitung", "Eine Seite sagt: „Ich bin umgezogen, frag dort.“ Faden folgt dem selbst und prüft jedes neue Ziel."],
+    readability: ["Readability", "Der Lesemodus von Firefox als Bibliothek. Er findet in einer Webseite den eigentlichen Artikel und lässt Menü, Werbung und Fußzeile weg."],
+    cascade: ["on delete cascade", "Wird etwas gelöscht, löscht die Datenbank alles mit, was daran hängt. Löscht man eine Quelle, verschwinden auch ihre Abschnitte."],
+    vercel: ["Vercel", "Der Dienst, auf dem Faden im Internet läuft. Unser Server-Code läuft dort in kleinen Funktionen."],
+    region: ["Region", "Der Ort des Rechenzentrums. Steht der Server weit weg von der Datenbank, dauert jede Anfrage länger."],
+    ratelimit: ["Rate Limit", "Eine Bremse: Jeder Nutzer darf nur eine bestimmte Zahl an Anfragen pro Minute stellen."],
+    injection: ["Prompt Injection", "Text in einem Dokument, der wie eine Anweisung an die KI aussieht. Ein Beispiel: „Ignoriere alle Regeln.“ Die KI darf so etwas nicht befolgen."],
+    maxduration: ["maxDuration", "Wie lange eine Funktion auf Vercel höchstens laufen darf. Bei uns 300 Sekunden. Danach bricht Vercel sie ab."],
+    claim: ["Beanspruchen", "Den Status in einem einzigen Befehl von „wartet“ auf „in Arbeit“ setzen. Kommen zwei Aufrufe gleichzeitig, gewinnt nur einer."]
+  };
+  function rich(s) {
+    return esc(s).replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) {
+      return G[k] ? '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>' : t;
+    });
+  }
+  document.querySelectorAll("[data-rich]").forEach(function (el) {
+    el.innerHTML = el.innerHTML.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) {
+      return G[k] ? '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>' : t;
+    });
+  });
+  var pop = document.getElementById("pop"), openTerm = null;
+  function closePop() { if (openTerm) openTerm.setAttribute("aria-expanded", "false"); openTerm = null; pop.hidden = true; }
+  function openPop(btn) {
+    var g = G[btn.getAttribute("data-t")]; if (!g) return;
+    if (openTerm === btn) { closePop(); return; }
+    closePop();
+    document.getElementById("popT").textContent = g[0];
+    document.getElementById("popD").textContent = g[1];
+    pop.hidden = false; openTerm = btn; btn.setAttribute("aria-expanded", "true");
+    place();
+  }
+  function place() {
+    if (!openTerm) return;
+    var r = openTerm.getClientRects()[0] || openTerm.getBoundingClientRect();
+    var pw = pop.offsetWidth, ph = pop.offsetHeight, vw = document.documentElement.clientWidth;
+    if (r.bottom < 0 || r.top > window.innerHeight) { closePop(); return; }
+    var left = Math.min(Math.max(12, r.left + r.width / 2 - pw / 2), vw - pw - 12);
+    var top = r.bottom + 8; if (top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 8);
+    pop.style.left = left + "px"; pop.style.top = top + "px";
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest(".term");
+    if (t) { e.preventDefault(); e.stopPropagation(); openPop(t); return; }
+    if (!e.target.closest(".pop")) closePop();
+  }, true);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closePop(); return; }
+    var t = e.target.closest && e.target.closest(".term");
+    if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); openPop(t); }
+  }, true);
+  window.addEventListener("scroll", place, { passive: true });
+  window.addEventListener("resize", place);
+
+  /* ---------- Theme ---------- */
+  var root = document.documentElement, themeBtn = document.getElementById("themeBtn");
+  var sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var moon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
+  function isDark() { var t = root.getAttribute("data-theme"); return t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches; }
+  function paintThemeBtn() { themeBtn.innerHTML = isDark() ? sun : moon; }
+  var saved = store("faden-doc-theme"); if (saved) root.setAttribute("data-theme", saved);
+  paintThemeBtn();
+  themeBtn.addEventListener("click", function () { var next = isDark() ? "light" : "dark"; root.setAttribute("data-theme", next); store("faden-doc-theme", next); paintThemeBtn(); });
+
+  /* ---------- Diagram ---------- */
+  var steps = [
+    { id: "n1", tag: "1 · Browser", title: "Jemand wählt eine PDF aus", text: "Im Notebook klickt man auf „PDF hochladen“ und wählt eine Datei. Die Datei bleibt erst einmal im Browser." },
+    { id: "e1", tag: "2 · Name, Größe", title: "Der Browser meldet die Datei an", text: "Er ruft die [[action|Server Action]] createPdfSource auf. Er schickt nur Name, Größe und Dateityp, noch nicht die Datei selbst." },
+    { id: "n2", tag: "3 · Server", title: "Der Server prüft alles", text: "Ist jemand angemeldet? Ist es eine PDF unter 20 MB? Das prüft [[zod|Zod]]. Dann denkt sich der Server eine neue ID aus und baut daraus den Speicherort: Notebook-ID/Quellen-ID.pdf." },
+    { id: "e2", tag: "4 · Zeile: wartet", title: "Die Quelle steht in der Datenbank", text: "Der Server legt eine Zeile in „sources“ an, mit dem Status „wartet“. Die [[rls|Zeilen-Regel]] erlaubt das nur im eigenen Notebook." },
+    { id: "e3", tag: "5 · Upload-URL", title: "Der Browser bekommt einen Einmal-Schlüssel", text: "Supabase erzeugt eine [[signed|signierte Upload-URL]]. Sie erlaubt genau diese eine Datei an genau diesem Ort, für zwei Stunden." },
+    { id: "e4", tag: "6 · PDF direkt", title: "Die Datei geht direkt in die Ablage", text: "Der Browser lädt die PDF direkt in [[storage|Storage]], nicht über unseren Server. Grund: [[vercel|Vercel]] nimmt pro Anfrage nur etwa 4,5 MB an. Die Ablage erlaubt bis 20 MB." },
+    { id: "e6", tag: "7 · after()", title: "Die Arbeit startet im Hintergrund", text: "Der Browser ruft startProcessing auf. Der Server prüft noch einmal die Rechte und startet die Verarbeitung mit [[after|after()]]. Die Antwort geht sofort zurück, die Arbeit läuft weiter." },
+    { id: "e7", tag: "8 · Datei holen", title: "Die Verarbeitung holt die Datei", text: "Zuerst setzt sie den Status von „wartet“ auf „in Arbeit“ ([[claim|beanspruchen]]). Dann lädt sie die PDF und liest mit [[pdfjs|unpdf]] den Text jeder Seite. Fast kein Text? Dann ist es ein [[scan|Scan]], und die Quelle bekommt „Fehler“." },
+    { id: "n5", tag: "9 · Abschnitte", title: "Der Text wird in Abschnitte geteilt", text: "Ganze Sätze, höchstens 800 [[token|Tokens]] pro Abschnitt, 120 Tokens [[overlap|Überlappung]]. Kein Abschnitt geht über eine Seitengrenze. Die Demo unten zeigt das live." },
+    { id: "e9", tag: "10 · Abschnitte", title: "OpenAI berechnet die Embeddings", text: "Die Abschnitte gehen in [[batch|Paketen]] zu 100 an [[openai|OpenAI]]. Zurück kommt pro Abschnitt ein [[embedding|Embedding]] mit 1.536 Zahlen." },
+    { id: "e10", tag: "11 · speichern", title: "Alles landet in der Datenbank", text: "Abschnitte, Seitenzahl und Embeddings kommen in „chunks“. Dann wird der Status „bereit“. Geht etwas schief, löscht Faden alle schon gespeicherten Abschnitte wieder und setzt „Fehler“." },
+    { id: "e11", tag: "12 · Status?", title: "Die Seite zeigt den Fortschritt", text: "Solange eine Quelle in Arbeit ist, fragt die Seite alle 2 Sekunden nach ([[polling|Polling]]). Bei „bereit“ hört sie auf." }
+  ];
+  var extras = {
+    n3: { tag: "Storage", title: "Die Dateiablage", text: "Jede Quelle hat hier eine Datei: die PDF, der eingefügte Text oder der Text der Webseite. So kann die Beleg-Ansicht später zeigen, was Faden wirklich gelesen hat." },
+    n4: { tag: "Postgres", title: "Die Datenbank", text: "Hier stehen die Quellen mit Status und die Abschnitte mit ihren Embeddings. Beim Löschen einer Quelle verschwinden ihre Abschnitte per [[cascade|cascade]]." },
+    n6: { tag: "OpenAI", title: "Der Dienst für Embeddings", text: "Modell: text-embedding-3-small. Die Leipzig-Seite mit 120 Abschnitten kostete etwa 0,2 Cent." },
+    n7: { tag: "Webseite", title: "Nur bei einer URL-Quelle", text: "Statt eine Datei zu holen, lädt die Verarbeitung die Webseite aus dem Internet. [[readability|Readability]] holt den Haupttext heraus. Der Text wird als Datei in Storage gespeichert." },
+    e8: { tag: "sicher laden", title: "Schutz vor SSRF", text: "Faden lädt nur öffentliche Adressen. Interne Adressen wie localhost oder 169.254.169.254 sind gesperrt, auch nach einer [[redirect|Weiterleitung]]. Probier es unten in der Demo „Adresse prüfen“." }
+  };
+  var diagram = document.getElementById("diagram"), detail = document.getElementById("detail"), dots = document.getElementById("dots");
+  var current = -1, timer = null, playBtn = document.getElementById("playBtn");
+  steps.forEach(function (s, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.setAttribute("aria-label", "Schritt " + (i + 1) + ": " + s.title);
+    b.addEventListener("click", function () { stop(); show(i); });
+    dots.appendChild(b);
+  });
+  function highlight(id) {
+    diagram.querySelectorAll(".is-active").forEach(function (el) { el.classList.remove("is-active"); });
+    var el = diagram.querySelector('[data-id="' + id + '"]'); if (el) el.classList.add("is-active");
+  }
+  function renderDetail(d) {
+    detail.innerHTML = '<span class="badge">' + esc(d.tag) + '</span><div><h3>' + esc(d.title) + '</h3><p>' + rich(d.text) + '</p></div>';
+    detail.classList.remove("swap"); void detail.offsetWidth; detail.classList.add("swap");
+  }
+  function show(i) {
+    current = (i + steps.length) % steps.length;
+    highlight(steps[current].id); renderDetail(steps[current]);
+    Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle("on", k === current); d.setAttribute("aria-current", k === current ? "step" : "false"); });
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } playBtn.querySelector("span").textContent = "Abspielen"; }
+  function play() {
+    if (timer) { stop(); return; }
+    playBtn.querySelector("span").textContent = "Pause";
+    if (current >= steps.length - 1) current = -1;
+    show(current + 1);
+    timer = setInterval(function () { if (current >= steps.length - 1) { stop(); return; } show(current + 1); }, reduce ? 3600 : 2800);
+  }
+  playBtn.addEventListener("click", play);
+  document.getElementById("prevBtn").addEventListener("click", function () { stop(); show(current <= 0 ? steps.length - 1 : current - 1); });
+  document.getElementById("nextBtn").addEventListener("click", function () { stop(); show(current + 1); });
+  function pick(id) {
+    stop();
+    var idx = steps.findIndex(function (s) { return s.id === id; });
+    if (idx >= 0) { show(idx); return; }
+    current = -1; highlight(id); renderDetail(extras[id]);
+    Array.prototype.forEach.call(dots.children, function (d) { d.classList.remove("on"); });
+  }
+  diagram.querySelectorAll(".node, .edge").forEach(function (el) {
+    el.addEventListener("click", function () { pick(el.getAttribute("data-id")); });
+    el.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(el.getAttribute("data-id")); } });
+  });
+  show(0);
+
+  /* ---------- File filter ---------- */
+  document.querySelectorAll(".filter button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".filter button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      var f = b.getAttribute("data-f");
+      document.querySelectorAll("#fileRows tr").forEach(function (tr) { tr.classList.toggle("hidden", f !== "all" && tr.getAttribute("data-k") !== f); });
+    });
+  });
+
+  /* ---------- Code ---------- */
+  function src(id) { return document.getElementById(id).textContent; }
+  // Notes point to a line by its text: "m" is a piece of the line,
+  // "=" at the start means the whole line must match exactly.
+  var snippets = [
+    { file: "chunk.ts", why: "Teilt Seiten in Abschnitte mit Überlappung", code: src("src-chunk"), notes: [
+      { m: "for (const { page, text } of pages)", t: "Jede Seite wird für sich geteilt. Darum geht kein Abschnitt über eine Seitengrenze, und die Seitenzahl stimmt immer." },
+      { m: "let hasNewText", t: "Merkt sich, ob der Abschnitt mehr enthält als nur die Überlappung. Einen Abschnitt nur aus Wiederholung speichert Faden nie." },
+      { m: "chunks.push(", t: "Ein fertiger Abschnitt: Text, Seite, Position und die echte Zahl der [[token|Tokens]]." },
+      { m: "for (let i = current.length - 1", t: "Die [[overlap|Überlappung]]: Von hinten nimmt die Schleife ganze Sätze, solange sie in 120 Tokens passen." },
+      { m: "current = overlap;", t: "Der nächste Abschnitt beginnt mit genau diesen Sätzen." },
+      { m: "for (const unit of toUnits", t: "toUnits teilt den Text in Sätze. Ein Satz ist die kleinste Einheit. Faden zerschneidet ihn nie, außer er ist allein länger als ein ganzer Abschnitt." },
+      { m: "if (currentTokens + unit.tokens > maxTokens) {", t: "Passt der nächste Satz nicht mehr hinein? Dann ist der Abschnitt voll und wird abgeschlossen." },
+      { m: "current = [];", t: "Überlappung und nächster Satz sind zusammen zu groß. Dann fällt die Überlappung weg. So bleibt jeder Abschnitt unter 800 Tokens." },
+      { m: "unit.endsParagraph &&", t: "Die Absatzregel: Ist der Abschnitt schon zu 75 % voll und endet ein Absatz, endet auch der Abschnitt." },
+      { m: "=    closeChunk();", t: "Am Ende der Seite: den letzten, oft kürzeren Abschnitt abschließen." }
+    ] },
+    { file: "process.ts", why: "Die ganze Verarbeitung, ganz oder gar nicht", code: src("src-process"), notes: [
+      { m: "createAdminClient()", t: "Der Client mit dem [[secret|geheimen Schlüssel]]. Die Rechte hat startProcessing vorher mit dem Nutzer-Client geprüft. Grund: Die Arbeit läuft nach der Antwort weiter, und der Login des Nutzers kann ablaufen." },
+      { m: ".eq(\"status\", \"pending\")", t: "[[claim|Beanspruchen]]: Nur eine Quelle mit „wartet“ wird zu „in Arbeit“. Kommt ein zweiter Aufruf (Doppelklick), findet er keine solche Zeile mehr." },
+      { m: "if (!source) return;", t: "Nichts beansprucht: Jemand anderes arbeitet schon daran. Dann ist hier nichts zu tun." },
+      { m: "loadSource(", t: "Je nach Typ: PDF lesen, Text laden oder Webseite sicher abrufen. Am Ende gibt es immer Seiten mit Text." },
+      { m: "embedTexts(", t: "Holt die [[embedding|Embeddings]] bei OpenAI, in [[batch|Paketen]] zu 100 Abschnitten." },
+      { m: "JSON.stringify(embeddings[i])", t: "Die Datenbank-Erweiterung pgvector liest einen Vektor als Text: „[0.1,0.2,…]“." },
+      { m: "status: \"ready\"", t: "Erst ganz am Ende wird die Quelle „bereit“. Vorher erscheint sie im Chat nie." },
+      { m: ".delete().eq(\"source_id\"", t: "Ganz oder gar nicht: Bei einem Fehler löscht Faden alle Abschnitte, die schon gespeichert waren." },
+      { m: "instanceof IngestError", t: "Nur Fehler, die wir selbst formuliert haben, sieht der Nutzer, etwa „Diese PDF ist gescannt“. Alle anderen bekommen eine allgemeine Meldung. Details landen nur im Server-Log." }
+    ] },
+    { file: "actions.ts", why: "PDF anmelden und Verarbeitung starten", code: src("src-upload"), notes: [
+      { m: "input: unknown", t: "Absichtlich „unknown“: Jeder kann eine [[action|Server Action]] mit beliebigen Daten aufrufen. Erst [[zod|Zod]] entscheidet, was gültig ist." },
+      { m: "requireUser()", t: "Ist jemand angemeldet? Sonst geht es zur Login-Seite." },
+      { m: "pdfUploadSchema.safeParse", t: "Prüft Notebook-ID, Dateiname, Größe (höchstens 20 MB) und Typ (nur PDF)." },
+      { m: "crypto.randomUUID()", t: "Der Server wählt die ID selbst. So steht der Speicherort fest, bevor die Datei kommt. Den Pfad übernimmt er nie vom Browser." },
+      { m: ".insert({", t: "Die neue Quelle mit Status „wartet“. Die [[rls|Zeilen-Regel]] lässt das nur im eigenen Notebook zu." },
+      { m: "createSignedUploadUrl", t: "Die [[signed|Upload-URL]] mit Einmal-Schlüssel. Auch hier prüft eine Regel, ob der Ordner zum eigenen Notebook gehört." },
+      { m: "startProcessing(", t: "Wird nach dem Upload aufgerufen." },
+      { m: "source.status !== \"pending\"", t: "Nur eine eigene Quelle mit „wartet“ wird gestartet. Die Regel in der Datenbank findet fremde Quellen gar nicht." },
+      { m: "after(", t: "[[after|after()]]: Die Antwort geht sofort raus. Die Verarbeitung läuft danach weiter, höchstens [[maxduration|300 Sekunden]]." },
+      { m: "refresh()", t: "Neu in Next.js 16: Die Seite wird neu gebaut und zeigt gleich „wartet“ oder „in Arbeit“." }
+    ] },
+    { file: "fetch-url.ts", why: "Webseiten laden, ohne ins interne Netz zu greifen", code: src("src-ssrf"), notes: [
+      { m: "url.protocol !== \"http:\"", t: "Schicht 1: Nur http und https. Adressen wie file:// oder ftp:// sind gesperrt." },
+      { m: "url.username", t: "Keine Zugangsdaten in der Adresse, etwa https://name:passwort@…" },
+      { m: "url.port !== \"\"", t: "Nur die normalen Ports. Interne Dienste laufen oft auf Ports wie 5432 oder 8080." },
+      { m: "isIP(host) !== 0", t: "Steht eine [[ip|IP-Adresse]] direkt in der URL, fragt Node das [[dns|DNS]] gar nicht. Darum prüft Faden sie hier schon." },
+      { m: "const safeLookup", t: "Schicht 2: eine eigene Funktion zum Nachschlagen im [[dns|DNS]]. Sie läuft beim Verbinden selbst." },
+      { m: "addresses.some(", t: "Ist auch nur eine Antwort intern (127.x, 10.x, 192.168.x, 169.254.x …)? Dann gibt es keine Verbindung. Geprüft wird genau die Adresse, die benutzt wird. Das schützt vor [[rebinding|DNS-Rebinding]]." },
+      { m: "new Agent(", t: "[[undici|undici]] bekommt die Prüfung mit. Jede Verbindung geht durch safeLookup." },
+      { m: "redirect: \"manual\"", t: "Schicht 3: Weiterleitungen folgt Faden selbst." },
+      { m: "parsePublicUrl(new URL(location", t: "Jedes neue Ziel einer [[redirect|Weiterleitung]] muss wieder durch Schicht 1 und 2. Eine harmlose Seite kann also nicht auf 169.254.169.254 umleiten." }
+    ] },
+    { file: "deleteSource", why: "Quelle löschen: Datei, Zeile, Abschnitte", code: src("src-delete"), notes: [
+      { m: ".maybeSingle();", t: "Die [[rls|Zeilen-Regel]] findet nur eigene Quellen. Fremde und unbekannte sehen gleich aus: „nicht gefunden“." },
+      { m: "canDeleteSource", t: "Nicht löschen, solange die Verarbeitung noch laufen kann. Sie würde sonst danach vielleicht noch eine Datei speichern. Hängt sie länger als 10 Minuten, ist Löschen erlaubt." },
+      { m: ".remove([", t: "Zuerst die Datei. Scheitert das, bleibt alles, wie es war. Eine Datei, die es nicht gibt, zu löschen, ist kein Fehler. Ein zweiter Versuch klappt also immer." },
+      { m: "from(\"sources\").delete()", t: "Dann die Zeile. Die Abschnitte mit ihren Embeddings verschwinden per [[cascade|on delete cascade]] von selbst." }
+    ] }
+  ];
+  var KW_TS = /^(import|from|export|default|const|let|function|async|await|return|type|true|false|for|of|if|else|try|catch|throw|new|break|continue|instanceof|null|unknown)$/;
+  function hlLine(line) {
+    var out = "", last = 0, m;
+    var re = /(\/\/.*$)|("(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(\s*:)?/g;
+    while ((m = re.exec(line))) {
+      out += esc(line.slice(last, m.index));
+      if (m[1]) out += '<span class="tok-com">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="tok-str">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="tok-num">' + m[3] + '</span>';
+      else if (m[4]) {
+        if (KW_TS.test(m[4])) out += '<span class="tok-kw">' + m[4] + '</span>' + esc(m[5] || "");
+        else if (m[5]) out += '<span class="tok-key">' + m[4] + '</span>' + esc(m[5]);
+        else out += esc(m[4]);
+      }
+      last = re.lastIndex;
+    }
+    return out + esc(line.slice(last));
+  }
+  // Turn the list of notes into { lineNumber: text }.
+  snippets.forEach(function (s) {
+    var lines = s.code.split("\n"), byLine = {};
+    s.notes.forEach(function (n) {
+      for (var i = 0; i < lines.length; i++) {
+        var hit = n.m.charAt(0) === "=" ? lines[i] === n.m.slice(1) : lines[i].indexOf(n.m) >= 0;
+        if (hit && !byLine[i + 1]) { byLine[i + 1] = n.t; break; }
+      }
+    });
+    s.lineNotes = byLine;
+  });
+  var tabs = document.getElementById("codeTabs"), pre = document.getElementById("codePre"), note = document.getElementById("codeNote");
+  var active = 0;
+  function defaultNote() { note.innerHTML = '<span class="muted">Klick auf eine Zeile mit Punkt.</span>'; }
+  function renderCode(i) {
+    active = i; var s = snippets[i];
+    Array.prototype.forEach.call(tabs.children, function (t, k) { t.setAttribute("aria-selected", String(k === i)); });
+    document.getElementById("codeFile").textContent = s.file;
+    document.getElementById("codeWhy").textContent = s.why;
+    pre.innerHTML = s.code.split("\n").map(function (l, k) {
+      var n = k + 1, has = s.lineNotes[n] ? " has-note" : "";
+      return '<div class="ln' + has + '" data-n="' + n + '"' + (has ? ' role="button" tabindex="0"' : "") + '><span class="n">' + n + '</span><span class="t">' + (hlLine(l) || " ") + '</span></div>';
+    }).join("");
+    defaultNote();
+  }
+  function selectLine(el) {
+    pre.querySelectorAll(".sel").forEach(function (x) { x.classList.remove("sel"); });
+    el.classList.add("sel"); var n = el.getAttribute("data-n");
+    note.innerHTML = '<b>Zeile ' + n + '</b> · ' + rich(snippets[active].lineNotes[n]);
+  }
+  pre.addEventListener("click", function (e) { var el = e.target.closest(".ln.has-note"); if (el) selectLine(el); });
+  pre.addEventListener("keydown", function (e) { var el = e.target.closest(".ln.has-note"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectLine(el); } });
+  snippets.forEach(function (s, i) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = s.file;
+    b.addEventListener("click", function () { renderCode(i); }); tabs.appendChild(b);
+  });
+  renderCode(0);
+  var copyBtn = document.getElementById("copyBtn");
+  copyBtn.addEventListener("click", function () {
+    var text = snippets[active].code, label = copyBtn.querySelector("span");
+    function done() { label.textContent = "Kopiert"; setTimeout(function () { label.textContent = "Kopieren"; }, 1400); }
+    function fallback() { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+  });
+
+  /* ---------- Demo tabs ---------- */
+  var demoTabs = document.getElementById("demoTabs");
+  demoTabs.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-pane]"); if (!b) return;
+    Array.prototype.forEach.call(demoTabs.children, function (x) {
+      var on = x === b; x.setAttribute("aria-pressed", String(on));
+      document.getElementById(x.getAttribute("data-pane")).hidden = !on;
+    });
+  });
+
+  /* ---------- Demo 1: chunks (same rules as src/lib/ingest/chunk.ts) ---------- */
+  var sampleText = "Das Faden-Haus ist ein Coworking-Space in Leipzig. Es hat 48 feste Plätze. Dazu kommen 30 flexible Plätze. Die Hausordnung gilt für alle.\n\n" +
+    "Das Haus öffnet werktags um 7:30 Uhr. Es schließt um 20:00 Uhr. Feste Mitglieder kommen immer hinein, z. B. auch am Sonntag. Der Empfang ist von 9 bis 17 Uhr da.\n\n" +
+    "Gäste melden sich am Empfang an. Fünf Gästetage im Monat sind frei. Jeder weitere Tag kostet 15 Euro. Die Kündigungsfrist beträgt drei Monate.";
+  var chunkText = document.getElementById("chunkText"), maxRange = document.getElementById("maxRange"), ovRange = document.getElementById("ovRange");
+  chunkText.value = sampleText;
+  var segmenter = window.Intl && Intl.Segmenter ? new Intl.Segmenter("de", { granularity: "sentence" }) : null;
+  var ABBR = /(?:^|\s)[A-Za-zÄÖÜäöüß]{1,3}\.$/;
+  function estTokens(s) { return Math.max(1, Math.round(s.length / 3.6)); }
+  function normalize(t) {
+    return t.replace(/\r\n?/g, "\n").replace(/[ \t]+/g, " ").replace(/ *\n */g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  }
+  function splitSentences(p) {
+    var parts = segmenter ? Array.from(segmenter.segment(p), function (x) { return x.segment; }) : p.split(/(?<=[.!?])\s+/);
+    var out = [], pending = "";
+    parts.forEach(function (seg) {
+      pending += (segmenter ? "" : " ") + seg;
+      if (!ABBR.test(pending.trim())) { out.push(pending.trim()); pending = ""; }
+    });
+    if (pending.trim()) out.push(pending.trim());
+    return out.filter(Boolean);
+  }
+  function toUnits(text, max) {
+    var units = [];
+    normalize(text).split("\n\n").forEach(function (para) {
+      splitSentences(para.replace(/\n/g, " ")).forEach(function (s) {
+        var tk = estTokens(s);
+        if (tk <= max) { units.push({ text: s, tokens: tk, endsParagraph: false }); return; }
+        var words = [], size = 0;
+        s.split(" ").forEach(function (w) {
+          var wt = estTokens(" " + w);
+          if (size + wt > max && words.length) { units.push({ text: words.join(" "), tokens: size, endsParagraph: false }); words = []; size = 0; }
+          words.push(w); size += wt;
+        });
+        if (words.length) units.push({ text: words.join(" "), tokens: size, endsParagraph: false });
+      });
+      if (units.length) units[units.length - 1].endsParagraph = true;
+    });
+    return units;
+  }
+  function chunkDemo(text, max, overlapMax) {
+    var chunks = [], current = [], size = 0, hasNew = false, carried = 0;
+    function close() {
+      if (!hasNew) return;
+      chunks.push({ units: current.slice(), carried: carried, tokens: size });
+      var ov = [], ovSize = 0;
+      for (var i = current.length - 1; i >= 0; i--) {
+        if (ovSize + current[i].tokens > overlapMax) break;
+        ov.unshift(current[i]); ovSize += current[i].tokens;
+      }
+      current = ov; size = ovSize; carried = ov.length; hasNew = false;
+    }
+    toUnits(text, max).forEach(function (u) {
+      if (size + u.tokens > max) {
+        close();
+        if (size + u.tokens > max) { current = []; size = 0; carried = 0; }
+      }
+      current.push(u); size += u.tokens; hasNew = true;
+      if (u.endsParagraph && size >= max * 0.75) close();
+    });
+    close();
+    return chunks;
+  }
+  function renderChunks() {
+    var max = Number(maxRange.value), ovPct = Number(ovRange.value), ovMax = Math.round(max * ovPct / 100);
+    document.getElementById("maxVal").textContent = max + " Tokens";
+    document.getElementById("ovVal").textContent = ovPct + " % (" + ovMax + " Tokens)";
+    var chunks = chunkDemo(chunkText.value, max, ovMax);
+    var sum = document.getElementById("chunkSum"), list = document.getElementById("chunkList");
+    if (!chunks.length) { sum.textContent = "Kein Text, also keine Abschnitte."; list.innerHTML = ""; return; }
+    var withOverlap = chunks.filter(function (c) { return c.carried > 0; }).length;
+    sum.innerHTML = "<b>" + chunks.length + (chunks.length === 1 ? " Abschnitt" : " Abschnitte") + "</b> · " + withOverlap + " davon beginnen mit Überlappung";
+    list.innerHTML = chunks.map(function (c, i) {
+      var body = c.units.map(function (u, k) {
+        var t = esc(u.text);
+        if (k < c.carried) t = "<mark>" + t + "</mark>";
+        var sep = k === c.units.length - 1 ? "" : (u.endsParagraph ? ' <span class="para" aria-label="neuer Absatz">¶</span> ' : " ");
+        return t + sep;
+      }).join("");
+      var pct = Math.min(100, Math.round(c.tokens / max * 100));
+      return '<div class="chunk"><div class="ch"><span>Abschnitt ' + (i + 1) + '</span><span class="meter"><span style="width:' + pct + '%"></span></span><span>≈ ' + c.tokens + ' / ' + max + '</span></div><p>' + body + '</p></div>';
+    }).join("");
+  }
+  [chunkText, maxRange, ovRange].forEach(function (el) { el.addEventListener("input", renderChunks); });
+  renderChunks();
+
+  /* ---------- Demo 2: URL check (same rules as src/lib/ingest/fetch-url.ts) ---------- */
+  var V4_BLOCKED = [["0.0.0.0", 8], ["10.0.0.0", 8], ["100.64.0.0", 10], ["127.0.0.0", 8], ["169.254.0.0", 16], ["172.16.0.0", 12], ["192.0.0.0", 24], ["192.0.2.0", 24], ["192.168.0.0", 16], ["198.18.0.0", 15], ["198.51.100.0", 24], ["203.0.113.0", 24], ["224.0.0.0", 4], ["240.0.0.0", 4]];
+  function v4num(ip) { var p = ip.split("."); if (p.length !== 4 || p.some(function (x) { return !/^\d{1,3}$/.test(x) || +x > 255; })) return null; return ((+p[0] << 24) >>> 0) + (+p[1] << 16) + (+p[2] << 8) + (+p[3]); }
+  function isIPv6(s) { return s.indexOf(":") >= 0 && /^[0-9a-f:.]+$/i.test(s); }
+  function blocked(ip) {
+    var mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/i.exec(ip); if (mapped) ip = mapped[1];
+    var n = v4num(ip);
+    if (n !== null) return V4_BLOCKED.some(function (r) { var base = v4num(r[0]), mask = r[1] === 0 ? 0 : (~0 << (32 - r[1])) >>> 0; return ((n & mask) >>> 0) === ((base & mask) >>> 0); });
+    if (isIPv6(ip)) { var l = ip.toLowerCase(); return l === "::" || l === "::1" || /^f[cd]/.test(l) || /^fe[89ab]/.test(l) || /^ff/.test(l) || /^2001:db8:/.test(l); }
+    return true;
+  }
+  // Pretend DNS. "rebind.example" answers differently the second time.
+  var DNS = {
+    "de.wikipedia.org": [["185.15.59.224"], ["185.15.59.224"]],
+    "example.com": [["93.184.215.14"], ["93.184.215.14"]],
+    "localhost": [["127.0.0.1"], ["127.0.0.1"]],
+    "intern.firma.example": [["10.0.0.5"], ["10.0.0.5"]],
+    "rebind.example": [["93.184.215.14"], ["127.0.0.1"]],
+    "kurz.example": [["93.184.215.20"], ["93.184.215.20"]]
+  };
+  var REDIRECTS = {
+    "http://de.wikipedia.org/wiki/Leipzig": "https://de.wikipedia.org/wiki/Leipzig",
+    "https://kurz.example/x": "http://169.254.169.254/latest/meta-data/"
+  };
+  var presets = [
+    "https://de.wikipedia.org/wiki/Leipzig", "http://de.wikipedia.org/wiki/Leipzig", "http://localhost", "http://127.0.0.1",
+    "http://169.254.169.254/latest/meta-data/", "https://intern.firma.example", "https://rebind.example", "https://kurz.example/x",
+    "ftp://example.com/datei", "http://example.com:8080", "https://name:passwort@example.com"
+  ];
+  var urlInput = document.getElementById("urlInput"), urlPresets = document.getElementById("urlPresets"), urlResult = document.getElementById("urlResult");
+  presets.forEach(function (p) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = p;
+    b.addEventListener("click", function () { urlInput.value = p; checkUrl(); });
+    urlPresets.appendChild(b);
+  });
+  function layer1(raw) {
+    var url; try { url = new URL(raw); } catch (e) { return { ok: false, text: "Das ist keine gültige Adresse." }; }
+    if (url.protocol !== "http:" && url.protocol !== "https:") return { ok: false, text: "„" + url.protocol + "“ ist nicht erlaubt. Nur http:// und https://." };
+    if (url.username || url.password) return { ok: false, text: "Zugangsdaten in der Adresse sind nicht erlaubt." };
+    if (url.port !== "") return { ok: false, text: "Port " + url.port + " ist nicht erlaubt. Nur die normalen Ports 80 und 443." };
+    var host = url.hostname.replace(/^\[|\]$/g, "");
+    var isIp = v4num(host) !== null || isIPv6(host);
+    if (isIp && blocked(host)) return { ok: false, text: host + " steht direkt in der Adresse und ist intern. Gestoppt, bevor überhaupt verbunden wird." };
+    return { ok: true, url: url, host: host, isIp: isIp, text: isIp ? "Öffentliche IP-Adresse, Form in Ordnung." : "http(s), keine Zugangsdaten, normaler Port. In Ordnung." };
+  }
+  function layer2(l1) {
+    if (l1.isIp) return { ok: true, text: "Eine IP-Adresse braucht kein DNS. Sie wurde schon in Schicht 1 geprüft." };
+    var entry = DNS[l1.host];
+    if (!entry) return { ok: null, text: "Diesen Namen kennt das nachgestellte DNS der Demo nicht. Im echten Faden fragt der Server das echte DNS und prüft jede Antwort." };
+    var atConnect = entry[1][0];
+    if (l1.host === "rebind.example") {
+      return { ok: false, text: "Erste Antwort: " + entry[0][0] + " (öffentlich). Beim Verbinden aber: " + atConnect + ". Eine Prüfung nur vorher hätte das übersehen. Faden prüft beim Verbinden und stoppt." };
+    }
+    if (blocked(atConnect)) return { ok: false, text: l1.host + " zeigt auf " + atConnect + ". Das ist intern. Keine Verbindung." };
+    return { ok: true, text: l1.host + " zeigt auf " + atConnect + ". Öffentlich, die Verbindung ist erlaubt." };
+  }
+  function checkUrl() {
+    var raw = urlInput.value.trim(); if (!raw) { urlResult.innerHTML = ""; return; }
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(raw)) raw = "https://" + raw;
+    var g1 = layer1(raw), g2, g3, verdict;
+    var skip = { state: "skip", text: "Wird nicht mehr geprüft." };
+    if (!g1.ok) { g2 = skip; g3 = skip; verdict = { cls: "out", title: "Gestoppt in Schicht 1", small: g1.text }; }
+    else {
+      var r2 = layer2(g1);
+      if (r2.ok === false) { g2 = { state: "fail", text: r2.text }; g3 = skip; verdict = { cls: "out", title: "Gestoppt in Schicht 2", small: "Keine Verbindung zu einer internen Adresse." }; }
+      else {
+        g2 = { state: r2.ok ? "ok" : "skip", text: r2.text };
+        var target = REDIRECTS[g1.url.href.replace(/\/$/, "")] || REDIRECTS[g1.url.href];
+        if (!target) { g3 = { state: "ok", text: "Keine Weiterleitung. Faden liest höchstens 5 MB und wartet höchstens 15 Sekunden." }; verdict = { cls: "in", title: "Faden lädt diese Seite", small: "Danach holt Readability den Haupttext heraus." }; }
+        else {
+          var t1 = layer1(target);
+          if (!t1.ok) { g3 = { state: "fail", text: "Die Seite leitet weiter nach " + target + ". Das neue Ziel geht wieder durch Schicht 1: " + t1.text }; verdict = { cls: "out", title: "Gestoppt bei der Weiterleitung", small: "Eine harmlose Adresse darf nicht ins interne Netz umleiten." }; }
+          else { g3 = { state: "ok", text: "Weiterleitung nach " + target + ". Das neue Ziel ist wieder geprüft und in Ordnung." }; verdict = { cls: "in", title: "Faden lädt " + target, small: "Weiterleitungen folgt Faden selbst, höchstens 5 Mal." }; }
+        }
+      }
+    }
+    if (g1.ok) g1 = { state: "ok", text: g1.text }; else g1 = { state: "fail", text: g1.text };
+    urlResult.innerHTML = '<div class="gates three">' + gateHtml(1, "Form der Adresse", g1) + gateHtml(2, "DNS beim Verbinden", g2) + gateHtml(3, "Weiterleitung", g3) + '</div>' +
+      '<div class="verdict ' + verdict.cls + '">' + esc(verdict.title) + '<small>' + esc(verdict.small) + '</small></div>';
+    urlResult.classList.remove("result-swap"); void urlResult.offsetWidth; urlResult.classList.add("result-swap");
+  }
+  function gateHtml(n, name, g) {
+    var st = g.state === "ok" ? "erlaubt" : g.state === "fail" ? "gestoppt" : "–";
+    return '<div class="gate ' + g.state + '"><div class="gh">Schicht ' + n + ' · ' + name + '<span class="st">' + st + '</span></div><p>' + esc(g.text) + '</p></div>';
+  }
+  document.getElementById("urlBtn").addEventListener("click", checkUrl);
+  urlInput.addEventListener("keydown", function (e) { if (e.key === "Enter") checkUrl(); });
+  urlInput.value = "https://rebind.example";
+  checkUrl();
+
+  /* ---------- Flashcards ---------- */
+  var qa = [
+    { q: "Warum lädt der Browser die PDF direkt in Storage und nicht über unseren Server?", a: ["[[vercel|Vercel]] nimmt pro Anfrage nur etwa 4,5 MB an. Eine PDF darf bei uns aber 20 MB groß sein.", "Darum meldet der Browser die Datei zuerst beim Server an. Der prüft alles und gibt eine [[signed|signierte Upload-URL]] zurück. Mit ihr lädt der Browser genau diese eine Datei an genau einen Ort. Den Speicherort bestimmt der Server, nie der Browser."] },
+    { q: "Wie teilt Faden einen Text in Abschnitte, und wozu die Überlappung?", a: ["Kleinste Einheit ist ein ganzer Satz. Faden sammelt Sätze, bis 800 [[token|Tokens]] erreicht sind. Ist ein Abschnitt zu 75 % voll und endet ein Absatz, endet er dort. Kein Abschnitt geht über eine Seitengrenze, damit die Seitenzahl stimmt.", "Der nächste Abschnitt beginnt mit den letzten Sätzen des vorigen, höchstens 120 Tokens. Steht eine Antwort genau an der Grenze, ist sie so trotzdem in einem Abschnitt vollständig."] },
+    { q: "Was ist SSRF, und wie schützt sich Faden davor?", a: ["Bei [[ssrf|SSRF]] bringt ein Angreifer unseren Server dazu, eine interne Adresse aufzurufen, zum Beispiel 169.254.169.254. Dort verrät die Cloud oft geheime Zugangsdaten.", "Faden prüft in drei Schichten. Erstens die Form der Adresse. Zweitens die echte [[ip|IP-Adresse]] beim Verbinden, das schützt auch vor [[rebinding|DNS-Rebinding]]. Drittens jedes Ziel einer Weiterleitung. Ein Test hat gezeigt: localhost wird auch in Produktion gestoppt."] },
+    { q: "Was passiert, wenn die Verarbeitung mitten drin scheitert?", a: ["Faden löscht alle Abschnitte, die es schon gespeichert hatte, und setzt den Status „Fehler“. Eine Quelle hat also alle Abschnitte oder keine. Halbe Quellen gibt es im Chat nie.", "Fehler, die wir selbst formuliert haben, etwa „gescannte PDF“, sieht der Nutzer. Alles andere bekommt eine allgemeine Meldung, Details nur im Log. Doppelte Verarbeitung verhindert das [[claim|Beanspruchen]] des Status in einem Befehl."] },
+    { q: "Warum zählt Faden Tokens mit „cl100k_base“, und was war daran knifflig?", a: ["Das Embedding-Modell liest Text in [[token|Tokens]], und die Grenzen gelten in Tokens. Faden muss also genauso zählen wie das Modell. text-embedding-3-small nutzt die Zählweise cl100k_base.", "Die Bibliothek zählt standardmäßig anders, nämlich wie GPT-4o. Bei deutschem Text sind das bis zu 50 % weniger, unsere Abschnitte wären also viel zu groß geworden. Der Beweis, dass es jetzt stimmt: 874 Tokens bei uns, 874 Tokens bei OpenAI."] }
+  ];
+  var known = {};
+  try { known = JSON.parse(store("faden-doc-s3-quiz") || "{}") || {}; } catch (e) { known = {}; }
+  var cardsEl = document.getElementById("cards");
+  var chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  cardsEl.innerHTML = qa.map(function (c, i) {
+    return '<div class="fc" data-i="' + i + '"><button class="fc-q" type="button" aria-expanded="false"><span class="num">0' + (i + 1) + '</span><span>' + esc(c.q) + '</span>' + chev + '</button>' +
+      '<div class="fc-a"><div><div class="inner">' + c.a.map(function (p) { return "<p>" + rich(p) + "</p>"; }).join("") +
+      '<div class="fc-actions"><button class="btn accent" type="button" data-k="1">Gewusst</button><button class="btn ghost" type="button" data-k="0">Noch nicht</button></div></div></div></div></div>';
+  }).join("");
+  function paintQuiz() {
+    var n = 0;
+    Array.prototype.forEach.call(cardsEl.children, function (el, i) { var k = !!known[i]; el.classList.toggle("known", k); if (k) n++; });
+    document.getElementById("score").textContent = n + " von " + qa.length + " gewusst";
+    document.getElementById("bar").style.width = (n / qa.length * 100) + "%";
+  }
+  cardsEl.addEventListener("click", function (e) {
+    var card = e.target.closest(".fc"); if (!card) return;
+    var i = card.getAttribute("data-i");
+    if (e.target.closest(".fc-q")) {
+      var open = card.classList.toggle("open");
+      card.querySelector(".fc-q").setAttribute("aria-expanded", String(open));
+      return;
+    }
+    var a = e.target.closest("[data-k]");
+    if (a) {
+      if (a.getAttribute("data-k") === "1") known[i] = true; else delete known[i];
+      store("faden-doc-s3-quiz", JSON.stringify(known));
+      card.classList.remove("open"); card.querySelector(".fc-q").setAttribute("aria-expanded", "false");
+      paintQuiz();
+    }
+  });
+  document.getElementById("resetQuiz").addEventListener("click", function () { known = {}; store("faden-doc-s3-quiz", "{}"); paintQuiz(); });
+  paintQuiz();
+})();
+</script>
+</body>
+</html>
