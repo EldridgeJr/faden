@@ -613,7 +613,7 @@
       <div class="risk"><span class="chip">Kosten</span><h3>Jeder Podcast kostet Geld</h3><p>Skript und Sprache. Das [[ratelimit|Rate Limit]] erlaubt 5 pro Stunde und 20 pro Tag. Die Sprach-API meldet keine Token-Zahlen, die echten Kosten pro Minute stehen nur im OpenAI-Dashboard.</p></div>
       <div class="risk"><span class="chip">Betrieb</span><h3>Die MP3-Adresse läuft ab</h3><p>Die [[signedurl|signierte URL]] gilt eine Stunde. Wer die Seite länger offen hat, muss neu laden, bevor er wieder abspielt.</p></div>
       <div class="risk"><span class="chip">Sicherheit</span><h3>Text aus Quellen im Prompt</h3><p>Steht in einer Quelle „Ignoriere alle Regeln“, ist das nur Material. Die [[quelle|Quellblöcke]] lassen sich nicht schließen, die Regeln sagen das ausdrücklich. Skript und Karten werden als Text gezeigt, nie als HTML.</p></div>
-      <div class="risk"><span class="chip">Noch offen</span><h3>Löschen eines Podcasts mit MP3</h3><p>Das Löschen von Karteikarten und von Podcasts ohne Audio ist im Browser getestet. Ein Podcast mit MP3 noch nicht: Dabei muss die Datei über die Storage-API verschwinden. Steht als nächster Test an.</p></div>
+      <div class="risk"><span class="chip">Sicherheit</span><h3>Löschen erreicht auch die MP3</h3><p>Erst die Datei, dann die Zeile. Getestet: Podcast im Browser gelöscht, danach per Skript in [[storage|Storage]] nachgesehen. Die MP3 war weg, die des anderen Podcasts blieb. Läuft ein Job noch, sperrt Faden das Löschen.</p></div>
     </div>
   </section>
 

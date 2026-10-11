@@ -227,6 +227,7 @@
 - **Mitlesen (6e).** `currentTurnIndex` sucht den zuletzt gestarteten Redebeitrag. Er wird hell-lime markiert, spätere sind grau, `scrollIntoView({ block: "nearest" })` hält ihn sichtbar (ohne Animation bei `prefers-reduced-motion`). Klick auf eine Zeit springt dorthin und spielt.
 - **„Neu erstellen“ statt „Folge anpassen“ (6e).** Länge, Sprache und Stimmen sind nicht gebaut, also auch keine Bedienelemente dafür. „Neu erstellen“ nutzt dieselben Quellen, die alte Folge bleibt. `createStudioItem` gibt die neue ID zurück, die Seite springt hin. Die Studio-Seite hat deshalb auch `maxDuration = 300`.
 - **Player-Farben als eigene Tokens (6e).** `--player` usw.: in beiden Modi dunkel, wie im Design. `--highlight-soft` für den aktiven Redebeitrag.
+- **Löschen eines Podcasts mit MP3 getestet (6, 12.10.2026).** Vorher per Admin-Skript: 2 MP3s im Ordner des Notebooks. Podcast im Browser gelöscht (Rückfrage, dann zurück zum Notebook). Danach: Zeile weg, nur noch 1 MP3, die des anderen Podcasts. Damit ist auch die Lösch-Policy des Buckets bewiesen, die sich in 6a nicht per SQL testen ließ (`storage.protect_delete()`).
 
 ## Echte Zahlen
 - Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.
