@@ -1,3 +1,4 @@
+import type { UIMessage } from "ai";
 import { z } from "zod";
 
 // Used on the server (check and store citations) and in the browser
@@ -19,6 +20,10 @@ export const citationSchema = z.object({
   content: z.string(),
 });
 export type Citation = z.infer<typeof citationSchema>;
+
+// A chat message as useChat sees it. Besides text, an answer has one data
+// part "citations": the numbered chunks the model got for this answer.
+export type ChatMessage = UIMessage<never, { citations: Citation[] }>;
 
 // Matches [1], [12] and lists like [1, 2]. The prompt asks for [1][2],
 // but models sometimes write [1, 2]. Ranges like [1-3] are not matched.
@@ -70,4 +75,10 @@ export function splitCitations(text: string, validNumbers: ReadonlySet<number>):
   }
   if (pendingText) segments.push({ type: "text", text: pendingText });
   return segments;
+}
+
+// Removes [n] from an old answer. In the history, these numbers would point
+// to the chunks of an earlier question, not to the chunks of the new one.
+export function stripCitations(text: string): string {
+  return text.replace(new RegExp(String.raw`\s?${CITATION}`, "g"), "");
 }

@@ -17,9 +17,12 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.91",
+    "@ai-sdk/react": "^4.0.140",
     "@mozilla/readability": "^0.6.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
+    "@upstash/ratelimit": "^2.2.0",
+    "@upstash/redis": "^1.39.0",
     "ai": "^7.0.137",
     "gpt-tokenizer": "^4.0.0",
     "linkedom": "^0.18.13",

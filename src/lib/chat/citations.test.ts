@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findCitations, splitCitations } from "./citations";
+import { findCitations, splitCitations, stripCitations } from "./citations";
 
 describe("findCitations", () => {
   it("finds single citations, sorted and without duplicates", () => {
@@ -65,5 +65,17 @@ describe("splitCitations", () => {
 
   it("returns nothing for an empty answer", () => {
     expect(splitCitations("", valid)).toEqual([]);
+  });
+});
+
+describe("stripCitations", () => {
+  it("removes citations and the space before them", () => {
+    expect(stripCitations("Ruhe ab 22 Uhr [1]. Hof offen [2][3].")).toBe(
+      "Ruhe ab 22 Uhr. Hof offen.",
+    );
+  });
+
+  it("keeps other brackets", () => {
+    expect(stripCitations("Siehe [Anhang] und [1-3].")).toBe("Siehe [Anhang] und [1-3].");
   });
 });

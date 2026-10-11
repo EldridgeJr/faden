@@ -39,6 +39,8 @@
 - **11.10.2026 · `${!name}` in zsh.** Die Claude-Shell ist zsh, die Schreibweise gibt es nur in bash („bad substitution“). Beim Eintragen der Upstash-Variablen in Vercel. Es wurde nichts angelegt. Gelöst: Schleife mit `bash -c`.
 - **11.10.2026 · `split()` mit zwei Klammergruppen (4b).** Beim Zerlegen der Antwort in Text und `[n]` hat die KI ein Muster mit innerer Klammergruppe an `split()` gegeben. `split()` liefert dann pro Treffer **zwei** Extra-Teile, die Regel „ungerade Stelle = Beleg“ stimmt nicht mehr. Beim Durchlesen bemerkt, vor dem ersten Testlauf. Gelöst: Muster ohne innere Gruppe, eine Hilfsfunktion `numbersIn` für beide Funktionen.
 - **11.10.2026 · Schutz-Ersetzung änderte die Schreibweise (4b).** `</QUELLE>` im Quelltext wurde zu `‹/quelle>`. Harmlos, aber unnötig verändert. Gemerkt: Test rot. Gelöst: Die Ersetzung übernimmt das Wort aus dem Text (`‹$1`).
+- **11.10.2026 · OpenAI-Doku zeigt ein zweites Argument, das es nicht gibt (4c).** Laut Doku geht `openai('gpt-6-astra', { … })` mit Einstellungen. Der Typ in `@ai-sdk/openai` kennt nur `openai(modelId)`. Gemerkt beim Lesen von `index.d.ts` vor dem Code. Gelöst: `reasoning: 'low'` direkt in `streamText` (neu in AI SDK 7, für alle Anbieter gleich), übrige Optionen über `providerOptions`.
+- **11.10.2026 · `after()` will ein echtes `Promise` (4c).** `result.consumeStream()` gibt nur ein `PromiseLike` zurück, der Typecheck war rot. Gelöst: `after(async () => { await finished; })`.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -116,10 +118,22 @@
 - **Belege sind Nummern, keine Zitate.** Das Modell schreibt nur `[n]`. Was hinter `[n]` steht, bestimmt der Server (Abschnitt n aus der Suche). So kann das Modell keine Quelle erfinden, nur auf eine falsche der 8 zeigen. Nummern außerhalb 1–8 fallen weg (`findCitations`) und bleiben in der Anzeige normaler Text (`splitCitations`).
 - **`citations.ts` ohne `server-only`.** Server und Browser nutzen dieselbe Zerlegung. Kein doppelter Code, gleiche Regeln.
 - **Abschnittstext wird im Beleg mitgespeichert.** Wird die Quelle später gelöscht, bleibt die alte Antwort mit ihren Belegen lesbar. Preis: bis zu 8 × ca. 4 KB pro Antwort in `messages.citations`.
+- **Route Handler statt Server Action für den Chat (4c).** `useChat` erwartet einen HTTP-Endpunkt, der einen Stream liefert. Die Route prüft trotzdem alles selbst: Login (401 statt Weiterleitung), Zod, Rate Limit, Notebook (fremd = 404).
+- **Reihenfolge der Prüfungen.** Erst alles, was nichts kostet (Login, Eingabe), dann Rate Limit, dann Datenbank, erst danach bezahlte Aufrufe (Embedding, Modell). Ein Angreifer ohne Login oder mit kaputter Eingabe verursacht keine Kosten und keinen Redis-Zugriff.
+- **Rate Limit: 10 Fragen pro Minute und 200 pro Tag, gleitendes Fenster.** Bei ca. 0,0005 $ pro Frage kostet ein missbrauchtes Konto höchstens ca. 0,10 $ am Tag. Gleitend statt fest: Niemand kann 10 Fragen um 12:00:59 und 10 weitere um 12:01:00 schicken.
+- **Nur die neue Frage kommt vom Browser.** Der Verlauf kommt aus der Datenbank (letzte 6 Nachrichten). Zod verwirft unbekannte Felder, ein mitgeschickter „Verlauf“ kommt nie an. Alternative (Doku-Beispiel): Browser schickt alle Nachrichten. Dann könnte jemand dem Modell eine erfundene frühere Antwort unterschieben.
+- **Alte Belegnummern aus dem Verlauf entfernt (`stripCitations`).** `[1]` einer alten Antwort zeigte auf einen anderen Abschnitt als `[1]` der neuen Frage.
+- **Quellen-IDs vom Browser werden gefiltert.** Nur Quellen dieses Notebooks mit Status „bereit“ gehen in die Suche. Fremde oder unfertige IDs fallen still weg.
+- **Belege vor dem Text senden (`data-citations`).** Der Browser kennt alle 8 Abschnitte, bevor das erste Wort kommt, und kann `[1]` sofort als Knopf zeigen. In der Datenbank landen nur die benutzten Belege.
+- **Keine Treffer → fester Satz ohne Modellaufruf.** Spart den Aufruf und ist sicher ehrlich.
+- **Antwort wird auch gespeichert, wenn der Tab zugeht.** `consumeStream()` liest den Modell-Stream zu Ende, `after()` hält die Vercel-Funktion so lange am Leben. Sonst bliebe eine Frage ohne Antwort in der Datenbank.
+- **`store: false` bei OpenAI.** OpenAI hebt die Antwort nicht für spätere API-Aufrufe auf. Wir speichern selbst, eine Kopie dort ist unnötig.
+- **Fehlertexte.** Der Browser bekommt nur „Die Antwort ist fehlgeschlagen…“. Details stehen im Server-Log. Im Log stehen pro Antwort nur Token-Zahlen, keine Inhalte.
+- **Bewusste Grenze: Suche nur mit der aktuellen Frage.** Folgefragen wie „Und wer hat es entworfen?“ klappten im Test trotzdem (das Notebook handelt fast nur vom Denkmal, der Verlauf löst „es“ auf). Bei gemischten Notebooks kann die Suche danebenliegen. Lösung für später: Frage vorher umschreiben lassen (ein Modellaufruf mehr).
 
 ## Echte Zahlen
-- Kosten pro Frage:
-- Antwortzeit bis zum ersten Text:
+- Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.
+- Antwortzeit bis zum ersten Text (lokal → Frankfurt, Dev-Server): 1,4–2,5 s, erster Aufruf 3,8 s (Kompilieren). Auf Vercel in `fra1` sollte es schneller sein, die Datenbank liegt dort nebenan.
 - Abschnitte im Demo-Notebook:
 - Test-PDF „Hausordnung“ (3 Seiten): 3 Abschnitte, 874 Tokens. Unsere Zählung (`cl100k_base`) und die Abrechnung von OpenAI stimmen exakt überein. Kosten bei 0,02 $ pro 1 Mio. Tokens: ca. 0,00002 $.
 - Upload bis „Bereit“ für diese PDF: wenige Sekunden (lokal).

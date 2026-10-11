@@ -85,3 +85,20 @@ export const urlSourceSchema = z.object({
 export const sourceMetaSchema = z
   .object({ pages: z.number(), chunks: z.number(), url: z.string() })
   .partial();
+
+// A chat question. The browser sends only the new question and the selected
+// sources. The history comes from the database, so nobody can smuggle in a
+// fake conversation.
+export const MAX_QUESTION_CHARS = 2000;
+
+export const chatRequestSchema = z.object({
+  notebookId: z.uuid(),
+  // A notebook with more than 100 sources is not realistic. The limit keeps
+  // the request and the SQL array small.
+  sourceIds: z.array(z.uuid()).max(100),
+  question: z
+    .string()
+    .trim()
+    .min(1, "Bitte stell eine Frage.")
+    .max(MAX_QUESTION_CHARS, "Die Frage darf höchstens 2.000 Zeichen lang sein."),
+});

@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { openai, type OpenAILanguageModelResponsesOptions } from "@ai-sdk/openai";
 
 // The one place where the app chooses its AI models.
 //
@@ -10,3 +10,22 @@ import { openai } from "@ai-sdk/openai";
 // another size needs a new migration and new embeddings for all chunks.
 export const embeddingModel = openai.embeddingModel("text-embedding-3-small");
 export const EMBEDDING_DIMENSIONS = 1536;
+
+// The chat model. gpt-6-luna is the cheapest model on the key
+// (0.10 $ / 0.50 $ per 1M input / output tokens, October 2026) and made for
+// narrow tasks like "answer only from these 8 chunks".
+export const chatModel = openai("gpt-6-luna");
+
+// gpt-6-luna is a reasoning model (default "medium"). "low" is enough to
+// find the answer in 8 chunks, and the first word comes sooner.
+export const CHAT_REASONING = "low";
+
+export const chatProviderOptions = {
+  openai: {
+    // OpenAI does not keep the response for later API calls. We store the
+    // answer ourselves, so there is no reason to leave a copy there.
+    store: false,
+    // We never show the model's reasoning, so do not ask for a summary of it.
+    reasoningSummary: null,
+  } satisfies OpenAILanguageModelResponsesOptions,
+};
