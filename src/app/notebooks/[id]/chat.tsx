@@ -87,24 +87,24 @@ export function Chat({
   return (
     <div className="flex flex-col gap-4">
       {sources.length === 0 ? (
-        <p className="text-[#6b7078]">Sobald eine Quelle bereit ist, kannst du Fragen stellen.</p>
+        <p className="text-muted-foreground">Sobald eine Quelle bereit ist, kannst du Fragen stellen.</p>
       ) : (
         <fieldset className="flex flex-wrap gap-2">
-          <legend className="mb-2 text-sm text-[#6b7078]">Antworten nur aus diesen Quellen:</legend>
+          <legend className="mb-2 text-sm text-muted-foreground">Antworten nur aus diesen Quellen:</legend>
           {sources.map((source) => {
             const checked = !excluded.has(source.id);
             return (
               <label
                 key={source.id}
                 className={`flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-sm ${
-                  checked ? "border-[#111315] bg-white" : "border-[#e3e5e8] text-[#6b7078]"
+                  checked ? "border-foreground bg-card" : "border-border text-muted-foreground"
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggleSource(source.id)}
-                  className="accent-[#111315]"
+                  className="accent-foreground"
                 />
                 <span className="max-w-60 truncate">{source.title}</span>
               </label>
@@ -117,7 +117,7 @@ export function Chat({
         {messages.map((message) => (
           <li key={message.id}>
             {message.role === "user" ? (
-              <p className="ml-auto w-fit max-w-[85%] whitespace-pre-wrap rounded-[18px] bg-[#111315] px-4 py-3 text-white">
+              <p className="ml-auto w-fit max-w-[85%] whitespace-pre-wrap rounded-tile bg-primary px-4 py-3 text-primary-foreground">
                 {message.parts.map((part) => (part.type === "text" ? part.text : "")).join("")}
               </p>
             ) : (
@@ -138,10 +138,10 @@ export function Chat({
       </ol>
 
       {status === "submitted" && (
-        <p className="text-sm text-[#6b7078]">Faden sucht in deinen Quellen …</p>
+        <p className="text-sm text-muted-foreground">Faden sucht in deinen Quellen …</p>
       )}
       {error && (
-        <p role="alert" className="rounded-[18px] bg-[#fde4db] px-4 py-3 text-sm text-[#a3361a]">
+        <p role="alert" className="rounded-tile bg-error px-4 py-3 text-sm text-error-foreground">
           {errorText(error)}
         </p>
       )}
@@ -151,7 +151,7 @@ export function Chat({
           event.preventDefault();
           send();
         }}
-        className="flex items-end gap-2 rounded-[18px] bg-white p-2"
+        className="flex items-end gap-2 rounded-tile bg-card p-2"
       >
         <textarea
           value={input}
@@ -173,7 +173,7 @@ export function Chat({
           <button
             type="button"
             onClick={() => stop()}
-            className="rounded-full border border-[#e3e5e8] px-4 py-2 text-sm"
+            className="rounded-full border border-border px-4 py-2 text-sm"
           >
             Stopp
           </button>
@@ -181,7 +181,7 @@ export function Chat({
           <button
             type="submit"
             disabled={!canSend}
-            className="rounded-full bg-[#111315] px-4 py-2 text-sm text-white disabled:opacity-40"
+            className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-40"
           >
             Senden
           </button>
@@ -211,7 +211,7 @@ function Answer({
   return (
     <div className="flex max-w-[85%] flex-col gap-2">
       {/* Plain text only. React escapes it, so model output never becomes HTML. */}
-      <p className="whitespace-pre-wrap rounded-[18px] bg-white px-4 py-3">
+      <p className="whitespace-pre-wrap rounded-tile bg-card px-4 py-3">
         {segments.map((segment, i) =>
           segment.type === "text" ? (
             <span key={i}>{segment.text}</span>
@@ -222,7 +222,7 @@ function Answer({
               onClick={() => onToggle(segment.n)}
               aria-expanded={openNumber === segment.n}
               className={`mx-0.5 rounded-full px-1.5 font-mono text-xs align-super ${
-                openNumber === segment.n ? "bg-[#111315] text-[#d6ee57]" : "bg-[#d6ee57] text-[#111315]"
+                openNumber === segment.n ? "bg-primary text-highlight" : "bg-highlight text-foreground"
               }`}
             >
               {segment.n}
@@ -231,14 +231,14 @@ function Answer({
         )}
       </p>
       {openCitation && (
-        <blockquote className="rounded-[18px] border border-[#e3e5e8] bg-[#f6f7f8] px-4 py-3 text-sm">
+        <blockquote className="rounded-tile border border-border bg-surface px-4 py-3 text-sm">
           <p className="mb-2 font-medium">
             [{openCitation.n}] {openCitation.sourceTitle}
             {openCitation.page !== null && (
-              <span className="font-mono text-[#6b7078]"> · Seite {openCitation.page}</span>
+              <span className="font-mono text-muted-foreground"> · Seite {openCitation.page}</span>
             )}
           </p>
-          <p className="max-h-60 overflow-y-auto whitespace-pre-wrap text-[#6b7078]">
+          <p className="max-h-60 overflow-y-auto whitespace-pre-wrap text-muted-foreground">
             {openCitation.content}
           </p>
         </blockquote>

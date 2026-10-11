@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { cn } from "@/lib/utils";
+import { themeClass } from "@/lib/theme";
+import { getTheme } from "@/lib/theme-server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,13 +20,17 @@ export const metadata: Metadata = {
   description: "Fragen an deine Quellen – mit Belegen, die zur Textstelle springen.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // The class comes from the cookie, so the first HTML already has the
+  // right colors. Without a cookie ("system") CSS follows the OS setting.
+  const theme = await getTheme();
+
   return (
     <html
       lang="de"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={cn(geistSans.variable, geistMono.variable, "h-full antialiased", themeClass(theme))}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

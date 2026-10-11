@@ -23,12 +23,12 @@ export function DeleteSourceButton({ sourceId, title }: { sourceId: string; titl
         type="button"
         onClick={handleClick}
         disabled={pending}
-        className="rounded-full border border-[#e3e5e8] px-3 py-1 text-sm text-[#6b7078] hover:border-[#a3361a] hover:text-[#a3361a] disabled:opacity-60"
+        className="rounded-full border border-border px-3 py-1 text-sm text-muted-foreground hover:border-error-foreground hover:text-error-foreground disabled:opacity-60"
       >
         {pending ? "Lösche …" : "Löschen"}
       </button>
       {error && (
-        <span role="alert" className="text-right text-sm text-[#a3361a]">
+        <span role="alert" className="text-right text-sm text-error-foreground">
           {error}
         </span>
       )}

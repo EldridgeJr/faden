@@ -65,21 +65,21 @@ export default async function NotebookPage({ params }: PageProps<"/notebooks/[id
     .map((source) => ({ id: source.id, title: source.title }));
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 text-[#111315]">
-      <Link href="/notebooks" className="text-sm text-[#6b7078] hover:text-[#111315]">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 text-foreground">
+      <Link href="/notebooks" className="text-sm text-muted-foreground hover:text-foreground">
         ← Alle Notebooks
       </Link>
       <h1 className="text-3xl font-semibold tracking-tight">{notebook.title}</h1>
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Quellen</h2>
         <PdfUpload notebookId={notebook.id} />
-        <details className="rounded-[18px] bg-white px-5 py-3">
+        <details className="rounded-tile bg-card px-5 py-3">
           <summary className="cursor-pointer font-medium">Text einfügen</summary>
           <div className="pt-3">
             <TextSourceForm notebookId={notebook.id} />
           </div>
         </details>
-        <details className="rounded-[18px] bg-white px-5 py-3">
+        <details className="rounded-tile bg-card px-5 py-3">
           <summary className="cursor-pointer font-medium">Webseite hinzufügen</summary>
           <div className="pt-3">
             <UrlSourceForm notebookId={notebook.id} />

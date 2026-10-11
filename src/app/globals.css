@@ -1,26 +1,142 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-/* Faden colors. The full design system follows in step 5. */
+/*
+ * Light and dark mode.
+ * The <html> element has the class "light", "dark" or none ("system",
+ * see src/lib/theme.ts). color-scheme tells the browser which side of
+ * light-dark() to use. "light dark" means: follow the operating system.
+ */
 :root {
-  --background: #e9ebee;
-  --foreground: #111315;
+  color-scheme: light dark;
+}
+:root.light {
+  color-scheme: light;
+}
+:root.dark {
+  color-scheme: dark;
+}
+
+/* The dark: variant must match the same three cases as color-scheme. */
+@custom-variant dark {
+  &:where(.dark, .dark *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not(.light), :root:not(.light) *) {
+      @slot;
+    }
+  }
+}
+
+/*
+ * Faden colors: light-dark(light value, dark value).
+ * The names on the left are the ones shadcn/ui components use. The Faden
+ * names from the design are in the comments.
+ */
+:root {
+  --background: light-dark(#e9ebee, #0b0c0e); /* Hintergrund */
+  --surface: light-dark(#f6f7f8, #131518); /* Fläche */
+  --card: light-dark(#ffffff, #1a1d21); /* Karte */
+  --tile: light-dark(#f3f4f6, #23272c); /* Kachel */
+  --border: light-dark(#e3e5e8, #2c3036); /* Linie */
+  --foreground: light-dark(#111315, #eceef0); /* Text */
+  --muted-foreground: light-dark(#6b7078, #9ba1aa); /* Grau */
+
+  /* Akzent (lime): only for citations, progress and the most important action. */
+  --highlight: #d6ee57;
+  --highlight-foreground: #111315;
+
+  /* Primary buttons are black. In dark mode they turn light. */
+  --primary: light-dark(#111315, #eceef0);
+  --primary-foreground: light-dark(#ffffff, #111315);
+
+  /* Status */
+  --ready: light-dark(#6e9a1c, #a4cf4f);
+  --busy: light-dark(#fdf0d5, #3a2c0e);
+  --busy-foreground: light-dark(#8a5a00, #f2c46d);
+  --error: light-dark(#fde4db, #3f1d13);
+  --error-foreground: light-dark(#a3361a, #f5a48a);
+
+  /* shadcn/ui names that map to the colors above. */
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--tile);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--tile);
+  /* In shadcn/ui, "accent" is the hover color of menu items, not our lime. */
+  --accent: var(--tile);
+  --accent-foreground: var(--foreground);
+  --destructive: var(--error-foreground);
+  --input: var(--border);
+  --ring: light-dark(#9aa0a8, #6b7078);
+
+  --radius: 0.75rem;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-tile: var(--tile);
+  --color-border: var(--border);
   --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-ready: var(--ready);
+  --color-busy: var(--busy);
+  --color-busy-foreground: var(--busy-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Geist is loaded in layout.tsx with next/font. */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+
+  /* Faden radii: card 28, tile 18. Buttons and chips use rounded-full. */
+  --radius-card: 28px;
+  --radius-tile: 18px;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  /* Lucide icons with a 1.8 px stroke, as in the design. CSS wins over the
+     stroke-width attribute that lucide-react sets. */
+  svg.lucide {
+    stroke-width: 1.8;
+  }
 }

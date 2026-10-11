@@ -14,10 +14,10 @@ export type SourceItem = {
 };
 
 const STATUS: Record<string, { label: string; className: string }> = {
-  pending: { label: "Wartet", className: "bg-[#f3f4f6] text-[#6b7078]" },
-  processing: { label: "In Arbeit", className: "bg-[#fdf0d5] text-[#8a5a00]" },
-  ready: { label: "Bereit", className: "bg-[#f3f4f6] text-[#6e9a1c]" },
-  error: { label: "Fehler", className: "bg-[#fde4db] text-[#a3361a]" },
+  pending: { label: "Wartet", className: "bg-tile text-muted-foreground" },
+  processing: { label: "In Arbeit", className: "bg-busy text-busy-foreground" },
+  ready: { label: "Bereit", className: "bg-tile text-ready" },
+  error: { label: "Fehler", className: "bg-error text-error-foreground" },
 };
 
 const POLL_INTERVAL_MS = 2000;
@@ -38,7 +38,7 @@ export function SourceList({ sources }: { sources: SourceItem[] }) {
 
   if (sources.length === 0) {
     return (
-      <p className="text-[#6b7078]">
+      <p className="text-muted-foreground">
         Noch keine Quellen. Lade eine PDF hoch, füge Text ein oder eine Webseite.
       </p>
     );
@@ -49,7 +49,7 @@ export function SourceList({ sources }: { sources: SourceItem[] }) {
       {sources.map((source) => {
         const status = STATUS[source.status] ?? STATUS.pending;
         return (
-          <li key={source.id} className="flex flex-col gap-1 rounded-[18px] bg-white px-5 py-4">
+          <li key={source.id} className="flex flex-col gap-1 rounded-tile bg-card px-5 py-4">
             <div className="flex items-start justify-between gap-4">
               <span className="truncate py-1 font-medium">{source.title}</span>
               <div className="flex shrink-0 items-start gap-2">
@@ -60,14 +60,14 @@ export function SourceList({ sources }: { sources: SourceItem[] }) {
               </div>
             </div>
             {source.status === "ready" && source.chunks !== undefined && (
-              <span className="font-mono text-sm text-[#6b7078]">
+              <span className="font-mono text-sm text-muted-foreground">
                 {source.pages !== undefined &&
                   `${source.pages} ${source.pages === 1 ? "Seite" : "Seiten"} · `}
                 {source.chunks} {source.chunks === 1 ? "Abschnitt" : "Abschnitte"}
               </span>
             )}
             {source.status === "error" && source.error && (
-              <span className="text-sm text-[#a3361a]">{source.error}</span>
+              <span className="text-sm text-error-foreground">{source.error}</span>
             )}
           </li>
         );

@@ -41,6 +41,9 @@
 - **11.10.2026 · Schutz-Ersetzung änderte die Schreibweise (4b).** `</QUELLE>` im Quelltext wurde zu `‹/quelle>`. Harmlos, aber unnötig verändert. Gemerkt: Test rot. Gelöst: Die Ersetzung übernimmt das Wort aus dem Text (`‹$1`).
 - **11.10.2026 · OpenAI-Doku zeigt ein zweites Argument, das es nicht gibt (4c).** Laut Doku geht `openai('gpt-6-astra', { … })` mit Einstellungen. Der Typ in `@ai-sdk/openai` kennt nur `openai(modelId)`. Gemerkt beim Lesen von `index.d.ts` vor dem Code. Gelöst: `reasoning: 'low'` direkt in `streamText` (neu in AI SDK 7, für alle Anbieter gleich), übrige Optionen über `providerOptions`.
 - **11.10.2026 · `after()` will ein echtes `Promise` (4c).** `result.consumeStream()` gibt nur ein `PromiseLike` zurück, der Typecheck war rot. Gelöst: `after(async () => { await finished; })`.
+- **11.10.2026 · `shadcn init` hat die Schrift kaputt gemacht (5a).** Es schrieb `--font-sans: var(--font-sans)` in `globals.css`, also eine Variable, die auf sich selbst zeigt. Geist wäre nicht mehr angekommen. Gemerkt beim Lesen des Diffs nach `init`. Gelöst: `globals.css` neu geschrieben, `--font-sans: var(--font-geist-sans)`. Lehre: Den Diff von Generatoren immer ganz lesen.
+- **11.10.2026 · `shadcn init` installiert ein Paket namens `cn` (5a).** Annahme: shadcn nutzt `clsx` + `tailwind-merge`. Neu in Version 4 ist ein eigenes Paket `cn`. Kurze, allgemeine Paketnamen sind ein typisches Ziel für untergeschobene Pakete. Geprüft: Maintainer `shadcn`, Repo `shadcn-ui/cn`, keine Abhängigkeiten, keine Install-Skripte. Behalten.
+- **11.10.2026 · Lint verbietet `document.cookie = …` in einer Komponente (5a).** Die React-Compiler-Regel `react-hooks/immutability` meldet das auch in einem Klick-Handler. Gelöst: eigene Funktion `applyTheme` außerhalb der Komponente. Die Komponente hält nur den Zustand.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -135,6 +138,11 @@
 - **`[n]` als Knopf, Auszug klappt unter der Antwort auf.** Zahl in Lime: Belege sind laut Design eine der drei Stellen für den Akzent.
 - **Fehler aus der Route als JSON `{ error }`.** `useChat` legt den Rohtext der Antwort in `error.message`. Die Oberfläche liest nur das Feld `error`, alles andere wird zu „Die Antwort ist fehlgeschlagen…“.
 - **Verlauf nach dem Neuladen aus der Datenbank** (`toChatMessages`, letzte 50 Nachrichten). Die gespeicherten Belege werden mit Zod geprüft. Kaputtes JSON heißt: Text ohne Knöpfe, kein Absturz.
+- **shadcn/ui mit Radix (5a).** Version 4 bietet Base UI, Radix und React Aria als Grundlage. Radix ist am weitesten verbreitet und am besten dokumentiert. Preset „Nova“ (Lucide + Geist), passt zum Design. Wir nutzen nur einzelne Bausteine (Button, Dialog, Menü), der Code liegt in `src/components/ui/` und gehört uns.
+- **Farben als CSS-Variablen mit `light-dark()` (5a).** Jede Farbe steht einmal da: `light-dark(hell, dunkel)`. Welche Seite gilt, bestimmt `color-scheme`. Ohne Klasse folgt der Browser dem Betriebssystem („System“). Alternative: zwei Blöcke `:root` und `.dark` plus ein dritter für `prefers-color-scheme` – dreimal dieselben Namen.
+- **shadcn-Namen auf Faden-Farben gemappt.** `--card`, `--primary`, `--muted` usw. zeigen auf die Faden-Werte. Achtung: `accent` heißt bei shadcn „Hover-Farbe“. Unser Lime heißt deshalb `highlight`.
+- **Farbschema im Cookie, nicht in `localStorage` (5a).** Der Server liest den Cookie und setzt die Klasse schon im ersten HTML. Mit `localStorage` wüsste das erst das JavaScript im Browser, die Seite würde kurz hell aufblitzen. Alternative: Paket `next-themes` (setzt ein Skript in den `<head>`). Unser Weg braucht kein Paket, und `parseTheme` lässt unbekannte Cookie-Werte nie in die Klasse.
+- **Lucide-Strich 1,8 px per CSS.** Eine Regel `svg.lucide { stroke-width: 1.8 }` statt `strokeWidth` an jedem Icon.
 
 ## Echte Zahlen
 - Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.

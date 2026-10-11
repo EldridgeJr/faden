@@ -45,7 +45,7 @@ export function PdfUpload({ notebookId }: { notebookId: string }) {
   return (
     <div className="flex flex-col gap-2">
       <label
-        className={`inline-flex w-fit cursor-pointer items-center rounded-full bg-[#111315] px-5 py-2.5 font-medium text-white ${uploading ? "pointer-events-none opacity-60" : ""}`}
+        className={`inline-flex w-fit cursor-pointer items-center rounded-full bg-primary px-5 py-2.5 font-medium text-primary-foreground ${uploading ? "pointer-events-none opacity-60" : ""}`}
       >
         {uploading ? "Lade hoch …" : "PDF hochladen"}
         <input
@@ -62,7 +62,7 @@ export function PdfUpload({ notebookId }: { notebookId: string }) {
         />
       </label>
       {error && (
-        <p role="alert" className="text-sm text-[#a3361a]">
+        <p role="alert" className="text-sm text-error-foreground">
           {error}
         </p>
       )}

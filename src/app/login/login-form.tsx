@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Button } from "@/components/ui/button";
 import { signIn, type SignInState } from "./actions";
 
 const initialState: SignInState = { error: null, email: "" };
@@ -20,7 +21,7 @@ export function LoginForm() {
           defaultValue={state.email}
           autoComplete="email"
           required
-          className="rounded-full border border-[#e3e5e8] bg-white px-4 py-2.5 text-base font-normal outline-none focus:border-[#111315]"
+          className="h-11 rounded-full border border-border bg-card px-4 text-base font-normal outline-none focus-visible:border-foreground"
         />
       </label>
       <label className="flex flex-col gap-1.5 text-sm font-medium">
@@ -30,23 +31,19 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           required
-          className="rounded-full border border-[#e3e5e8] bg-white px-4 py-2.5 text-base font-normal outline-none focus:border-[#111315]"
+          className="h-11 rounded-full border border-border bg-card px-4 text-base font-normal outline-none focus-visible:border-foreground"
         />
       </label>
 
       {state.error && (
-        <p role="alert" className="rounded-[18px] bg-[#fde4db] px-4 py-2.5 text-sm text-[#a3361a]">
+        <p role="alert" className="rounded-tile bg-error px-4 py-2.5 text-sm text-error-foreground">
           {state.error}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-full bg-[#111315] px-4 py-2.5 font-medium text-white disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending}>
         {pending ? "Melde an …" : "Anmelden"}
-      </button>
+      </Button>
     </form>
   );
 }
