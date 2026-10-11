@@ -17,6 +17,10 @@ describe("normalizeText", () => {
     expect(normalizeText("per E-\nMail")).toBe("per E-\nMail");
   });
 
+  it("removes null characters (Postgres rejects them)", () => {
+    expect(normalizeText("Text\u0000mit Null")).toBe("Textmit Null");
+  });
+
   it("unifies line breaks, spaces and empty lines", () => {
     expect(normalizeText("  a  b\r\nc\n\n\n\nd ­ ")).toBe("a b\nc\n\nd");
   });

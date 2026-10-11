@@ -28,6 +28,8 @@ export function normalizeText(raw: string): string {
   return (
     raw
       .replace(/\r\n?/g, "\n")
+      // Postgres cannot store the null character in text. Some PDFs contain it.
+      .replace(/\u0000/g, "")
       // Soft hyphens are invisible, but they split words for the search.
       .replace(/­/g, "")
       // Hyphenation at the end of a line: "Verarbei-\ntung" → "Verarbeitung".

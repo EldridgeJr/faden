@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Local preview config for the Claude app (machine-specific Node path)
 .claude/launch.json
+
+# Local test files (generated, not part of the repo)
+/tmp/

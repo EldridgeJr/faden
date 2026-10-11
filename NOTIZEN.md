@@ -24,6 +24,10 @@
 - **10.10.2026 · `Intl.Segmenter` trennt nach „z. B.“ und „Dr.“.** Gemerkt beim Ausprobieren. Gelöst: Ein Stück, das auf ein kurzes Wort (1–3 Buchstaben) mit Punkt endet, wird an das nächste geklebt. Preis: Kurze Sätze wie „Das ist so.“ kleben auch am nächsten Satz. Das schadet nicht, sie bleiben nur zusammen.
 - **10.10.2026 · `pdf.destroy is not a function`.** Die KI hat aus dem Gedächtnis `getDocumentProxy()` + `destroy()` geschrieben. In dieser PDF.js-Version hat das Dokument kein `destroy()`. Gemerkt: 4 Tests rot. Gelöst: im Quellcode von `unpdf` nachgesehen. `extractText` mit Rohdaten öffnet und schließt das Dokument selbst. Code wurde dadurch kürzer.
 - **10.10.2026 · Test lag falsch, nicht der Code.** Der Absatz-Test nahm ca. 20 Tokens pro Satz an, echt sind es 27. Zwei Absätze passten dann nicht in 800 Tokens, der Code hat richtig früher geschlossen. Gemerkt: Zahlen im Test ausgegeben statt den Code zu „reparieren“. Gelöst: Testdaten angepasst (12 statt 16 Sätze pro Absatz).
+- **11.10.2026 · Text-Modellnamen gehen im AI SDK 7 über das Vercel AI Gateway (3c).** Die Doku-Beispiele nutzen `model: "openai/text-embedding-3-small"`. Das braucht einen Gateway-Key, nicht den OpenAI-Key. Gemerkt beim Lesen von `node_modules/ai/docs`. Gelöst: `openai.embeddingModel(...)` aus `@ai-sdk/openai`.
+- **11.10.2026 · `embedMany` teilt nur nach Anzahl auf (2.048), nicht nach Tokens.** OpenAI begrenzt aber auch die Tokens pro Anfrage (ca. 300.000). Eine große PDF wäre gescheitert. Gemerkt beim Lesen des Quellcodes (`maxEmbeddingsPerCall = 2048`). Gelöst: eigene Pakete à 100 Abschnitte.
+- **11.10.2026 · Null-Zeichen in PDFs.** Postgres speichert `\u0000` nicht in `text`. Manche PDFs enthalten es, der Insert wäre gescheitert. Vorab beim Durchdenken bemerkt, nicht erst im Fehlerfall. Gelöst in `normalizeText`, mit Test.
+- **11.10.2026 · PDF-Absätze gehen verloren.** PDF.js liefert Zeilenenden, aber keine Leerzeilen. Für uns ist jede PDF-Seite ein einziger Absatz, die Absatzregel greift nur bei Text und Webseiten. Gemerkt beim Ausgeben der Abschnitte der Test-PDF. Bewusst nicht gelöst. Besser wäre: Absätze an größeren Zeilenabständen erkennen (`extractTextItems` liefert Positionen).
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -66,11 +70,22 @@
 - **Silbentrennung zusammenfügen nur zwischen Kleinbuchstaben.** „Verarbei-\ntung“ → „Verarbeitung“, aber „E-\nMail“ bleibt.
 - **Test-PDFs von Hand gebaut (`src/test/make-pdf.ts`).** Keine Binärdateien im Repo, keine Abhängigkeit wie `pdf-lib`. Eine „gescannte“ Seite ist dort eine graue Fläche ohne Text. Für die Erkennung reicht das, denn wir prüfen nur, ob Text da ist.
 - **`unpdf` statt `pdf-parse`.** Liefert Text pro Seite, läuft serverless, aktiv gepflegt. `pdf-parse` 1.x hatte den bekannten Fehler mit der Testdatei beim Import.
+- **Upload in zwei Server Actions (3c).** `createPdfSource` legt Zeile und signierte Upload-URL an, der Browser lädt **direkt** in Storage, `startProcessing` startet die Verarbeitung. Die Datei läuft nie durch Vercel (Grenze ca. 4,5 MB pro Request).
+- **Parameter der Server Actions als `unknown`.** Jeder kann eine Server Action mit beliebigen Daten aufrufen. TypeScript-Typen prüfen zur Laufzeit nichts, nur Zod.
+- **Rechte prüfen mit dem Nutzer-Client, dann arbeiten mit dem Admin-Client.** `startProcessing` findet die Quelle nur, wenn RLS sie zeigt. Erst danach läuft `processSource` mit dem Secret Key (`server-only`). Grund: Die Verarbeitung läuft nach der Antwort weiter, und das Login-Token des Nutzers kann ablaufen.
+- **Verarbeitung mit `after()` statt Warteschlange.** Läuft nach der Antwort weiter, bis `maxDuration` (300 s auf Vercel Hobby). Grenze: Bricht die Funktion ab, bleibt die Quelle auf „In Arbeit“. Eine echte Warteschlange (z. B. Inngest, QStash) steht unter „Später“.
+- **Status „beanspruchen“ in einem Statement.** `update … set status = 'processing' where status = 'pending'`. Bei Doppelklick bekommt nur ein Aufruf die Zeile zurück, die Quelle wird nicht doppelt verarbeitet.
+- **Ganz oder gar nicht.** Bei einem Fehler löscht die Pipeline alle schon gespeicherten Abschnitte der Quelle. Eine Quelle hat entweder alle Abschnitte oder keine. Alternative: Insert in einer Datenbank-Funktion (Transaktion).
+- **`IngestError` für Meldungen an den Nutzer.** Nur diese Fehler zeigen ihren Text. Alle anderen zeigen „Die Verarbeitung ist fehlgeschlagen“, Details nur im Server-Log. So landen keine internen Fehlermeldungen in der Oberfläche.
+- **Polling alle 2 Sekunden statt Supabase Realtime.** `router.refresh()`, solange eine Quelle „Wartet“ oder „In Arbeit“ ist. Einfach und ohne extra Einrichtung. Realtime wäre schneller und spart Anfragen.
+- **Auch nach fehlgeschlagenem Upload `startProcessing` aufrufen.** Der Server findet dann keine Datei und setzt „Fehler“ mit klarer Meldung. Sonst bliebe die Quelle für immer auf „Wartet“.
 
 ## Echte Zahlen
 - Kosten pro Frage:
 - Antwortzeit bis zum ersten Text:
 - Abschnitte im Demo-Notebook:
+- Test-PDF „Hausordnung“ (3 Seiten): 3 Abschnitte, 874 Tokens. Unsere Zählung (`cl100k_base`) und die Abrechnung von OpenAI stimmen exakt überein. Kosten bei 0,02 $ pro 1 Mio. Tokens: ca. 0,00002 $.
+- Upload bis „Bereit“ für diese PDF: wenige Sekunden (lokal).
 - Dauer Podcast-Erstellung:
 
 ## Schwierigstes Problem

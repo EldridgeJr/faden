@@ -26,3 +26,26 @@ export const notebookTitleSchema = z
 // Notebook ids come from the URL. Anything that is not a UUID is rejected
 // before it reaches Postgres (which would answer with a type error).
 export const notebookIdSchema = z.uuid();
+
+// Same limit as file_size_limit of the storage bucket "sources".
+export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+
+// What the browser tells us about a PDF before it uploads it.
+// The bucket checks size and type again during the upload.
+export const pdfUploadSchema = z.object({
+  notebookId: z.uuid(),
+  fileName: z.string().trim().min(1).max(255, "Der Dateiname ist zu lang."),
+  fileSize: z
+    .number()
+    .int()
+    .positive("Die Datei ist leer.")
+    .max(MAX_UPLOAD_BYTES, "Die Datei ist größer als 20 MB."),
+  fileType: z.literal("application/pdf", { error: "Bitte wähle eine PDF-Datei." }),
+});
+
+export const sourceIdSchema = z.uuid();
+
+// sources.meta is free JSON. Only these fields are read by the UI.
+export const sourceMetaSchema = z
+  .object({ pages: z.number(), chunks: z.number() })
+  .partial();
