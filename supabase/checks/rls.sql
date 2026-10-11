@@ -76,6 +76,24 @@ begin
   end;
   assert failed, 'A could upload into a foreign folder';
 
+  -- Studio bucket: only the server writes. A cannot upload, not even into an
+  -- own notebook folder.
+  failed := false;
+  begin
+    insert into storage.objects (bucket_id, name) values ('studio', nb_a || '/x.mp3');
+  exception when insufficient_privilege then failed := true;
+  end;
+  assert failed, 'A could upload into the studio bucket';
+
+  -- The server writes A's podcast. Role "none" switches back to the role of
+  -- this script, which bypasses RLS like the secret key.
+  perform set_config('role', 'none', true);
+  insert into storage.objects (bucket_id, name) values ('studio', nb_a || '/podcast.mp3');
+  perform set_config('role', 'authenticated', true);
+
+  select count(*) into n from storage.objects where bucket_id = 'studio';
+  assert n = 1, 'A does not see own studio file';
+
   -- -------------------------------------------------------------------------
   -- As user B: A's data must be invisible and unchangeable
   -- -------------------------------------------------------------------------
@@ -89,6 +107,11 @@ begin
   select count(*) into n from public.studio_items; assert n = 0, 'B sees A''s studio items';
   select count(*) into n from storage.objects where bucket_id = 'sources';
   assert n = 0, 'B sees A''s files';
+  select count(*) into n from storage.objects where bucket_id = 'studio';
+  assert n = 0, 'B sees A''s studio files';
+  -- Deleting files cannot be checked here: the trigger storage.protect_delete()
+  -- blocks every direct DELETE on storage.objects, even with a matching policy.
+  -- Deletion goes through the Storage API, which is tested from the app.
 
   update public.notebooks set title = 'gehackt' where id = nb_a;
   get diagnostics n = row_count;

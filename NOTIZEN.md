@@ -52,6 +52,8 @@
 - **11.10.2026 · Wikipedia-Fußnoten zerreißen Sätze.** Ein Abschnitt beginnt mit „24] Der Einsatz …“. `Intl.Segmenter` trennt nach „Bauzeit.“, die Fußnote „[24]“ landet halb im nächsten Satz. Nur kosmetisch, die Suche funktioniert. Besser wäre: Fußnoten-Marken beim Einlesen von Webseiten entfernen.
 - **11.10.2026 · Lime-Striche zwischen markierten Absätzen (5e).** Die Markierung hatte `px-0.5` und `box-decoration-break: clone`. Mit `clone` bekommt jede Zeile eigenen Innenabstand, auch die leere Zeile zwischen zwei Absätzen. Die bestand dann nur aus Abstand und wurde zum Strich. Gemerkt im Screenshot. Gelöst: kein seitlicher Innenabstand.
 - **11.10.2026 · „Audio-Zusammenfassung“ ragte aus der Kachel (5, von mir gefunden).** Zwei Studio-Kacheln nebeneinander in einer ca. 300 px breiten Spalte: Das Wort „Zusammenfassung“ passte nicht und lief in die Nachbarkachel. Gelöst: `grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]`, die Kacheln stehen dann untereinander, plus `hyphens-auto` (die Seite hat `lang="de"`, der Browser trennt deutsch). Dabei auch gesehen: Bei ca. 1100 px schrumpfte die Quellen-Spalte auf 185 px, Titel brachen mitten im Wort. Gelöst: Seitenspalten mit Mindestbreite (Chat gibt zuerst nach), Typ-Icon zwischen 1024 und 1280 px ausgeblendet (reine Deko, der Typ steht im Text darunter). Lehre: Nicht nur bei 1440 px und Handy testen, auch bei der kleinsten Breite mit drei Spalten.
+- **11.10.2026 · Mein MP3-Prüfskript las die Datei falsch (6a).** Beim Hörtest hat die KI die MP3 von OpenAI mit den Tabellen für MPEG-1 gelesen. Ergebnis: „224 kbit/s, 48 kHz“, und nach dem ersten Frame „kein Sync“. Die Bits `FF F3` bedeuten aber MPEG-2 Layer III, mit anderen Tabellen für Bitrate und Abtastrate. Gemerkt: `afinfo` von macOS meldete 128 kbit/s. Gelöst: mit MPEG-2-Tabellen nachgerechnet. Alle Frames passen lückenlos, die Dauer stimmt auf die Millisekunde mit `afinfo` überein. Lehre: Ein eigenes Ergebnis mit einem unabhängigen Werkzeug gegenprüfen.
+- **11.10.2026 · Lösch-Regel für Storage lässt sich nicht per SQL testen (6a).** Annahme: Das RLS-Prüfskript kann prüfen, dass B die MP3 von A nicht löschen darf. Falsch: Supabase hat den Trigger `storage.protect_delete()`. Er verbietet **jedes** direkte `DELETE` auf `storage.objects`, damit keine Dateien ohne Datenbankeintrag zurückbleiben. Gemerkt: Das Skript brach mit „Direct deletion from storage tables is not allowed“ ab. Gelöst: Prüfung entfernt, Kommentar ins Skript. Das Löschen wird über die Storage-API aus der App getestet.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -179,6 +181,12 @@
 - **Gelöschte Quelle: gespeicherter Abschnitt.** Antwortet die Route mit einem Fehler, zeigt das Panel den Abschnitt aus `messages.citations` mit Hinweis. Dafür wird der Text im Beleg mitgespeichert (Entscheidung aus 4b).
 - **`AbortController` beim Laden.** Blättert jemand schnell weiter, wird die alte Anfrage abgebrochen und kann das neue Ergebnis nicht überschreiben. Der Zustand merkt sich, zu welcher Seite ein Ergebnis gehört (`key`). „Lädt“ heißt: Ergebnis gehört zu einer anderen Seite. So kein `setState` direkt im Effect.
 - **Sanftes Scrollen zur Markierung, außer bei `prefers-reduced-motion`.**
+- **Studio-Abschnitte ohne Suche (6a).** Podcast und Karteikarten haben keine Frage. `pickChunks` verteilt höchstens 16 Abschnitte: reihum auf die Quellen (eine kleine Quelle kommt nicht zu kurz), innerhalb einer Quelle gleichmäßig (Anfang, Mitte, Ende). Gezählt werden Abschnitte, nicht Tokens: 16 × max. ca. 800 = ca. 13.000 Tokens. Alternative: Map-Reduce (jede Quelle erst zusammenfassen). Deckt alles ab, kostet aber mehr Zeit und Geld, und Belege zeigen dann auf Zusammenfassungen statt auf den Originaltext.
+- **Data API liefert höchstens 1.000 Zeilen (6a).** Vorab beim Planen bemerkt. Der Rest wird ohne Fehler abgeschnitten. `loadStudioChunks` lädt deshalb erst nur `id`, `source_id`, `position`, seitenweise mit `.range()`, wählt aus und holt dann nur für die 16 gewählten Abschnitte den Text.
+- **Quellblöcke an einer Stelle (6a).** `formatSourceBlocks` in `src/lib/ai/source-blocks.ts` baut die `<quelle nr="…">`-Blöcke für Chat, Podcast und Karteikarten. Der Schutz gegen Prompt Injection steht nur einmal im Code.
+- **Bucket `studio` ohne Insert-Policy (6a).** Nur der Server schreibt MP3s (Secret Key, umgeht RLS). Nutzer dürfen ihre Dateien lesen (signierte URL) und löschen, aber nichts hochladen. Max. 25 MB, nur `audio/mpeg`.
+- **Eigene Rate Limits fürs Studio (6a).** 5 pro Stunde, 20 pro Tag, getrennt vom Chat. Ein Podcast kostet ein Vielfaches einer Chat-Antwort.
+- **MP3s einfach aneinanderhängen statt ffmpeg (6a, Hörtest).** OpenAI liefert reine MP3-Frames: kein ID3-Kopf, kein Xing/Info-Frame, konstant 128 kbit/s, 24 kHz, Mono. Ein Frame dauert genau 576/24.000 s = 24 ms. Zwei Dateien hintereinander (8,808 s + 9,720 s) ergeben laut `afinfo` genau 18,528 s.
 
 ## Echte Zahlen
 - Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.
@@ -188,6 +196,7 @@
 - Upload bis „Bereit“ für diese PDF: wenige Sekunden (lokal).
 - Wikipedia „Leipzig“ als URL: 1,5 MB HTML → 230 KB Text → 120 Abschnitte, 80.346 Tokens (ca. 0,0016 $), ca. 10–20 s bis „Bereit“.
 - Suche (4a, lokal → Frankfurt): Frage einbetten 140–290 ms (erster Aufruf 2,2 s), `match_chunks` 100–180 ms bei 38 Abschnitten.
+- Text-to-Speech (6a, Hörtest, `gpt-4o-mini-tts`): ein Satz von ca. 9 s Audio braucht 1,8–3,4 s und ergibt ca. 150 KB MP3 (128 kbit/s = 16 KB pro Sekunde, 5 Minuten ≈ 4,8 MB).
 - Dauer Podcast-Erstellung:
 
 ## Schwierigstes Problem

@@ -1,33 +1,9 @@
+import { formatSourceBlocks, type PromptChunk } from "@/lib/ai/source-blocks";
 import { NO_ANSWER } from "./citations";
-
-// What the prompt needs from a found chunk.
-export type PromptChunk = {
-  sourceTitle: string;
-  page: number | null;
-  content: string;
-};
-
-// Text from sources is data, not instructions. It goes into <quelle> blocks.
-// A source must not be able to close its block and write "outside" of it,
-// so we break every <quelle or </quelle tag inside the text.
-// "‹" looks similar to "<", the model can still read the text.
-function neutralizeTags(text: string): string {
-  return text.replace(/<(\/?quelle)/gi, "‹$1");
-}
 
 // The system prompt: fixed rules, then the chunks numbered [1] to [n].
 // The order of the chunks is the order of the search (best first).
 export function buildInstructions(chunks: PromptChunk[]): string {
-  const blocks = chunks.map((chunk, i) => {
-    const where = chunk.page === null ? "" : ` · Seite ${chunk.page}`;
-    return [
-      `<quelle nr="${i + 1}">`,
-      `Titel: ${neutralizeTags(chunk.sourceTitle)}${where}`,
-      neutralizeTags(chunk.content),
-      `</quelle>`,
-    ].join("\n");
-  });
-
   return `Du bist Faden. Du beantwortest Fragen nur mit den Quellen unten.
 
 Regeln:
@@ -40,5 +16,5 @@ Regeln:
 
 Quellen:
 
-${blocks.join("\n\n")}`;
+${formatSourceBlocks(chunks)}`;
 }

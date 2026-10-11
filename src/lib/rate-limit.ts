@@ -33,3 +33,23 @@ export async function allowChatRequest(userId: string): Promise<boolean> {
   const [minute, day] = await Promise.all([perMinute.limit(userId), perDay.limit(userId)]);
   return minute.success && day.success;
 }
+
+// Studio items (podcast, flashcards) have their own counters. A podcast costs
+// many times a chat answer (script + speech), so the limits are lower.
+const studioPerHour = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, "1 h"),
+  prefix: "faden:studio:hour",
+});
+
+const studioPerDay = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(20, "1 d"),
+  prefix: "faden:studio:day",
+});
+
+// true: the user may create a studio item. false: try again later.
+export async function allowStudioRequest(userId: string): Promise<boolean> {
+  const [hour, day] = await Promise.all([studioPerHour.limit(userId), studioPerDay.limit(userId)]);
+  return hour.success && day.success;
+}
