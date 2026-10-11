@@ -28,6 +28,7 @@
 - **11.10.2026 · `embedMany` teilt nur nach Anzahl auf (2.048), nicht nach Tokens.** OpenAI begrenzt aber auch die Tokens pro Anfrage (ca. 300.000). Eine große PDF wäre gescheitert. Gemerkt beim Lesen des Quellcodes (`maxEmbeddingsPerCall = 2048`). Gelöst: eigene Pakete à 100 Abschnitte.
 - **11.10.2026 · Null-Zeichen in PDFs.** Postgres speichert `\u0000` nicht in `text`. Manche PDFs enthalten es, der Insert wäre gescheitert. Vorab beim Durchdenken bemerkt, nicht erst im Fehlerfall. Gelöst in `normalizeText`, mit Test.
 - **11.10.2026 · PDF-Absätze gehen verloren.** PDF.js liefert Zeilenenden, aber keine Leerzeilen. Für uns ist jede PDF-Seite ein einziger Absatz, die Absatzregel greift nur bei Text und Webseiten. Gemerkt beim Ausgeben der Abschnitte der Test-PDF. Bewusst nicht gelöst. Besser wäre: Absätze an größeren Zeilenabständen erkennen (`extractTextItems` liefert Positionen).
+- **11.10.2026 · Vercel-Funktionen liefen in Washington, die Datenbank steht in Frankfurt.** Annahme: Vercel wählt die Region passend. Falsch: Standard ist `iad1` (Washington). Jede Datenbankabfrage ging über den Atlantik (ca. 80–100 ms extra), und Nutzertexte wurden unnötig in den USA verarbeitet. Gemerkt im Build-Log („Running build in Washington“) und am Header `x-vercel-id: fra1::iad1`. Gelöst: `vercel.json` mit `"regions": ["fra1"]` (Hobby erlaubt eine frei gewählte Region).
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -79,6 +80,7 @@
 - **`IngestError` für Meldungen an den Nutzer.** Nur diese Fehler zeigen ihren Text. Alle anderen zeigen „Die Verarbeitung ist fehlgeschlagen“, Details nur im Server-Log. So landen keine internen Fehlermeldungen in der Oberfläche.
 - **Polling alle 2 Sekunden statt Supabase Realtime.** `router.refresh()`, solange eine Quelle „Wartet“ oder „In Arbeit“ ist. Einfach und ohne extra Einrichtung. Realtime wäre schneller und spart Anfragen.
 - **Auch nach fehlgeschlagenem Upload `startProcessing` aufrufen.** Der Server findet dann keine Datei und setzt „Fehler“ mit klarer Meldung. Sonst bliebe die Quelle für immer auf „Wartet“.
+- **Funktionen in `fra1` (Frankfurt),** dieselbe Region wie Supabase. Kurze Wege zur Datenbank, Daten bleiben in der EU (außer bei OpenAI). Datei `vercel.json`, weil sie im Repo steht und man sie sehen kann. Alternative: Einstellung im Vercel-Dashboard (unsichtbar im Code).
 
 ## Echte Zahlen
 - Kosten pro Frage:
