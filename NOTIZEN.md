@@ -63,6 +63,9 @@
 - **12.10.2026 · Falsche Annahme zum Sprechtempo (6d).** Annahme: Deutsch hat ca. 140 Wörter pro Minute, also 700 Wörter ≈ 5 Minuten. Gemessen am ersten echten Podcast: 779 Wörter = 6:31 Min., also ca. 120 Wörter pro Minute. Dazu schreibt das Modell etwas mehr als verlangt. Gelöst: Ziel 600 Wörter, Messung als Kommentar im Code.
 - **12.10.2026 · Lücke im Parallel-Helfer (6d).** `mapWithConcurrency` brach bei einem Fehler zwar ab, die anderen Worker holten sich aber weiter neue Redebeiträge. Ein ohnehin gescheiterter Podcast hätte also weiter Sprach-Aufrufe bezahlt. Beim Durchlesen bemerkt. Gelöst: Nach dem ersten Fehler startet kein Worker mehr einen Aufruf, ein Test sichert das ab.
 - **12.10.2026 · Notebook löschen hätte MP3s liegen lassen (6d).** `deleteNotebook` räumte nur den Bucket `sources` auf. `on delete cascade` löscht die `studio_items`-Zeilen, erreicht aber Storage nicht. Vorab beim Durchdenken bemerkt. Gelöst: beide Buckets leeren, und Löschen sperren, solange ein Studio-Job läuft (er würde seine MP3 sonst in den geleerten Ordner hochladen).
+- **12.10.2026 · Neue CSS-Farben kamen nicht im Browser an (6e).** Sprecher-Leiste unsichtbar, aktiver Redebeitrag ohne Lime. Gemessen: Die Tokens `--player` usw. waren im Browser leer, die ausgelieferte CSS-Datei enthielt sie nicht, obwohl `globals.css` auf der Platte richtig war. Neuladen half nicht, keine Fehler im Log. Gelöst: Entwicklungsserver neu gestartet. Turbopack hatte die geänderte CSS-Datei nicht neu gebaut. Lehre: Erst prüfen, was wirklich ausgeliefert wird, bevor man am Code sucht.
+- **12.10.2026 · `Content-Disposition` im Browser `null` (6e), kein Fehler.** Der Test per `fetch` im Browser zeigte keinen Download-Header. Grund: Bei Anfragen an eine andere Domain gibt der Browser dem Skript nur wenige Header frei (CORS). Per Node-Skript geprüft: `attachment; filename=hausregeln-und-ein-leipziger-monument.mp3`.
+- **12.10.2026 · Steuerzeile brach auf dem Handy in drei Zeilen (6e).** Sprecher, Knöpfe und Tempo mit `flex-wrap` und Mindestbreiten passten nicht in ca. 295 px. Gemerkt im Screenshot. Gelöst: CSS-Grid, auf dem Handy oben die Knöpfe, darunter Sprecher und Tempo, ab `sm` eine Zeile.
 
 ## Entscheidungen
 <!-- Was habe ich entschieden, warum, welche Alternative gab es -->
@@ -215,6 +218,13 @@
 - **Fortschritt nacheinander speichern (6d).** Die Fortschritts-Updates kommen aus 4 parallelen Aufrufen. Eine Promise-Kette schreibt sie nacheinander, so überschreibt nie ein älterer Stand einen neueren. Fehler dort werden nur geloggt (reine Anzeige).
 - **MP3 wieder löschen, wenn danach etwas scheitert (6d).** Lädt der Job die Datei hoch und das letzte Update schlägt fehl, entfernt der `catch`-Block die Datei. Keine Datei ohne fertiges Element.
 - **Sprachmodell in `models.ts` (6d).** `gpt-4o-mini-tts` mit der Anweisung aus dem Hörtest. Die Stimmen gehören zu den Personen (`SPEAKERS` in `podcast.ts`).
+- **Sprecher-Leiste statt Wellenform (6e).** Die Balken im Design haben Zufallshöhen. Echte Lautstärken bräuchten MP3-Dekodierung. Stattdessen: ein Abschnitt pro Redebeitrag, so breit wie seine Dauer, Lea etwas höher als Tom. Echte Daten statt Deko. Zwei gleiche Schichten (grau, darüber lime mit `clip-path` bis zur Position).
+- **Unsichtbarer Schieberegler (6e).** Ein `<input type="range">` mit `opacity: 0` liegt über der Leiste. Spulen per Maus, Touch, Tastatur und Screenreader ohne eigenen Code. Der Rahmen zeigt den Tastatur-Fokus (`has-[:focus-visible]`).
+- **Zustand kommt vom `<audio>`-Element (6e).** `useAudioPlayer` speichert nur, was das Element meldet (`play`, `pause`, `timeupdate`). Anzeige und Ton können nicht auseinanderlaufen.
+- **Zwei signierte URLs, je 1 Stunde (6e).** Eine zum Abspielen, eine mit `download`-Option (setzt `Content-Disposition: attachment` mit Dateinamen aus dem Titel, nur a–z, 0–9, „-“). Erstellt mit dem Client des Nutzers, die Bucket-Policy entscheidet. Grenze: Nach einer Stunde braucht die Seite ein Neuladen.
+- **Mitlesen (6e).** `currentTurnIndex` sucht den zuletzt gestarteten Redebeitrag. Er wird hell-lime markiert, spätere sind grau, `scrollIntoView({ block: "nearest" })` hält ihn sichtbar (ohne Animation bei `prefers-reduced-motion`). Klick auf eine Zeit springt dorthin und spielt.
+- **„Neu erstellen“ statt „Folge anpassen“ (6e).** Länge, Sprache und Stimmen sind nicht gebaut, also auch keine Bedienelemente dafür. „Neu erstellen“ nutzt dieselben Quellen, die alte Folge bleibt. `createStudioItem` gibt die neue ID zurück, die Seite springt hin. Die Studio-Seite hat deshalb auch `maxDuration = 300`.
+- **Player-Farben als eigene Tokens (6e).** `--player` usw.: in beiden Modi dunkel, wie im Design. `--highlight-soft` für den aktiven Redebeitrag.
 
 ## Echte Zahlen
 - Kosten pro Frage (4c, `gpt-6-luna`, Reasoning `low`): 3.800–5.000 Eingabe-Tokens, 14–31 Ausgabe-Tokens, 0 Reasoning-Tokens. Ca. 0,0005 $ pro Frage, das Embedding der Frage ist vernachlässigbar.
@@ -229,7 +239,8 @@
 - Podcast-Skript (6c, lokal, 3 Quellen, 16 Abschnitte): unter 20 s, 28–29 Redebeiträge, ca. 760 Wörter (≈ 5,4 Min. Sprechzeit).
 - Erster echter Podcast (6d, lokal): **39 s** vom Klick bis „Bereit“. Skript ca. 20 s (8.257 Eingabe-, 2.304 Ausgabe-Tokens, davon 474 Reasoning), Sprache 16,7 s für 22 Redebeiträge mit 4 parallelen Aufrufen. Ergebnis: 6:31 Min., 6,26 MB, 779 Wörter. Dauer laut unserem Parser und laut `afinfo`: beide 391,008 s.
 - Preise Text-to-Speech (OpenAI-Preisseite, 12.10.2026): `gpt-4o-mini-tts` 0,60 $ pro 1 Mio. Text-Tokens, 12,00 $ pro 1 Mio. Audio-Tokens. `generateSpeech` meldet keine Token-Zahlen (Antwort ist reine Audiodatei), echte Kosten pro Minute deshalb nur im OpenAI-Nutzungs-Dashboard ablesbar.
-- Dauer Podcast-Erstellung:
+- Podcast mit Ziel 600 Wörter (6e): 701 Wörter, 27 Redebeiträge, 5:50 Min., 5,6 MB, erstellt in 37 s. Das Modell schreibt etwa 15 % mehr als verlangt.
+- Dauer Podcast-Erstellung: 37–39 s (lokal, 3 Quellen).
 
 ## Schwierigstes Problem
 <!-- Problem · woran gemerkt · was probiert · Lösung · was ich mitnehme -->

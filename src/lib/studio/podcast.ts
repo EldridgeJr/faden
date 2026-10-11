@@ -126,3 +126,31 @@ export function describeProgress(progress: PodcastProgress | undefined): string 
       return "MP3 wird gespeichert …";
   }
 }
+
+// The turn that is playing at `time` (seconds): the last one that has
+// started. -1 before the first turn or without start times.
+export function currentTurnIndex(turns: Turn[], time: number): number {
+  let index = -1;
+  for (const [i, turn] of turns.entries()) {
+    if (turn.start === undefined || turn.start > time) break;
+    index = i;
+  }
+  return index;
+}
+
+// File name for the download: "Das Völkerschlachtdenkmal" →
+// "das-voelkerschlachtdenkmal.mp3". Only a–z, 0–9 and "-", so it works on
+// every system and in the Content-Disposition header.
+export function downloadFileName(title: string): string {
+  const slug = title
+    .toLowerCase()
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80)
+    .replace(/-+$/, "");
+  return `${slug || "audio-zusammenfassung"}.mp3`;
+}

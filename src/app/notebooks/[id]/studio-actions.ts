@@ -10,6 +10,8 @@ import { generatePodcast } from "@/lib/studio/generate-podcast";
 import { studioState } from "@/lib/studio/status";
 
 export type StudioActionResult = { error: string | null };
+// itemId: the new item, so the page can open it.
+export type CreateStudioItemResult = { error: string; itemId?: never } | { error: null; itemId: string };
 
 // One background job per kind.
 const JOBS = {
@@ -22,7 +24,7 @@ const JOBS = {
 //
 // input is "unknown" on purpose: anyone can call a Server Action with any
 // data. Only Zod decides what is valid.
-export async function createStudioItem(input: unknown): Promise<StudioActionResult> {
+export async function createStudioItem(input: unknown): Promise<CreateStudioItemResult> {
   // 1. Login.
   const { supabase, userId } = await requireUser();
 
@@ -64,7 +66,7 @@ export async function createStudioItem(input: unknown): Promise<StudioActionResu
   after(() => job(item.id));
 
   refresh();
-  return { error: null };
+  return { error: null, itemId: item.id };
 }
 
 // Deletes a studio item: its file in storage (podcast) and its row.

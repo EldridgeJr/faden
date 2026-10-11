@@ -59,6 +59,17 @@
   --error: light-dark(#fde4db, #3f1d13);
   --error-foreground: light-dark(#a3361a, #f5a48a);
 
+  /* Audio player: dark in both modes, as in the design. In dark mode a bit
+     darker than a card, so it still stands out. */
+  --player: light-dark(#111315, #08090a);
+  --player-foreground: #ffffff;
+  --player-muted: #9aa0a8;
+  --player-line: #2f3338;
+  --player-track: #42464d;
+
+  /* Soft lime: the turn that is playing right now (transcript). */
+  --highlight-soft: light-dark(#f1f8cf, #2b3210);
+
   /* shadcn/ui names that map to the colors above. */
   --card-foreground: var(--foreground);
   --popover: var(--card);
@@ -86,6 +97,12 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-highlight: var(--highlight);
   --color-highlight-foreground: var(--highlight-foreground);
+  --color-highlight-soft: var(--highlight-soft);
+  --color-player: var(--player);
+  --color-player-foreground: var(--player-foreground);
+  --color-player-muted: var(--player-muted);
+  --color-player-line: var(--player-line);
+  --color-player-track: var(--player-track);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-ready: var(--ready);

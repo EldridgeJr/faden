@@ -62,3 +62,11 @@ const megabyteFormat = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1
 export function formatMegabytes(bytes: number): string {
   return `${megabyteFormat.format(bytes / 1_000_000)} MB`;
 }
+
+// How long a job took: 39 → "39 s", 108 → "1 Min. 48 s", 120 → "2 Min.".
+export function formatBuildTime(seconds: number): string {
+  const whole = Math.max(0, Math.round(seconds));
+  if (whole < 60) return `${whole} s`;
+  const rest = whole % 60;
+  return `${Math.floor(whole / 60)} Min.${rest > 0 ? ` ${rest} s` : ""}`;
+}

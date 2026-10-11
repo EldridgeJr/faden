@@ -14,11 +14,14 @@ export function StudioFrame({
   notebook,
   item,
   canDelete,
+  actions,
   children,
 }: {
   notebook: { id: string; title: string };
   item: { id: string; title: string };
   canDelete: boolean;
+  // Extra buttons in the header, for example the MP3 download.
+  actions?: ReactNode;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -27,7 +30,7 @@ export function StudioFrame({
   return (
     <div className="flex h-dvh flex-col p-2 sm:p-5">
       <div className="mx-auto flex min-h-0 w-full max-w-[1480px] flex-1 flex-col gap-4 rounded-[36px] bg-surface p-3 shadow-[0_1px_2px_rgba(17,19,21,0.04),0_16px_48px_rgba(17,19,21,0.06)] sm:p-5">
-        <header className="flex items-center justify-between gap-3">
+        <header className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <Link
               href="/notebooks"
@@ -53,13 +56,16 @@ export function StudioFrame({
               </h1>
             </div>
           </div>
-          {canDelete && (
-            <DeleteStudioItemButton
-              itemId={item.id}
-              title={item.title}
-              onDeleted={() => router.push(notebookHref)}
-            />
-          )}
+          <div className="flex shrink-0 items-center gap-2.5">
+            {actions}
+            {canDelete && (
+              <DeleteStudioItemButton
+                itemId={item.id}
+                title={item.title}
+                onDeleted={() => router.push(notebookHref)}
+              />
+            )}
+          </div>
         </header>
         {children}
       </div>

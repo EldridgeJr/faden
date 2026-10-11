@@ -3,7 +3,9 @@ import {
   buildPodcastInstructions,
   cleanScript,
   countWords,
+  currentTurnIndex,
   describeProgress,
+  downloadFileName,
   MAX_TURNS,
   scriptCitations,
   spokenText,
@@ -96,5 +98,37 @@ describe("describeProgress", () => {
     expect(describeProgress({ stage: "script" })).toBe("Skript wird geschrieben …");
     expect(describeProgress({ stage: "audio", done: 12, total: 29 })).toBe("Sprache wird erzeugt: 12 von 29");
     expect(describeProgress({ stage: "upload" })).toBe("MP3 wird gespeichert …");
+  });
+});
+
+describe("currentTurnIndex", () => {
+  const turns = [
+    { speaker: "lea" as const, text: "A", start: 0 },
+    { speaker: "tom" as const, text: "B", start: 13.4 },
+    { speaker: "lea" as const, text: "C", start: 46.5 },
+  ];
+
+  it("finds the turn that has started last", () => {
+    expect(currentTurnIndex(turns, 0)).toBe(0);
+    expect(currentTurnIndex(turns, 13.39)).toBe(0);
+    expect(currentTurnIndex(turns, 13.4)).toBe(1);
+    expect(currentTurnIndex(turns, 300)).toBe(2);
+  });
+
+  it("returns -1 without start times", () => {
+    expect(currentTurnIndex([{ speaker: "lea", text: "A" }], 5)).toBe(-1);
+  });
+});
+
+describe("downloadFileName", () => {
+  it("writes umlauts out and keeps only a–z, 0–9 and dashes", () => {
+    expect(downloadFileName("Das Völkerschlachtdenkmal in Leipzig")).toBe(
+      "das-voelkerschlachtdenkmal-in-leipzig.mp3",
+    );
+    expect(downloadFileName("Straße: Regeln & Ruhe?")).toBe("strasse-regeln-ruhe.mp3");
+  });
+
+  it("falls back to a fixed name", () => {
+    expect(downloadFileName("???")).toBe("audio-zusammenfassung.mp3");
   });
 });

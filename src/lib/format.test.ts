@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDay, formatDuration, formatMegabytes, greeting } from "./format";
+import { formatBuildTime, formatDay, formatDuration, formatMegabytes, greeting } from "./format";
 
 describe("greeting", () => {
   // October: Germany is UTC+2 (summer time).
@@ -45,5 +45,13 @@ describe("formatMegabytes", () => {
   it("writes megabytes with a German decimal comma", () => {
     expect(formatMegabytes(4_812_345)).toBe("4,8 MB");
     expect(formatMegabytes(6_000_000)).toBe("6 MB");
+  });
+});
+
+describe("formatBuildTime", () => {
+  it("writes seconds, or minutes and seconds", () => {
+    expect(formatBuildTime(39.4)).toBe("39 s");
+    expect(formatBuildTime(108)).toBe("1 Min. 48 s");
+    expect(formatBuildTime(120)).toBe("2 Min.");
   });
 });
