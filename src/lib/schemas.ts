@@ -107,3 +107,13 @@ export const chatRequestSchema = z.object({
     .min(1, "Bitte stell eine Frage.")
     .max(MAX_QUESTION_CHARS, "Die Frage darf höchstens 2.000 Zeichen lang sein."),
 });
+
+// Create a studio item from the selected sources. The kinds grow with step 6
+// (podcast follows).
+export const studioRequestSchema = z.object({
+  notebookId: z.uuid(),
+  sourceIds: z.array(z.uuid()).min(1, "Bitte wähle mindestens eine Quelle aus.").max(100),
+  kind: z.enum(["flashcards"]),
+});
+
+export const studioItemIdSchema = z.uuid();

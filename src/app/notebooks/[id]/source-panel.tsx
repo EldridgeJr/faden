@@ -1,12 +1,11 @@
 "use client";
 
 import { AlignLeft, CloudUpload, FileText, Globe, Plus, TriangleAlert } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DeleteSourceButton } from "./delete-source-button";
 import { useFileDrop } from "./use-file-drop";
+import { usePolling } from "./use-polling";
 
 export type SourceItem = {
   id: string;
@@ -23,8 +22,6 @@ const TYPES: Record<string, { label: string; Icon: typeof FileText }> = {
   url: { label: "Webseite", Icon: Globe },
   text: { label: "Text", Icon: AlignLeft },
 };
-
-const POLL_INTERVAL_MS = 2000;
 
 // "PDF · 12 S. · 38 Abschnitte"
 function describe(source: SourceItem): string {
@@ -55,20 +52,11 @@ export function SourcePanel({
   onPasteText: (title: string) => void;
   uploading: boolean;
 }) {
-  const router = useRouter();
   // PDFs can be dropped anywhere on this column, not only in the dialog.
   const { dragging, handlers } = useFileDrop(onFiles, uploading);
   const busy = sources.some((s) => s.status === "pending" || s.status === "processing");
 
-  // Polling: while a source is busy, ask the server for the page again every
-  // 2 seconds. router.refresh() re-renders the Server Component with fresh
-  // data. Stops as soon as nothing is busy.
-  // Alternative: Supabase Realtime (push instead of asking), more setup.
-  useEffect(() => {
-    if (!busy) return;
-    const timer = setInterval(() => router.refresh(), POLL_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [busy, router]);
+  usePolling(busy);
 
   const ready = sources.filter((s) => s.status === "ready");
   const selectedCount = ready.filter((s) => !excluded.has(s.id)).length;

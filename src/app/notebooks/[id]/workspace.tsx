@@ -7,6 +7,7 @@ import { Logo } from "@/components/logo";
 import { StatusChip } from "@/components/status-chip";
 import { Button } from "@/components/ui/button";
 import type { ChatMessage } from "@/lib/chat/citations";
+import type { StudioItemSummary } from "@/lib/studio/summary";
 import { cn } from "@/lib/utils";
 import { NotebookMenu } from "../notebook-dialogs";
 import { AddSourceDialog } from "./add-source-dialog";
@@ -31,10 +32,12 @@ export function Workspace({
   notebook,
   sources,
   initialMessages,
+  studioItems,
 }: {
   notebook: { id: string; title: string };
   sources: SourceItem[];
   initialMessages: ChatMessage[];
+  studioItems: StudioItemSummary[];
 }) {
   // We store the sources the user switched OFF, not the ones that are on.
   // So a source that becomes ready later is selected automatically.
@@ -205,7 +208,7 @@ export function Workspace({
               openCitation ? "lg:hidden" : "lg:flex",
             )}
           >
-            <StudioPanel />
+            <StudioPanel notebookId={notebook.id} selectedIds={selectedIds} items={studioItems} />
           </div>
         </div>
       </div>

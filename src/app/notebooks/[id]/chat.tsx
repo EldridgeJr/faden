@@ -13,8 +13,8 @@ import {
   type Citation,
 } from "@/lib/chat/citations";
 import { MAX_QUESTION_CHARS } from "@/lib/schemas";
-import { cn } from "@/lib/utils";
 import type { OpenCitation } from "./citation-panel";
+import { CitationChips, CitationNumber, CitedText, usedCitations } from "./cited-text";
 
 const GENERIC_ERROR = "Die Antwort ist fehlgeschlagen. Bitte versuche es noch einmal.";
 
@@ -198,24 +198,6 @@ export function Chat({
   );
 }
 
-// The number of a citation as a small lime square.
-function CitationNumber({ n, active = false }: { n: number; active?: boolean }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex h-6 min-w-6 items-center justify-center rounded-lg px-1.5 align-[2px] font-mono text-xs leading-none font-medium",
-        // Active: black with lime text in both themes. bg-primary would turn
-        // light in dark mode, and lime on light grey is hard to read.
-        active
-          ? "bg-highlight-foreground text-highlight ring-1 ring-highlight"
-          : "bg-highlight text-highlight-foreground",
-      )}
-    >
-      {n}
-    </span>
-  );
-}
-
 // One answer: text with [n] as buttons, the cited sources as chips below.
 function Answer({
   message,
@@ -233,61 +215,18 @@ function Answer({
   );
   const text = textOf(message);
   const segments = splitCitations(text, new Set(citations.map((c) => c.n)));
-
-  // Only the citations the text really uses, in order of their number.
-  const used = new Set(segments.flatMap((s) => (s.type === "citation" ? [s.n] : [])));
-  const usedCitations = citations.filter((c) => used.has(c.n)).sort((a, b) => a.n - b.n);
-  const open = (n: number) => onOpen(n, usedCitations);
+  const cited = usedCitations(segments, citations);
+  const open = (n: number) => onOpen(n, cited);
 
   return (
     <article className="flex items-start gap-3">
       <Logo size={30} />
       <div className="flex min-w-0 flex-1 flex-col gap-3.5">
-        {/* Plain text only. React escapes it, so model output never becomes HTML. */}
         <p className="max-w-[66ch] text-[15px] leading-[1.7] whitespace-pre-wrap">
-          {segments.map((segment, i) =>
-            segment.type === "text" ? (
-              <span key={i}>{segment.text}</span>
-            ) : (
-              <button
-                key={i}
-                type="button"
-                onClick={() => open(segment.n)}
-                aria-label={`Beleg ${segment.n} anzeigen`}
-                aria-pressed={activeNumber === segment.n}
-                className="mx-0.5 rounded-lg focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
-              >
-                <CitationNumber n={segment.n} active={activeNumber === segment.n} />
-              </button>
-            ),
-          )}
+          <CitedText segments={segments} activeNumber={activeNumber} onOpen={open} />
         </p>
 
-        {usedCitations.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {usedCitations.map((citation) => (
-              <button
-                key={citation.n}
-                type="button"
-                onClick={() => open(citation.n)}
-                className={cn(
-                  "inline-flex min-h-11 max-w-full items-center gap-2 rounded-[14px] border py-1.5 pr-3.5 pl-2 text-left text-[13px] transition-colors",
-                  activeNumber === citation.n
-                    ? "border-foreground/30 bg-tile"
-                    : "border-border bg-surface hover:bg-tile",
-                )}
-              >
-                <CitationNumber n={citation.n} active={activeNumber === citation.n} />
-                <span className="min-w-0 break-words">{citation.sourceTitle}</span>
-                {citation.page !== null && (
-                  <span className="font-mono text-xs whitespace-nowrap text-muted-foreground">
-                    S. {citation.page}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
+        <CitationChips citations={cited} activeNumber={activeNumber} onOpen={open} />
 
         {text.trim() === NO_ANSWER && (
           <span className="inline-flex h-[30px] items-center gap-1.5 self-start rounded-full bg-tile px-3 text-xs text-muted-foreground">

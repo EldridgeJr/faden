@@ -77,6 +77,16 @@ export function splitCitations(text: string, validNumbers: ReadonlySet<number>):
   return segments;
 }
 
+// Keeps only citation numbers from 1 to count. "[2, 17]" becomes "[2]",
+// "[17]" disappears together with the space before it. For texts we store
+// (flashcards, podcast), so no bracket points to nothing.
+export function keepValidCitations(text: string, count: number): string {
+  return text.replace(new RegExp(String.raw`(\s?)(${CITATION})`, "g"), (_match, space: string, bracket: string) => {
+    const valid = numbersIn(bracket).filter((n) => n >= 1 && n <= count);
+    return valid.length === 0 ? "" : space + valid.map((n) => `[${n}]`).join("");
+  });
+}
+
 // Removes [n] from an old answer. In the history, these numbers would point
 // to the chunks of an earlier question, not to the chunks of the new one.
 export function stripCitations(text: string): string {

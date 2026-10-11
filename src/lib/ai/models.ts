@@ -20,7 +20,13 @@ export const chatModel = openai("gpt-6-luna");
 // find the answer in 8 chunks, and the first word comes sooner.
 export const CHAT_REASONING = "low";
 
-export const chatProviderOptions = {
+// Studio items (flashcards, podcast script): the same model, but "medium".
+// Here quality counts more than speed, nobody waits for the first word.
+export const studioModel = openai("gpt-6-luna");
+export const STUDIO_REASONING = "medium";
+
+// For chat and studio.
+export const textProviderOptions = {
   openai: {
     // OpenAI does not keep the response for later API calls. We store the
     // answer ourselves, so there is no reason to leave a copy there.

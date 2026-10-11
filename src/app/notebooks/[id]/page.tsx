@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { toChatMessages } from "@/lib/chat/messages";
 import { notebookIdSchema, sourceMetaSchema } from "@/lib/schemas";
+import { summarizeStudioItem } from "@/lib/studio/summary";
 import type { SourceItem } from "./source-panel";
 import { Workspace } from "./workspace";
 
@@ -60,11 +61,21 @@ export default async function NotebookPage({ params }: PageProps<"/notebooks/[id
     .limit(50);
   if (messagesError) throw messagesError;
 
+  // Studio items, newest first.
+  const { data: studioRows, error: studioError } = await supabase
+    .from("studio_items")
+    .select("id, kind, status, error, data, created_at")
+    .eq("notebook_id", notebook.id)
+    .order("created_at", { ascending: false });
+  if (studioError) throw studioError;
+  const now = new Date();
+
   return (
     <Workspace
       notebook={notebook}
       sources={items}
       initialMessages={toChatMessages(lastMessages.reverse())}
+      studioItems={studioRows.map((row) => summarizeStudioItem(row, now))}
     />
   );
 }

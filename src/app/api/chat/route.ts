@@ -6,7 +6,7 @@ import {
   type ModelMessage,
 } from "ai";
 import { after } from "next/server";
-import { CHAT_REASONING, chatModel, chatProviderOptions } from "@/lib/ai/models";
+import { CHAT_REASONING, chatModel, textProviderOptions } from "@/lib/ai/models";
 import { getUser } from "@/lib/auth";
 import {
   findCitations,
@@ -155,7 +155,7 @@ export async function POST(request: Request) {
       const result = streamText({
         model: chatModel,
         reasoning: CHAT_REASONING,
-        providerOptions: chatProviderOptions,
+        providerOptions: textProviderOptions,
         instructions: buildInstructions(chunks),
         messages: [...history, { role: "user", content: question }],
         maxOutputTokens: MAX_OUTPUT_TOKENS,
