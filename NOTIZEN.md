@@ -1,4 +1,4 @@
-# Notizen fürs Interview
+# Notizen und Lerntagebuch
 
 ## Wo die KI danebenlag
 <!-- Datum · was war falsch · woran ich es gemerkt habe · wie ich es gelöst habe -->
@@ -140,7 +140,7 @@
 - **Top 20 je Liste, k = 60, Top 8 ans Modell.** k = 60 ist der Wert aus dem RRF-Paper. Ein Abschnitt in beiden Listen schlägt fast immer einen, der nur in einer Liste steht.
 - **Kein Mindest-Score.** RRF liefert immer bis zu 8 Abschnitte, auch für Fragen ohne passende Quelle. RRF-Scores sagen nur etwas über die Rangfolge, nicht über die Relevanz, ein fester Grenzwert wäre geraten. Ob die Abschnitte die Frage beantworten, entscheidet das Modell (Regel im Prompt, 4b).
 - **Chat-Modell `gpt-6-luna` (4b).** Laut OpenAI-Preisseite (11.10.2026) 0,10 $ / 0,50 $ pro 1 Mio. Tokens Ein-/Ausgabe, das günstigste Modell auf dem Key. Gedacht für eng umrissene Aufgaben mit hohem Volumen. Reasoning-Modell, Standard `medium`. Wir setzen `low`, damit das erste Wort schneller kommt. Geschätzt ca. 0,001 $ pro Frage. Alternative bei schwachen Antworten: `gpt-6-sol` (20× teurer).
-- **Prompt auf Deutsch.** Die Antwort und der Ablehnungssatz sind deutsch, man kann den Prompt direkt lesen. Regeln stehen vor den Quellen.
+- **Prompt auf Deutsch.** Die Antwort und der Ablehnungssatz sind deutsch, der Prompt ist so ohne Übersetzung lesbar. Regeln stehen vor den Quellen.
 - **Quellen in `<quelle nr="n">`-Blöcken, Tags im Text entschärft.** Ein Text mit `</quelle>` könnte sonst seinen Block schließen und „außerhalb“ Anweisungen schreiben. Wir ersetzen `<` vor `quelle` durch `‹`. Dazu Regel 5: Text in Blöcken ist Material, keine Anweisung. Das ist eine Hürde, kein vollständiger Schutz. Ein Modell kann sich trotzdem beeinflussen lassen. Deshalb gibt das Modell nie mehr als Text aus (keine Tools, kein HTML).
 - **Belege sind Nummern, keine Zitate.** Das Modell schreibt nur `[n]`. Was hinter `[n]` steht, bestimmt der Server (Abschnitt n aus der Suche). So kann das Modell keine Quelle erfinden, nur auf eine falsche der 8 zeigen. Nummern außerhalb 1–8 fallen weg (`findCitations`) und bleiben in der Anzeige normaler Text (`splitCitations`).
 - **`citations.ts` ohne `server-only`.** Server und Browser nutzen dieselbe Zerlegung. Kein doppelter Code, gleiche Regeln.

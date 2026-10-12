@@ -10,12 +10,12 @@ Faden lässt Nutzer Quellen hochladen und beantwortet Fragen **nur aus diesen Qu
 - Frist: 7 Tage ab 09.10.2026, Ziel: deutlich früher
 
 ## Wichtig für die Zusammenarbeit
-- Ich muss jede Zeile im Repo im Technik-Interview erklären können. **Erkläre bei jedem Schritt kurz, was du tust und warum.** Keine Magie, keine unnötigen Abstraktionen.
+- Ich muss jede Zeile im Repo selbst erklären können. **Erkläre bei jedem Schritt kurz, was du tust und warum.** Keine Magie, keine unnötigen Abstraktionen.
 - Arbeite in kleinen Schritten. Vor größeren Änderungen erst einen Plan zeigen und auf mein Okay warten.
 - Nach jedem Schritt: `npm run lint`, Typecheck und Tests laufen lassen, dann committen (klare Commit-Nachricht).
 - Wenn du dir bei einer API unsicher bist (Versionen ändern sich), prüfe die aktuelle Doku, statt zu raten. Sag mir, wenn du unsicher bist.
 - Nach jedem fertigen Schritt: Erklärseite erstellen (siehe unten).
-- Trage in `NOTIZEN.md` ein, wenn etwas schiefging, eine Annahme falsch war oder du einen Fehler korrigieren musstest. Ich brauche das fürs Interview.
+- Trage in `NOTIZEN.md` ein, wenn etwas schiefging, eine Annahme falsch war oder du einen Fehler korrigieren musstest. Das ist mein Lerntagebuch.
 
 ## Erklärseite nach jedem Schritt
 Wenn ein Schritt aus der Reihenfolge fertig ist, erstelle eine Erklärseite als HTML:
@@ -28,7 +28,7 @@ Inhalt:
 4. **Wichtigster Code** – 3 bis 5 Ausschnitte, jeweils kurz erklärt.
 5. **Entscheidungen und Alternativen** – was wir gewählt haben und was die Alternative gewesen wäre.
 6. **Was schiefgehen kann** – Grenzen, Fehlerfälle, Sicherheitsaspekte.
-7. **Interview-Check** – 5 Fragen, die dazu gestellt werden könnten, Antworten zum Aufklappen.
+7. **Selbsttest** – 5 Verständnisfragen zum Schritt, Antworten zum Aufklappen.
 
 Schreibstil: kurze, klare Sätze, ein Gedanke pro Satz, aktive Form, gleiche Begriffe für gleiche Dinge (etwa 80 % in Richtung ASD-STE100 / Simplified Technical English).
 
@@ -37,7 +37,7 @@ Schreibstil: kurze, klare Sätze, ein Gedanke pro Satz, aktive Form, gleiche Beg
 - Diagramm zum Durchklicken: Klick auf einen Schritt oder Pfeil hebt ihn hervor und zeigt Details. Dazu ein „Abspielen“-Knopf, der den Datenfluss Schritt für Schritt animiert.
 - Code-Ausschnitte mit Syntax-Hervorhebung und Kopieren-Knopf; einzelne Zeilen anklickbar mit Erklärung.
 - Interaktive Mini-Demos, wo es passt: z. B. Text eingeben und sehen, wie er in Abschnitte mit Überlappung zerfällt, oder wie RRF zwei Ranglisten zusammenführt.
-- Interview-Check als Lernkarten: erst Frage, Klick zeigt Antwort, Fortschritt „x von 5 gewusst“.
+- Selbsttest als Lernkarten: erst Frage, Klick zeigt Antwort, Fortschritt „x von 5 gewusst“.
 - Sanfte Übergänge und Animationen, die `prefers-reduced-motion` respektieren.
 - Alles in einer Datei: eigenes CSS und JavaScript inline, keine CDNs, funktioniert offline.
 - Zusätzlich `docs/erklaerungen/index.html` als Übersicht aller Schritte, wird nach jedem Schritt aktualisiert.
