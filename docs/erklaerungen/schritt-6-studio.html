@@ -353,6 +353,70 @@
   #mp3Now .verdict { margin-top: 10px; }
   #fileRows td:first-child { line-height: 2; }
   @media (max-width: 760px) { .sliders.three { grid-template-columns: 1fr; } }
+  /* ---------- Step 6, easier to read ---------- */
+  .tldr { background: color-mix(in srgb, var(--accent) 24%, var(--card)); border-radius: var(--r-card); padding: 28px; box-shadow: var(--shadow); }
+  .tldr-intro { font: 500 12px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--text); opacity: .7; margin-bottom: 12px; }
+  .tldr-list { margin: 0; padding-left: 22px; display: grid; gap: 14px; font-size: 17px; line-height: 1.55; }
+  .tldr-list li::marker { font: 600 15px var(--mono); }
+  .tldr-list b { font-weight: 650; }
+  .tldr .facts { margin-top: 22px; }
+  .tldr .fact { background: color-mix(in srgb, var(--card) 70%, transparent); }
+
+  .blocks { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); }
+  .block { background: var(--card); border-radius: var(--r-tile); padding: 20px 22px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+  .block-num { width: 26px; height: 26px; border-radius: 50%; background: var(--tile); font: 600 13px var(--mono); display: grid; place-items: center; margin-bottom: 10px; }
+  .block p { font-size: 15px; margin: 0 0 8px; }
+  .block .why { color: var(--muted); }
+  .block .files { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); font: 12px/1.6 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+  details.more { margin-top: 14px; background: var(--card); border-radius: var(--r-tile); padding: 14px 18px; box-shadow: var(--shadow); }
+  .card details.more { background: var(--tile); box-shadow: none; }
+  details.more summary { cursor: pointer; font-weight: 500; }
+  details.more[open] summary { margin-bottom: 12px; }
+  #fileRows td:first-child { white-space: normal; min-width: 180px; }
+
+  .code-head .spacer { flex: 1; }
+  .seg.mini button { padding: 5px 12px; font-size: 13px; }
+  .io { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 14px 20px; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  .io span { display: flex; gap: 8px; align-items: baseline; }
+  .io b { font: 600 11px var(--mono); letter-spacing: .06em; background: var(--tile); padding: 2px 8px; border-radius: var(--r-pill); }
+  .walk-step { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); border-bottom: 1px solid var(--line); }
+  .walk-step:last-child { border-bottom: 0; }
+  .walk-text { padding: 18px 20px; display: flex; gap: 12px; align-items: flex-start; }
+  .walk-num, .dnum { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #111315; font: 600 13px var(--mono); display: grid; place-items: center; }
+  .walk-text h4 { margin: 2px 0 4px; font-size: 15.5px; }
+  .walk-text p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .walk-code { margin: 0; padding: 16px 20px; background: var(--surface); font: 13px/1.65 var(--mono); overflow-x: auto; white-space: pre; }
+  .walk-code.de { font: 14.5px/1.75 var(--sans); white-space: pre-wrap; }
+  @media (max-width: 760px) { .walk-step { grid-template-columns: minmax(0, 1fr); } .walk-text { padding-bottom: 10px; } .code-head { flex-wrap: wrap; } .code-head .file { flex-basis: 100%; } }
+
+  .demo-q { background: var(--tile); border-radius: var(--r-tile); padding: 14px 16px; font-size: 15.5px; }
+  .try { display: flex; flex-wrap: wrap; gap: 8px; }
+  .try button { font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 9px 14px; border-radius: var(--r-pill); cursor: pointer; transition: background .2s, color .2s; }
+  .try button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .explain { margin-top: 14px; padding: 16px 18px; border-radius: var(--r-tile); background: color-mix(in srgb, var(--accent) 22%, transparent); font-size: 15.5px; line-height: 1.6; }
+  .dsteps { display: grid; gap: 22px; margin-top: 18px; }
+  .dstep { display: flex; gap: 14px; align-items: flex-start; }
+  .dbody { flex: 1; min-width: 0; }
+  .dbody h4 { margin: 2px 0 4px; font-size: 16px; }
+  .dbody p { margin: 0 0 10px; color: var(--muted); font-size: 15px; }
+  .beads { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .bead { width: 12px; height: 12px; border-radius: 50%; background: var(--text); }
+  .more-beads { font: 12px var(--mono); color: var(--muted); margin-left: 6px; }
+  .mtrack { display: flex; align-items: center; gap: 3px; height: 30px; }
+  .mseg { height: 18px; border-radius: 999px; min-width: 3px; flex-basis: 0; transition: box-shadow .2s; }
+  .mseg.lea { background: var(--text); }
+  .mseg.tom { background: color-mix(in srgb, var(--muted) 50%, var(--line)); }
+  .mseg.on { box-shadow: 0 0 0 3px var(--accent); }
+  .mlabels { display: flex; gap: 3px; font: 11px var(--mono); color: var(--muted); }
+  .mlabels span { flex-basis: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+  #mp3Now .verdict { margin-top: 10px; }
+
+  .says { display: grid; gap: 12px; }
+  .say { background: var(--card); border-radius: var(--r-tile); padding: 20px 22px; box-shadow: var(--shadow); }
+  .say p { font-size: 15px; margin: 0 0 8px; }
+  .say .said { font-weight: 650; font-size: 17px; line-height: 1.45; }
+  .say .whynot { color: var(--muted); margin: 0; }
+  .say .whynot b { color: var(--text); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -370,11 +434,11 @@
 
 <div class="wrap">
   <nav class="toc" aria-label="Abschnitte">
-    <a href="#funktioniert">Was funktioniert</a>
+    <a href="#kurz">In 60 Sekunden</a>
     <a href="#ablauf">Ablauf</a>
-    <a href="#dateien">Dateien</a>
+    <a href="#bausteine">Bausteine</a>
     <a href="#code">Code</a>
-    <a href="#demo">Demo</a>
+    <a href="#demo">Demos</a>
     <a href="#entscheidungen">Entscheidungen</a>
     <a href="#risiken">Was schiefgehen kann</a>
     <a href="#interview">Interview-Check</a>
@@ -383,26 +447,30 @@
   <header class="hero">
     <div class="eyebrow">SCHRITT 6 VON 7 · 12.10.2026</div>
     <h1>Studio: Podcast mit zwei Stimmen und Karteikarten</h1>
-    <p class="lead" data-rich>Aus den ausgewählten Quellen macht Faden jetzt zwei neue Formate. Eine Audio-Zusammenfassung, in der Lea und Tom über die Quellen sprechen. Und Karteikarten zum Lernen. Beide haben [[citation|Belege]] wie der Chat.</p>
+    <p class="lead">Aus den ausgewählten Quellen macht Faden jetzt zwei neue Formate: eine Audio-Zusammenfassung, in der Lea und Tom über die Quellen sprechen, und Karteikarten zum Lernen. Beide haben Belege wie der Chat.</p>
     <div class="chips">
       <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test 185/185</span><span class="chip ok">live auf Vercel getestet</span>
     </div>
-    <div class="hint" data-rich>Tipp: [[term|Gepunktet unterstrichene Wörter]] antippen. Dann erscheint eine kurze Erklärung.</div>
   </header>
 
-  <!-- 1 -->
-  <section id="funktioniert">
-    <div class="sec-head"><span class="sec-num">01</span><h2>Was jetzt funktioniert</h2></div>
-    <div class="card" data-rich>
-      <p>Die Studio-Spalte hat zwei echte Knöpfe: „Audio-Zusammenfassung“ und „Karteikarten“. Ein Klick startet einen [[job|Hintergrundjob]], die Spalte zeigt den Fortschritt. Der Podcast ist etwa 5 Minuten lang, Lea fragt und Tom erklärt. Auf seiner eigenen Seite gibt es einen Player, ein Transkript zum Mitlesen und einen MP3-Download. Karteikarten dreht man mit einem Klick um. Jede Antwort hat einen Beleg, der zur Stelle in der Quelle springt.</p>
+  <!-- 0 -->
+  <section id="kurz">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Das Wichtigste in 60 Sekunden</h2></div>
+    <div class="tldr">
+      <p class="tldr-intro">Diese drei Sätze solltest du im Interview frei sagen können:</p>
+      <ol class="tldr-list">
+        <li><b>Ein Klick startet einen Job im Hintergrund.</b> Der Server prüft erst Login, Eingabe, Limit und Rechte. Dann antwortet er sofort, und die Arbeit läuft danach weiter. Die Seite fragt alle 2 Sekunden nach dem Stand.</li>
+        <li><b>Das Modell schreibt ein Skript mit Belegen.</b> Es bekommt 16 Abschnitte, gleichmäßig aus allen Quellen. Lea fragt, Tom erklärt. Ein Skript ganz ohne Beleg lehnt Faden ab.</li>
+        <li><b>Jeder Redebeitrag wird einzeln vertont, mein Code fügt die Teile zu einer MP3 zusammen.</b> Dabei zählt er die Ton-Stücke jeder Datei. So kennt er die Startzeit jedes Redebeitrags, und das Transkript läuft beim Hören mit.</li>
+      </ol>
       <div class="facts">
         <div class="tile fact"><div class="k">PODCAST FERTIG IN</div><div class="v mono small">37–58 s (live 47 s)</div></div>
-        <div class="tile fact"><div class="k">LÄNGE</div><div class="v mono small">ca. 5 Min. · 20–24 Redebeiträge</div></div>
+        <div class="tile fact"><div class="k">LÄNGE</div><div class="v mono small">ca. 5 Min.</div></div>
         <div class="tile fact"><div class="k">STIMMEN</div><div class="v mono small">Lea: marin · Tom: cedar</div></div>
-        <div class="tile fact"><div class="k">KARTEIKARTEN</div><div class="v mono small">bis 12 Karten in 10–25 s</div></div>
-        <div class="tile fact"><div class="k">NEUE TESTS</div><div class="v mono small">66 (jetzt 185)</div></div>
+        <div class="tile fact"><div class="k">KARTEIKARTEN</div><div class="v mono small">bis 12 in 10–25 s</div></div>
       </div>
     </div>
+    <div class="hint" data-rich>Tipp: [[term|Gepunktet unterstrichene Wörter]] antippen. Dann erscheint eine kurze Erklärung.</div>
   </section>
 
   <!-- 2 -->
@@ -485,126 +553,145 @@
   </section>
 
   <!-- 3 -->
-  <section id="dateien">
-    <div class="sec-head"><span class="sec-num">03</span><h2>Geänderte Dateien</h2></div>
-    <div class="card">
-      <div class="filter" role="group" aria-label="Dateien filtern">
-        <button type="button" data-f="all" aria-pressed="true">Alle</button>
-        <button type="button" data-f="base" aria-pressed="false">Grundlage</button>
-        <button type="button" data-f="cards" aria-pressed="false">Karteikarten</button>
-        <button type="button" data-f="pod" aria-pressed="false">Podcast</button>
-        <button type="button" data-f="ui" aria-pressed="false">Oberfläche</button>
-        <button type="button" data-f="conf" aria-pressed="false">Tests und Notizen</button>
-      </div>
+  <section id="bausteine">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Die Bausteine</h2></div>
+    <p class="muted">Schritt 6 hat 22 Dateien geändert. Sie gehören zu sechs Bausteinen. Für das Interview reicht es, die Bausteine zu kennen.</p>
+    <div class="blocks" data-rich>
+      <div class="block"><div class="block-num">1</div><h3>Start und Prüfung</h3><p>Der Klick landet bei einer [[serveraction|Server Action]]. Sie prüft Login, Eingabe, Limit und Rechte. Erst dann legt sie das Element an.</p><p class="why">Warum: Jeder kann eine Server Action aufrufen. Also muss sie alles selbst prüfen.</p><div class="files">studio-actions.ts · schemas.ts · rate-limit.ts</div></div>
+      <div class="block"><div class="block-num">2</div><h3>Arbeit im Hintergrund</h3><p>Ein [[job|Job]] nimmt das Element an, erledigt die Arbeit und speichert das Ergebnis oder den Fehler. Die Seite fragt alle 2 Sekunden nach.</p><p class="why">Warum: Ein Podcast dauert fast eine Minute. So wartet niemand auf eine Antwort.</p><div class="files">job.ts · status.ts · generate-flashcards.ts · generate-podcast.ts · use-polling.ts</div></div>
+      <div class="block"><div class="block-num">3</div><h3>Was das Modell liest</h3><p>16 [[chunk|Abschnitte]], gleichmäßig aus allen Quellen, nummeriert von [1] bis [16]. Dazu feste Regeln für Karten und Skript.</p><p class="why">Warum: Belege brauchen Nummern. Und Text aus Quellen darf nie zur Anweisung werden.</p><div class="files">pick-chunks.ts · load-chunks.ts · source-blocks.ts · flashcards.ts · podcast.ts</div></div>
+      <div class="block"><div class="block-num">4</div><h3>Ton</h3><p>Jeder Redebeitrag wird einzeln vertont, höchstens 4 gleichzeitig. Ein kleiner eigener Code fügt die MP3s zusammen und misst die Dauer.</p><p class="why">Warum: Kein großes Zusatzprogramm nötig, und die Startzeiten fallen nebenbei ab.</p><div class="files">mp3.ts · concurrency.ts · models.ts</div></div>
+      <div class="block"><div class="block-num">5</div><h3>Oberfläche</h3><p>Studio-Spalte mit Status, eine eigene Seite pro Element, Karten zum Umdrehen, Player mit Transkript zum Mitlesen.</p><p class="why">Warum so: Chat, Karten und Transkript zeigen Belege mit demselben Baustein. Sie sehen überall gleich aus.</p><div class="files">studio-panel.tsx · studio/[itemId]/page.tsx · flashcards-view.tsx · podcast-view.tsx · podcast-player.tsx · cited-text.tsx</div></div>
+      <div class="block"><div class="block-num">6</div><h3>Speicher und Sicherheit</h3><p>Die MP3s liegen in einem privaten [[bucket|Bucket]]. Nur der Server schreibt dort. Nutzer dürfen ihre Dateien hören und löschen.</p><p class="why">Warum: So kann niemand eigene Dateien unterschieben. Löschen entfernt erst die Datei, dann die Zeile.</p><div class="files">…_studio_bucket.sql · rls.sql · notebooks/actions.ts</div></div>
+    </div>
+    <details class="more">
+      <summary>Alle 22 Dateien einzeln anzeigen</summary>
       <div class="table-wrap">
         <table>
           <thead><tr><th>DATEI</th><th>AUFGABE</th><th>WARUM SO</th></tr></thead>
-          <tbody id="fileRows" data-rich>
-            <tr data-k="base"><td><code>migrations/…_studio_bucket.sql</code></td><td>Privater [[bucket|Bucket]] „studio“ für die MP3s</td><td>Nutzer dürfen ihre Dateien lesen und löschen, aber nichts hochladen. Nur der Server schreibt, mit dem Admin-Schlüssel.</td></tr>
+          <tbody id="fileRows">
+            <tr data-k="base"><td><code>migrations/…_studio_bucket.sql</code></td><td>Privater Bucket „studio“ für die MP3s</td><td>Nutzer dürfen ihre Dateien lesen und löschen, aber nichts hochladen. Nur der Server schreibt, mit dem Admin-Schlüssel.</td></tr>
             <tr data-k="base"><td><code>supabase/checks/rls.sql</code></td><td>Prüft den neuen Bucket mit</td><td>Zwei Testnutzer: A sieht seine MP3, B nicht, A kann nichts hochladen. Löschen lässt sich per SQL nicht testen, Supabase verbietet das direkt.</td></tr>
-            <tr data-k="base"><td><code>src/lib/ai/models.ts</code></td><td>Studio-Modell und Sprachmodell</td><td>Eine Stelle für alle Modelle. Das Studio nutzt dasselbe Modell wie der Chat, aber mit mehr [[reasoning|Nachdenken]].</td></tr>
-            <tr data-k="base"><td><code>src/lib/ai/source-blocks.ts</code></td><td>Die nummerierten [[quelle|Quellblöcke]] im Prompt</td><td>Aus dem Chat-Prompt herausgezogen. Der Schutz gegen [[injection|Prompt Injection]] steht nur noch einmal im Code.</td></tr>
+            <tr data-k="base"><td><code>src/lib/ai/models.ts</code></td><td>Studio-Modell und Sprachmodell</td><td>Eine Stelle für alle Modelle. Das Studio nutzt dasselbe Modell wie der Chat, aber mit mehr Nachdenken.</td></tr>
+            <tr data-k="base"><td><code>src/lib/ai/source-blocks.ts</code></td><td>Die nummerierten Quellblöcke im Prompt</td><td>Aus dem Chat-Prompt herausgezogen. Der Schutz gegen Prompt Injection steht nur noch einmal im Code.</td></tr>
             <tr data-k="base"><td><code>src/lib/rate-limit.ts</code><br><code>schemas.ts</code></td><td>Studio-Limit, Eingabe-Schema</td><td>Eigene Grenzen: 5 pro Stunde, 20 pro Tag. Ein Podcast kostet ein Vielfaches einer Chat-Antwort.</td></tr>
             <tr data-k="base"><td><code>src/lib/studio/pick-chunks.ts</code><br><code>load-chunks.ts</code></td><td>Welche Abschnitte das Modell bekommt</td><td>Ohne Frage gibt es keine Suche. 16 Abschnitte, gleichmäßig verteilt. Die Datenbank liefert höchstens 1.000 Zeilen pro Anfrage, darum seitenweise.</td></tr>
-            <tr data-k="base"><td><code>src/lib/studio/job.ts</code><br><code>status.ts</code><br><code>summary.ts</code></td><td>Gemeinsamer Ablauf aller Studio-Jobs</td><td>Element annehmen, Fehler speichern, [[stuck|hängende Jobs]] erkennen, Text für die Anzeige. Karteikarten und Podcast nutzen dasselbe.</td></tr>
+            <tr data-k="base"><td><code>src/lib/studio/job.ts</code><br><code>status.ts</code><br><code>summary.ts</code></td><td>Gemeinsamer Ablauf aller Studio-Jobs</td><td>Element annehmen, Fehler speichern, hängende Jobs erkennen, Text für die Anzeige. Karteikarten und Podcast nutzen dasselbe.</td></tr>
             <tr data-k="cards"><td><code>src/lib/studio/flashcards.ts</code></td><td>Schema, Prompt und Prüfung der Karten</td><td>Reine Funktionen, darum leicht zu testen. Eine Karte ohne gültigen Beleg fliegt raus.</td></tr>
             <tr data-k="cards"><td><code>src/lib/studio/generate-flashcards.ts</code></td><td>Der Hintergrundjob für Karteikarten</td><td>Gleiches Muster wie beim Einlesen: wartet → in Arbeit → bereit oder Fehler.</td></tr>
             <tr data-k="pod"><td><code>src/lib/studio/podcast.ts</code></td><td>Skript-Schema, Prompt, Hilfsfunktionen</td><td>Lea fragt, Tom erklärt. Vor der Sprache werden die Belege entfernt. Dazu: welcher Beitrag läuft gerade, Dateiname für den Download.</td></tr>
             <tr data-k="pod"><td><code>src/lib/studio/generate-podcast.ts</code></td><td>Skript → Sprache → MP3 → Storage</td><td>Der Fortschritt steht nach jedem Teil in der Datenbank. Scheitert ein späterer Schritt, löscht der Job die MP3 wieder.</td></tr>
-            <tr data-k="pod"><td><code>src/lib/studio/mp3.ts</code></td><td>MP3 lesen, Dauer messen, zusammenfügen</td><td>Eigener kleiner Parser statt [[ffmpeg|ffmpeg]]. Gegen die echten OpenAI-Dateien geprüft: gleiche Dauer wie das macOS-Werkzeug.</td></tr>
-            <tr data-k="pod"><td><code>src/lib/studio/concurrency.ts</code></td><td>Höchstens 4 Aufrufe [[concurrency|gleichzeitig]]</td><td>Ergebnisse in der richtigen Reihenfolge. Nach einem Fehler startet kein neuer, bezahlter Aufruf.</td></tr>
-            <tr data-k="ui"><td><code>notebooks/[id]/studio-actions.ts</code></td><td>[[serveraction|Server Actions]]: erstellen, löschen</td><td>Prüft Login, Eingabe, [[ratelimit|Rate Limit]] und Rechte selbst. Erst danach startet der Job.</td></tr>
-            <tr data-k="ui"><td><code>studio-panel.tsx</code><br><code>use-polling.ts</code></td><td>Die Studio-Spalte mit Status</td><td>Fragt nach, solange etwas in Arbeit ist ([[polling|Polling]]). Die Polling-Logik der Quellenliste nutzt jetzt denselben [[hook|Hook]].</td></tr>
+            <tr data-k="pod"><td><code>src/lib/studio/mp3.ts</code></td><td>MP3 lesen, Dauer messen, zusammenfügen</td><td>Eigener kleiner Parser statt ffmpeg. Gegen die echten OpenAI-Dateien geprüft: gleiche Dauer wie das macOS-Werkzeug.</td></tr>
+            <tr data-k="pod"><td><code>src/lib/studio/concurrency.ts</code></td><td>Höchstens 4 Aufrufe gleichzeitig</td><td>Ergebnisse in der richtigen Reihenfolge. Nach einem Fehler startet kein neuer, bezahlter Aufruf.</td></tr>
+            <tr data-k="ui"><td><code>notebooks/[id]/studio-actions.ts</code></td><td>Server Actions: erstellen, löschen</td><td>Prüft Login, Eingabe, Rate Limit und Rechte selbst. Erst danach startet der Job.</td></tr>
+            <tr data-k="ui"><td><code>studio-panel.tsx</code><br><code>use-polling.ts</code></td><td>Die Studio-Spalte mit Status</td><td>Fragt nach, solange etwas in Arbeit ist (Polling). Die Polling-Logik der Quellenliste nutzt jetzt denselben Hook.</td></tr>
             <tr data-k="ui"><td><code>cited-text.tsx</code></td><td>Belege überall gleich</td><td>Aus dem Chat herausgezogen. Chat, Karteikarten und Transkript zeigen [1] gleich.</td></tr>
-            <tr data-k="ui"><td><code>studio/[itemId]/page.tsx</code><br><code>studio-frame.tsx</code></td><td>Eigene Seite pro Studio-Element</td><td>Das Element muss zum Notebook in der Adresse gehören. Fremd, unbekannt oder falsch kombiniert: [[http404|404]].</td></tr>
-            <tr data-k="ui"><td><code>flashcards-view.tsx</code></td><td>Karten zum Umdrehen</td><td>Jede Karte ist ein neues Element (<code>[[reactkey|key]]</code>). Sonst sähe man beim Weiterblättern kurz die nächste Antwort.</td></tr>
+            <tr data-k="ui"><td><code>studio/[itemId]/page.tsx</code><br><code>studio-frame.tsx</code></td><td>Eigene Seite pro Studio-Element</td><td>Das Element muss zum Notebook in der Adresse gehören. Fremd, unbekannt oder falsch kombiniert: 404.</td></tr>
+            <tr data-k="ui"><td><code>flashcards-view.tsx</code></td><td>Karten zum Umdrehen</td><td>Jede Karte ist ein neues Element (<code>key</code>). Sonst sähe man beim Weiterblättern kurz die nächste Antwort.</td></tr>
             <tr data-k="ui"><td><code>podcast-view.tsx</code><br><code>podcast-player.tsx</code><br><code>use-audio-player.ts</code></td><td>Player, Transkript, Mitlesen</td><td>Der Zustand kommt vom <code>&lt;audio&gt;</code>-Element. Die Leiste zeigt echte Redebeiträge, keine erfundene Wellenform.</td></tr>
-            <tr data-k="ui"><td><code>notebooks/actions.ts</code><br><code>globals.css</code><br><code>format.ts</code></td><td>Notebook löschen, Player-Farben, Zeitformate</td><td>Löschen leert jetzt beide Buckets. [[cascade|on delete cascade]] erreicht keine Dateien.</td></tr>
+            <tr data-k="ui"><td><code>notebooks/actions.ts</code><br><code>globals.css</code><br><code>format.ts</code></td><td>Notebook löschen, Player-Farben, Zeitformate</td><td>Löschen leert jetzt beide Buckets. on delete cascade erreicht keine Dateien.</td></tr>
             <tr data-k="conf"><td><code>src/lib/**/*.test.ts</code></td><td>66 neue Tests (jetzt 185)</td><td>Auswahl der Abschnitte, MP3-Parser, Parallel-Helfer, Prüfung von Karten und Skript, Status, Formate.</td></tr>
             <tr data-k="conf"><td><code>NOTIZEN.md</code></td><td>Lerntagebuch</td><td>Zum Beispiel: Das Modell ignorierte die Wortzahl (962 statt 600 Wörter). Gelöst mit einer Zahl von Redebeiträgen.</td></tr>
+          
           </tbody>
         </table>
       </div>
-    </div>
+    </details>
   </section>
 
   <!-- 4 -->
   <section id="code">
     <div class="sec-head"><span class="sec-num">04</span><h2>Wichtigster Code</h2></div>
-    <p class="muted">Zeilen mit Punkt sind anklickbar. Ein Klick zeigt, was die Zeile tut. Die Ausschnitte sind leicht gekürzt.</p>
+    <p class="muted">Drei Stellen, nach denen im Interview am ehesten gefragt wird. Lies zuerst „Rein und raus“, dann Teil für Teil: links die Erklärung, rechts der Code. Mit <b>Auf Deutsch</b> steht rechts dasselbe ohne Programmiersprache.</p>
     <div class="code-tabs" role="tablist" id="codeTabs"></div>
     <div class="code-card">
       <div class="code-head">
         <span class="file" id="codeFile"></span>
-        <span class="why" id="codeWhy"></span>
+        <span class="spacer"></span>
+        <div class="seg mini" id="codeMode" role="group" aria-label="Ansicht">
+          <button type="button" data-mode="code" aria-pressed="true">Code</button>
+          <button type="button" data-mode="de" aria-pressed="false">Auf Deutsch</button>
+        </div>
         <button class="copy" id="copyBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Kopieren</span></button>
       </div>
-      <pre id="codePre" role="tabpanel"></pre>
-      <div class="note" id="codeNote" aria-live="polite"></div>
-    </div>
-  </section>
-
-  <!-- Demo -->
-  <section id="demo">
-    <div class="sec-head"><span class="sec-num">04b</span><h2>Mini-Demos</h2></div>
-    <div class="card">
-      <div class="seg demo-tabs" id="demoTabs" role="group" aria-label="Demo wählen">
-        <button type="button" data-pane="panePick" aria-pressed="true">Abschnitte verteilen</button>
-        <button type="button" data-pane="paneMp3" aria-pressed="false">MP3-Frames → Startzeiten</button>
-      </div>
-
-      <div class="pane" id="panePick">
-        <p class="muted" data-rich>Der Podcast hat keine Frage, also gibt es keine Suche. Trotzdem soll das Modell alle Quellen sehen, nicht nur die erste. [[pickchunks|pickChunks]] verteilt die Plätze reihum auf die Quellen und nimmt in jeder Quelle gleichmäßig verteilte [[chunk|Abschnitte]]. Stell die Größe der Quellen ein.</p>
-        <div class="sliders three">
-          <div class="slider"><label for="pickA">Hausordnung <b id="pickAVal"></b></label><input type="range" id="pickA" min="0" max="40" step="1" value="3"></div>
-          <div class="slider"><label for="pickB">Notiz <b id="pickBVal"></b></label><input type="range" id="pickB" min="0" max="40" step="1" value="1"></div>
-          <div class="slider"><label for="pickC">Völkerschlachtdenkmal <b id="pickCVal"></b></label><input type="range" id="pickC" min="0" max="80" step="1" value="40"></div>
-        </div>
-        <div class="sliders one">
-          <div class="slider"><label for="pickMax">Plätze für das Modell <b id="pickMaxVal"></b></label><input type="range" id="pickMax" min="4" max="24" step="1" value="16"></div>
-        </div>
-        <div class="demo-label">Abschnitte je Quelle · lime = ausgewählt · Zahl = Beleg im Prompt</div>
-        <div id="pickRows"></div>
-        <div class="gates" id="pickCompare"></div>
-      </div>
-
-      <div class="pane" id="paneMp3" hidden>
-        <p class="muted" data-rich>Jede MP3 von OpenAI besteht nur aus [[frame|Frames]]. Jeder Frame beginnt mit 4 Bytes, die sagen, wie lang er ist und wie viel Ton er enthält. Unten die echten 4 Bytes aus dem Hörtest. Mit dem Häkchen siehst du den Fehler, den die KI dabei zuerst gemacht hat.</p>
-        <div class="demo-label">Frame-Kopf: FF F3 C4 C4 in Bits</div>
-        <div class="bitgroups" id="mp3Bits"></div>
-        <label class="bugtoggle"><input type="checkbox" id="mp3Bug"> Fehler aus dem Hörtest: mit den Tabellen für MPEG-1 lesen</label>
-        <div class="gates" id="mp3Header"></div>
-        <div class="demo-label">Sechs Redebeiträge: Frames → Dauer → Startzeit</div>
-        <div class="table-wrap">
-          <table class="rowtable" id="mp3Turns"></table>
-        </div>
-        <div class="mtrack" id="mp3Track" aria-hidden="true"></div>
-        <div class="sliders one">
-          <div class="slider"><label for="mp3Time">Position im Podcast <b id="mp3TimeVal"></b></label><input type="range" id="mp3Time" min="0" max="49" step="0.1" value="12"></div>
-        </div>
-        <div id="mp3Now" aria-live="polite"></div>
-      </div>
+      <div class="io" id="codeIO"></div>
+      <div class="walk" id="codeWalk"></div>
     </div>
   </section>
 
   <!-- 5 -->
+  <section id="demo">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Mini-Demos</h2></div>
+    <div class="card">
+      <div class="seg demo-tabs" id="demoTabs" role="group" aria-label="Demo wählen">
+        <button type="button" data-pane="panePick" aria-pressed="true">Welche Abschnitte liest das Modell?</button>
+        <button type="button" data-pane="paneMp3" aria-pressed="false">Wann spricht wer?</button>
+      </div>
+
+      <div class="pane" id="panePick">
+        <div class="demo-q"><b>Die Frage:</b> Ein Podcast hat keine Frage, also gibt es nichts zu suchen. Trotzdem darf das Modell nur 16 Abschnitte lesen. Welche nimmt Faden, damit jede Quelle vorkommt?</div>
+        <div class="demo-label">Probier das</div>
+        <div class="try" id="pickTry" role="group" aria-label="Beispiele">
+          <button type="button" data-a="3" data-b="1" data-c="40" aria-pressed="true">Wie im Test-Notebook</button>
+          <button type="button" data-a="60" data-b="2" data-c="10" aria-pressed="false">Eine Quelle ist riesig</button>
+          <button type="button" data-a="3" data-b="1" data-c="8" aria-pressed="false">Alles passt hinein</button>
+          <button type="button" data-a="0" data-b="0" data-c="80" aria-pressed="false">Nur eine lange Quelle</button>
+        </div>
+        <div class="explain" id="pickExplain" aria-live="polite"></div>
+        <div class="demo-label">Jedes Kästchen ist ein Abschnitt · lime = das Modell liest ihn · Zahl = seine Belegnummer</div>
+        <div id="pickRows"></div>
+        <div class="gates" id="pickCompare"></div>
+        <details class="more">
+          <summary>Selbst einstellen</summary>
+          <div class="sliders three">
+            <div class="slider"><label for="pickA">Hausordnung <b id="pickAVal"></b></label><input type="range" id="pickA" min="0" max="60" step="1" value="3"></div>
+            <div class="slider"><label for="pickB">Notiz <b id="pickBVal"></b></label><input type="range" id="pickB" min="0" max="40" step="1" value="1"></div>
+            <div class="slider"><label for="pickC">Völkerschlachtdenkmal <b id="pickCVal"></b></label><input type="range" id="pickC" min="0" max="80" step="1" value="40"></div>
+          </div>
+          <div class="sliders one">
+            <div class="slider"><label for="pickMax">Plätze für das Modell <b id="pickMaxVal"></b></label><input type="range" id="pickMax" min="4" max="24" step="1" value="16"></div>
+          </div>
+        </details>
+      </div>
+
+      <div class="pane" id="paneMp3" hidden>
+        <div class="demo-q"><b>Die Frage:</b> Faden bekommt von OpenAI für jeden Redebeitrag eine eigene kleine MP3. Wie weiß der Player später, dass Tom bei 0:21 zu sprechen beginnt?</div>
+        <div class="dsteps" data-rich>
+          <div class="dstep"><span class="dnum">1</span><div class="dbody"><h4>Eine MP3 ist eine Kette aus kleinen Stücken</h4><p>Die Stücke heißen [[frame|Frames]]. Jedes Stück ist genau 24 Millisekunden Ton. Leas erste MP3 hat 367 Stücke: 367 × 24 ms = 8,8 Sekunden.</p><div class="beads" id="mp3Beads" aria-hidden="true"></div></div></div>
+          <div class="dstep"><span class="dnum">2</span><div class="dbody"><h4>Faden hängt die Ketten einfach aneinander</h4><p>Sechs Redebeiträge, sechs Ketten. Hintereinander ergeben sie eine einzige MP3. Dunkel ist Lea, hell ist Tom.</p><div class="mtrack" id="mp3Track" aria-hidden="true"></div><div class="mlabels" id="mp3Labels" aria-hidden="true"></div></div></div>
+          <div class="dstep"><span class="dnum">3</span><div class="dbody"><h4>Startzeit = alle Stücke davor × 24 ms</h4><p>Toms erster Beitrag beginnt nach Leas 367 Stücken, also bei 8,8 Sekunden. So rechnet Faden für jeden Beitrag.</p><div class="table-wrap"><table class="rowtable" id="mp3Turns"></table></div></div></div>
+          <div class="dstep"><span class="dnum">4</span><div class="dbody"><h4>Mitlesen: Wer spricht gerade?</h4><p>Zieh den Regler. Faden sucht den letzten Beitrag, der schon begonnen hat. Genau so markiert der Player die Zeile im Transkript.</p>
+            <div class="sliders one"><div class="slider"><label for="mp3Time">Position im Podcast <b id="mp3TimeVal"></b></label><input type="range" id="mp3Time" min="0" max="48" step="0.1" value="23"></div></div>
+            <div id="mp3Now" aria-live="polite"></div></div></div>
+        </div>
+        <details class="more">
+          <summary>Für Neugierige: Woher weiß Faden, dass ein Stück 24 ms lang ist?</summary>
+          <p class="muted small">Jedes Stück beginnt mit 4 Bytes, einer Art Etikett. Darin stehen Version, Datenmenge und Messwerte pro Sekunde. Unten das echte Etikett aus dem Hörtest, in Bits. Mit dem Häkchen siehst du den Fehler, den die KI dabei zuerst gemacht hat: Sie hat die Version falsch gelesen.</p>
+          <div class="bitgroups" id="mp3Bits"></div>
+          <label class="bugtoggle"><input type="checkbox" id="mp3Bug"> Fehler aus dem Hörtest zeigen: Version falsch gelesen</label>
+          <div class="gates" id="mp3Header"></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
   <section id="entscheidungen">
-    <div class="sec-head"><span class="sec-num">05</span><h2>Entscheidungen und Alternativen</h2></div>
-    <div class="decisions" data-rich>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>16 Abschnitte gleichmäßig verteilt</h3><p>[[pickchunks|pickChunks]] gibt jeder Quelle reihum einen Platz und nimmt Anfang, Mitte und Ende. Die Belege zeigen auf den echten Text der Quelle.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Jede Quelle erst zusammenfassen, dann aus den Zusammenfassungen schreiben (Map-Reduce). Deckt alles ab, kostet aber mehr Zeit und Geld. Belege würden auf Zusammenfassungen zeigen.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Hintergrundjob mit after() und Polling</h3><p>Die Action antwortet sofort, der Job läuft weiter. Die Seite fragt alle 2 Sekunden nach. Kein extra Dienst nötig, ein Podcast braucht unter einer Minute.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Eine echte [[queue|Warteschlange]] und Push-Nachrichten. Robuster bei langen Jobs und vielen Nutzern, aber mehr Aufbau. Steht unter „Nächste Schritte“.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>MP3s selbst aneinanderhängen</h3><p>Ein kleiner Parser liest die Frame-Köpfe, misst die Dauer und hängt die Frames aneinander. So kennen wir auch die Startzeit jedes Redebeitrags.</p></div><div class="alt"><div class="lbl">Alternative</div><p>[[ffmpeg|ffmpeg]]. Kann alles, ist aber ein Programm von etwa 70 MB in der Vercel-Funktion. Für Aneinanderhängen zu viel.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Länge über die Zahl der Redebeiträge</h3><p>„20 bis 24 Redebeiträge, je höchstens 40 Wörter“. Gleiche Quellen: 604 Wörter, 4:54 Minuten.</p></div><div class="alt"><div class="lbl">Alternative</div><p>„Etwa 600 Wörter“. Ausprobiert: Das Modell schrieb 701 und einmal 962 Wörter, das waren 8 Minuten. Ein Modell kann seine eigenen Wörter nicht zählen.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Belege im Skript, vor der Sprache entfernt</h3><p>Das Modell schreibt [n] direkt hinter die Aussage, wie im Chat. Das Transkript macht Knöpfe daraus. <code>spokenText</code> entfernt sie, bevor die Stimme liest.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Ein eigenes Feld mit Belegnummern pro Redebeitrag. Dann wüsste man nicht, welcher Satz welchen Beleg hat.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Sprecher-Leiste statt Wellenform</h3><p>Ein Abschnitt pro Redebeitrag, so breit wie seine Dauer. Echte Daten. Darüber ein unsichtbarer Schieberegler, so geht Spulen auch mit Tastatur und Screenreader.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Balken wie im Design. Die Höhen wären erfunden, echte Lautstärken bräuchten ein Dekodieren der MP3.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Eigene Seite pro Studio-Element</h3><p>Wie im Design. Player, Transkript und Beleg-Ansicht haben Platz. Die Adresse lässt sich teilen und neu laden.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Alles in der schmalen Studio-Spalte, etwa 300 Pixel breit. Für ein Transkript mit Belegen zu eng.</p></div></div>
-      <div class="decision"><div class="pick"><div class="lbl">Gewählt</div><h3>Nur Funktionen, die es gibt</h3><p>Von „Folge anpassen“ bleibt nur „Neu erstellen“. Länge, Sprache und Stimmen sind nicht gebaut, also gibt es auch keine Knöpfe dafür.</p></div><div class="alt"><div class="lbl">Alternative</div><p>Alle Felder aus dem Design zeigen. Knöpfe ohne Funktion wirken im Live-Test unecht.</p></div></div>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Entscheidungen und Alternativen</h2></div>
+    <p class="muted">Der fette Satz ist die Antwort, die du im Interview sagen kannst. Darunter steht, warum, und was die Alternative gewesen wäre.</p>
+    <div class="says" data-rich>
+      <div class="say"><p class="said">„Das Modell bekommt 16 Abschnitte, gleichmäßig aus allen Quellen. Gesucht wird nicht.“</p><p>Es gibt keine Frage, nach der man suchen könnte. So kommt jede Quelle vor, mit Anfang, Mitte und Ende.</p><p class="whynot"><b>Warum nicht erst jede Quelle zusammenfassen?</b> Das kostet mehr Zeit und Geld. Die Belege würden dann auf Zusammenfassungen zeigen statt auf den Originaltext.</p></div>
+      <div class="say"><p class="said">„Die Arbeit läuft im Hintergrund, die Seite fragt alle 2 Sekunden nach.“</p><p>Ein Podcast dauert fast eine Minute. Niemand soll so lange auf eine Antwort warten.</p><p class="whynot"><b>Warum keine echte Warteschlange?</b> Für unter eine Minute reicht [[after|after()]]. Eine [[queue|Warteschlange]] ist mehr Aufbau und steht unter „Nächste Schritte“.</p></div>
+      <div class="say"><p class="said">„Ich füge die MP3s selbst zusammen, ohne Zusatzprogramm.“</p><p>Im Hörtest habe ich gesehen: OpenAI liefert saubere Stücke ohne Extras. Dann reicht Aneinanderhängen, und die Startzeiten bekomme ich nebenbei.</p><p class="whynot"><b>Warum nicht [[ffmpeg|ffmpeg]]?</b> Das ist ein Programm von etwa 70 MB in der Vercel-Funktion, nur zum Aneinanderhängen.</p></div>
+      <div class="say"><p class="said">„Die Länge steuere ich über die Zahl der Redebeiträge, nicht über Wörter.“</p><p>Das Modell kann Wörter nicht zählen: 600 verlangt, einmal 962 bekommen, das waren 8 Minuten. Mit 20 bis 24 Beiträgen waren es 4:54 Minuten.</p><p class="whynot"><b>Warum nicht im Code nach 600 Wörtern abschneiden?</b> Dann fehlt das Ende, also Zusammenfassung und Abschied.</p></div>
+      <div class="say"><p class="said">„Belege stehen im Skript und werden vor dem Vorlesen entfernt.“</p><p>Das Transkript macht aus [3] einen Knopf. Die Stimme würde sonst „eckige Klammer drei“ sagen.</p><p class="whynot"><b>Warum nicht ein eigenes Feld für Belege?</b> Dann wüsste man nicht, welcher Satz welchen Beleg hat.</p></div>
+      <div class="say"><p class="said">„Die Leiste im Player zeigt echte Redebeiträge, keine erfundene Wellenform.“</p><p>Jeder Abschnitt der Leiste ist ein Redebeitrag, so breit wie seine Dauer. Darunter liegt ein normaler Schieberegler, so geht Spulen auch mit Tastatur.</p><p class="whynot"><b>Warum nicht Balken wie im Design?</b> Deren Höhen wären erfunden. Echte Lautstärken müsste man erst aus der MP3 ausrechnen.</p></div>
     </div>
   </section>
 
   <!-- 6 -->
   <section id="risiken">
-    <div class="sec-head"><span class="sec-num">06</span><h2>Was schiefgehen kann</h2></div>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Was schiefgehen kann</h2></div>
     <div class="risks" data-rich>
       <div class="risk"><span class="chip err">Betrieb</span><h3>Vercel bricht nach 300 Sekunden ab</h3><p>Ein Podcast braucht heute unter einer Minute. Bricht ein Job trotzdem ab, bleibt er „in Arbeit“. Nach 10 Minuten zeigt Faden ihn als Fehler, und man kann ihn löschen.</p></div>
       <div class="risk"><span class="chip warn">Qualität</span><h3>Die Länge schwankt</h3><p>Das Modell hält die Grenzen nicht genau ein: 27 statt höchstens 24 Redebeiträge, ein Beitrag mit 70 Wörtern. Die Folgen liegen trotzdem bei 4 bis 6 Minuten.</p></div>
@@ -619,7 +706,7 @@
 
   <!-- 7 -->
   <section id="interview">
-    <div class="sec-head"><span class="sec-num">07</span><h2>Interview-Check</h2></div>
+    <div class="sec-head"><span class="sec-num">08</span><h2>Interview-Check</h2></div>
     <div class="quiz-top">
       <div class="progress" aria-hidden="true"><span id="bar"></span></div>
       <span class="score" id="score">0 von 5 gewusst</span>
@@ -636,20 +723,42 @@
 
 <div class="pop" id="pop" role="dialog" aria-live="polite" hidden><b id="popT"></b><p id="popD"></p></div>
 
-<!-- Code samples as plain text: no escaping needed -->
-<script type="text/plain" id="src-pick">export const MAX_STUDIO_CHUNKS = 16;
+<!-- Code parts as plain text: no escaping needed -->
+<script type="text/plain" id="w-action-1">export async function createStudioItem(input: unknown) {
+  // 1. Login.
+  const { supabase, userId } = await requireUser();</script>
+<script type="text/plain" id="w-action-2">  // 2. Input.
+  const parsed = studioRequestSchema.safeParse(input);
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  const { notebookId, sourceIds, kind } = parsed.data;</script>
+<script type="text/plain" id="w-action-3">  // 3. Rate limit, before any paid call.
+  if (!(await allowStudioRequest(userId))) {
+    return { error: "Du hast gerade sehr viel erstellt. Bitte versuche es später noch einmal." };
+  }</script>
+<script type="text/plain" id="w-action-4">  // 4. Rights. RLS shows only sources in the user's notebooks.
+  const { data: sources } = await supabase
+    .from("sources")
+    .select("id")
+    .eq("notebook_id", notebookId)
+    .eq("status", "ready")
+    .in("id", sourceIds);
+  if (sources.length === 0) return { error: "Bitte wähle mindestens eine bereite Quelle aus." };</script>
+<script type="text/plain" id="w-action-5">  const { data: item } = await supabase
+    .from("studio_items")
+    .insert({ notebook_id: notebookId, kind, data: { sourceIds: sources.map((s) => s.id) } })
+    .select("id")
+    .single();
 
-export function pickChunks<T extends ChunkRef>(
-  chunks: T[],
-  sourceIds: string[],
-  max = MAX_STUDIO_CHUNKS,
-): T[] {
+  const job = JOBS[kind];
+  after(() => job(item.id));
+  return { error: null, itemId: item.id };
+}</script>
+<script type="text/plain" id="w-pick-1">export function pickChunks(chunks, sourceIds, max = 16) {
   // The chunks of each source, in text order.
   const bySource = sourceIds.map((sourceId) =>
     chunks.filter((chunk) => chunk.sourceId === sourceId).sort((a, b) => a.position - b.position),
-  );
-
-  // 1. How many per source: one at a time, source after source (round robin).
+  );</script>
+<script type="text/plain" id="w-pick-2">  // 1. How many per source: one at a time, source after source.
   const counts = bySource.map(() => 0);
   let total = 0;
   let added = true;
@@ -662,148 +771,44 @@ export function pickChunks<T extends ChunkRef>(
         added = true;
       }
     }
-  }
-
-  // 2. Which ones: k chunks out of n, evenly spaced.
+  }</script>
+<script type="text/plain" id="w-pick-3">  // 2. Which ones: k chunks out of n, evenly spaced.
   return bySource.flatMap((list, s) => {
     const n = list.length;
     const k = counts[s];
     return Array.from({ length: k }, (_, i) => list[Math.floor(((i + 0.5) * n) / k)]);
   });
 }</script>
-<script type="text/plain" id="src-action">export async function createStudioItem(input: unknown): Promise<CreateStudioItemResult> {
-  // 1. Login.
-  const { supabase, userId } = await requireUser();
-
-  // 2. Input.
-  const parsed = studioRequestSchema.safeParse(input);
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const { notebookId, sourceIds, kind } = parsed.data;
-
-  // 3. Rate limit, before any paid call.
-  if (!(await allowStudioRequest(userId))) {
-    return { error: "Du hast gerade sehr viel erstellt. Bitte versuche es später noch einmal." };
-  }
-
-  // 4. Rights. RLS shows only sources in the user's notebooks.
-  const { data: sources } = await supabase
-    .from("sources")
-    .select("id")
-    .eq("notebook_id", notebookId)
-    .eq("status", "ready")
-    .in("id", sourceIds);
-  if (sources.length === 0) return { error: "Bitte wähle mindestens eine bereite Quelle aus." };
-
-  const { data: item } = await supabase
-    .from("studio_items")
-    .insert({ notebook_id: notebookId, kind, data: { sourceIds: sources.map((s) => s.id) } })
-    .select("id")
-    .single();
-
-  const job = JOBS[kind];
-  after(() => job(item.id));
-
-  refresh();
-  return { error: null, itemId: item.id };
-}</script>
-<script type="text/plain" id="src-podcast">let done = 0;
-let progressWrites = Promise.resolve();
-const saveProgress = (progress: PodcastProgress) => {
-  progressWrites = progressWrites
-    .then(() => saveData({ ...scripted, progress }))
-    .catch((error) => console.warn("podcast progress not saved", itemId, error));
-};
-
-const parts = await mapWithConcurrency(turns, CONCURRENT_SPEECH_CALLS, async (turn) => {
+<script type="text/plain" id="w-pod-1">const parts = await mapWithConcurrency(turns, CONCURRENT_SPEECH_CALLS, async (turn) => {
   const { audio } = await generateSpeech({
     model: speechModel,
     text: spokenText(turn.text),
     voice: SPEAKERS[turn.speaker].voice,
     instructions: SPEECH_INSTRUCTIONS,
-    outputFormat: "mp3",
     abortSignal: AbortSignal.timeout(SPEECH_TIMEOUT_MS),
   });
   done++;
   saveProgress({ stage: "audio", done, total: turns.length });
   return audio.uint8Array;
-});
-await progressWrites;
-
-const { bytes, durations } = joinMp3(parts);
-const starts = startTimes(durations);
-
-const path = `${item.notebook_id}/${item.id}.mp3`;
+});</script>
+<script type="text/plain" id="w-pod-2">const { bytes, durations } = joinMp3(parts);
+const starts = startTimes(durations);</script>
+<script type="text/plain" id="w-pod-3">const path = `${item.notebook_id}/${item.id}.mp3`;
 const { error: uploadError } = await supabase.storage
   .from("studio")
   .upload(path, bytes, { contentType: "audio/mpeg" });
 if (uploadError) throw uploadError;
-uploadedPath = path;
-
-const ready: PodcastData = {
+uploadedPath = path;</script>
+<script type="text/plain" id="w-pod-4">const ready = {
   ...scripted,
   turns: turns.map((turn, i) => ({ ...turn, start: Math.round(starts[i] * 1000) / 1000 })),
   durationSeconds,
   sizeBytes: bytes.length,
 };
-await supabase.from("studio_items").update({ status: "ready", data: ready, storage_path: path }).eq("id", item.id);</script>
-<script type="text/plain" id="src-mp3">export function readFrameHeader(bytes: Uint8Array, offset: number): FrameHeader | null {
-  const [b0, b1, b2] = [bytes[offset], bytes[offset + 1], bytes[offset + 2]];
-  if (b0 !== 0xff || (b1 & 0xe0) !== 0xe0) return null;
-
-  const versionBits = (b1 >> 3) & 0b11; // 3 = MPEG-1, 2 = MPEG-2, 0 = MPEG-2.5
-  const layerBits = (b1 >> 1) & 0b11; // 1 = Layer III
-  if (versionBits === 1 || layerBits !== 1) return null;
-  const version = versionBits === 3 ? "1" : versionBits === 2 ? "2" : "2.5";
-
-  const bitrateIndex = b2 >> 4;
-  const sampleRateIndex = (b2 >> 2) & 0b11;
-  const padding = (b2 >> 1) & 1;
-
-  const bitrate = (version === "1" ? BITRATES_V1 : BITRATES_V2)[bitrateIndex] * 1000;
-  const sampleRate = SAMPLE_RATES[version][sampleRateIndex];
-  const samples = version === "1" ? 1152 : 576;
-  const length = Math.floor(((samples / 8) * bitrate) / sampleRate) + padding;
-  return { length, samples, sampleRate };
-}
-
-export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: number } {
-  const start = id3v2Length(bytes);
-  let offset = start;
-  let seconds = 0;
-  while (offset < bytes.length) {
-    const header = readFrameHeader(bytes, offset);
-    if (!header || offset + header.length > bytes.length) {
-      throw new Error(`Invalid MP3 data at byte ${offset} of ${bytes.length}`);
-    }
-    seconds += header.samples / header.sampleRate;
-    offset += header.length;
-  }
-  return { frames: bytes.subarray(start, offset), seconds };
-}</script>
-<script type="text/plain" id="src-concurrency">export async function mapWithConcurrency<T, R>(
-  items: T[],
-  limit: number,
-  fn: (item: T, index: number) => Promise<R>,
-): Promise<R[]> {
-  const results = new Array<R>(items.length);
-  let next = 0;
-  let failed = false;
-
-  async function worker() {
-    while (!failed && next < items.length) {
-      const index = next++;
-      try {
-        results[index] = await fn(items[index], index);
-      } catch (error) {
-        failed = true;
-        throw error;
-      }
-    }
-  }
-
-  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
-  return results;
-}</script>
+await supabase
+  .from("studio_items")
+  .update({ status: "ready", data: ready, storage_path: path })
+  .eq("id", item.id);</script>
 
 <script>
 (function () {
@@ -974,88 +979,53 @@ export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: numbe
   });
   show(0);
 
-  /* ---------- File filter ---------- */
-  document.querySelectorAll(".filter button").forEach(function (b) {
-    b.addEventListener("click", function () {
-      document.querySelectorAll(".filter button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
-      var f = b.getAttribute("data-f");
-      document.querySelectorAll("#fileRows tr").forEach(function (tr) { tr.classList.toggle("hidden", f !== "all" && tr.getAttribute("data-k") !== f); });
-    });
-  });
-
-  /* ---------- Code ---------- */
+  /* ---------- Code: guided walk ---------- */
   function src(id) { return document.getElementById(id).textContent; }
-  // Notes point to a line by its text: "m" is a piece of the line,
-  // "=" at the start means the whole line must match exactly.
-  var snippets = [
-    { file: "pick-chunks.ts", lang: "ts", why: "Welche Abschnitte das Modell sieht", code: src("src-pick"), notes: [
-      { m: "MAX_STUDIO_CHUNKS = 16", t: "Höchstens 16 Abschnitte. Einer hat höchstens etwa 800 Tokens, das sind höchstens etwa 13.000 Tokens für das Modell. Das hält Zeit und Kosten klein." },
-      { m: "export function pickChunks", t: "Eine reine Funktion: keine Datenbank, kein Modell. Darum testen 8 Vitest-Tests sie, einer davon mit allen Kombinationen von 1–40 Abschnitten und 1–20 Plätzen." },
-      { m: "chunks.filter((chunk)", t: "Die Abschnitte jeder Quelle, in der Reihenfolge des Textes. sourceIds bestimmt die Reihenfolge der Quellen, wie in der Quellenliste." },
-      { m: "const counts", t: "Wie viele Plätze jede Quelle bekommt. Am Anfang null." },
-      { m: "while (total < max && added)", t: "Runde um Runde, bis alle Plätze vergeben sind oder keine Quelle mehr Abschnitte hat." },
-      { m: "if (counts[s] < bySource[s].length)", t: "Jede Quelle bekommt pro Runde einen Platz, wenn sie noch Abschnitte hat. So kommt eine kleine Quelle nicht zu kurz, und eine große verdrängt die anderen nicht." },
-      { m: "Math.floor(((i + 0.5) * n) / k)", t: "k aus n gleichmäßig verteilt: die Mitte von k gleichen Teilen. Bei 4 aus 100: Abschnitt 12, 37, 62, 87. So sieht das Modell Anfang, Mitte und Ende." }
+  // Each snippet: what goes in and out, then parts. A part has a short
+  // explanation, the code, and the same steps in plain German ("de").
+  var walks = [
+    { tab: "Element starten", file: "studio-actions.ts · createStudioItem", io: ["Notebook-ID, ausgewählte Quellen, Art (Podcast oder Karteikarten)", "die ID des neuen Elements oder eine Fehlermeldung"], parts: [
+      { title: "Wer ist angemeldet?", text: "Niemand angemeldet: weiter zur Login-Seite. Die Nutzer-ID brauchen wir gleich für das Limit.", code: src("w-action-1"),
+        de: "Funktion „Studio-Element erstellen“ (Eingabe: irgendetwas):\n  Prüfe, wer angemeldet ist.\n  Niemand? → zur Login-Seite." },
+      { title: "Ist die Eingabe gültig?", text: "Die Eingabe ist mit Absicht „unknown“: Jeder kann diese Funktion mit beliebigen Daten aufrufen. [[zod|Zod]] prüft: echte IDs, höchstens 100 Quellen, Art ist Podcast oder Karteikarten.", code: src("w-action-2"),
+        de: "Prüfe die Eingabe mit dem Schema.\n  Ungültig? → Fehlermeldung zurück.\n  Sonst: Notebook, Quellen und Art übernehmen." },
+      { title: "Noch unter dem Limit?", text: "Das kommt vor allem, was Geld kostet: höchstens 5 pro Stunde und 20 pro Tag pro Nutzer ([[ratelimit|Rate Limit]]).", code: src("w-action-3"),
+        de: "Hat dieser Nutzer zu viel erstellt?\n  Ja → Fehlermeldung zurück. Bis hier hat nichts Geld gekostet." },
+      { title: "Gehören die Quellen dem Nutzer?", text: "Die Datenbank zeigt jedem nur Quellen aus eigenen Notebooks ([[rls|RLS]]). Fremde IDs fallen hier still heraus. Nur fertige Quellen zählen.", code: src("w-action-4"),
+        de: "Hole die gewählten Quellen aus der Datenbank:\n  nur aus diesem Notebook, nur fertige.\n  (Fremde Quellen sieht die Datenbank für diesen Nutzer gar nicht.)\n  Keine übrig? → Fehlermeldung zurück." },
+      { title: "Anlegen und Job starten", text: "Eine Zeile mit Status „wartet“, die geprüften Quellen gleich mit drin. [[after|after()]] startet den Job erst nach der Antwort. Die Seite springt mit der neuen ID zur Fortschrittsanzeige.", code: src("w-action-5"),
+        de: "Lege ein neues Element an: Status „wartet“, mit den geprüften Quellen.\n  Wähle den passenden Job: Podcast oder Karteikarten.\n  Starte den Job, NACHDEM die Antwort verschickt ist.\n  Antworte sofort mit der neuen ID." }
     ] },
-    { file: "studio-actions.ts", lang: "ts", why: "Erst prüfen, dann bezahlen", code: src("src-action"), notes: [
-      { m: "input: unknown", t: "unknown mit Absicht: Eine [[serveraction|Server Action]] kann jeder mit beliebigen Daten aufrufen. Erst [[zod|Zod]] entscheidet, was gültig ist." },
-      { m: "await requireUser()", t: "Nicht angemeldet: weiter zur Login-Seite. userId brauchen wir für das Rate Limit." },
-      { m: "studioRequestSchema.safeParse", t: "Notebook-ID und Quellen-IDs müssen UUIDs sein, höchstens 100 Quellen, und kind ist „flashcards“ oder „podcast“." },
-      { m: "allowStudioRequest(userId)", t: "Das [[ratelimit|Rate Limit]] kommt vor allem, was Geld kostet. 5 pro Stunde, 20 pro Tag." },
-      { m: ".eq(\"status\", \"ready\")", t: "Nur fertige Quellen. Dank [[rls|RLS]] fallen fremde IDs hier still heraus." },
-      { m: ".insert({ notebook_id", t: "Die Zeile mit Status „wartet“. Die Quellen stehen in data. Der Job liest sie von dort, nicht später aus dem Browser." },
-      { m: "const job = JOBS[kind]", t: "Eine kleine Tabelle: Karteikarten oder Podcast. Beide Jobs folgen demselben Ablauf." },
-      { m: "after(() => job(item.id))", t: "[[after|after()]]: Die Antwort geht sofort raus, der [[job|Job]] läuft danach weiter." },
-      { m: "itemId: item.id", t: "Die neue ID. Mit „Neu erstellen“ springt die Seite direkt dorthin und zeigt den Fortschritt." }
+    { tab: "16 Abschnitte wählen", file: "pick-chunks.ts · pickChunks", io: ["alle Abschnitte der gewählten Quellen, die Reihenfolge der Quellen, 16 Plätze", "höchstens 16 Abschnitte, sortiert nach Quelle und Textstelle"], parts: [
+      { title: "Eine Liste pro Quelle", text: "Zuerst bekommt jede Quelle ihre eigene Liste, sortiert wie im Text. Die Demo „Welche Abschnitte liest das Modell?“ zeigt das Ergebnis.", code: src("w-pick-1"),
+        de: "Funktion „Abschnitte auswählen“ (alle Abschnitte, Quellen, 16 Plätze):\n  Mache für jede Quelle eine Liste ihrer Abschnitte,\n  sortiert wie im Text." },
+      { title: "Plätze reihum verteilen", text: "Runde für Runde bekommt jede Quelle einen Platz, solange sie noch Abschnitte hat. So kommt eine kleine Quelle nicht zu kurz, und eine große verdrängt die anderen nicht.", code: src("w-pick-2"),
+        de: "Jede Quelle hat 0 Plätze.\nWiederhole, bis alle 16 Plätze vergeben sind\noder keine Quelle mehr Abschnitte übrig hat:\n  Gehe die Quellen der Reihe nach durch.\n  Hat die Quelle noch Abschnitte übrig?\n    → Sie bekommt einen Platz." },
+      { title: "Mit gleichem Abstand auswählen", text: "Hat eine Quelle 40 Abschnitte und 12 Plätze, nimmt Faden etwa jeden dritten. Genauer: aus 12 gleich großen Teilen jeweils den mittleren. So sind Anfang, Mitte und Ende dabei.", code: src("w-pick-3"),
+        de: "Für jede Quelle mit n Abschnitten und k Plätzen:\n  Teile ihre Abschnitte in k gleich große Teile.\n  Nimm aus jedem Teil den mittleren Abschnitt.\n  (Beispiel: 40 Abschnitte, 12 Plätze → etwa jeder dritte)" }
     ] },
-    { file: "generate-podcast.ts", lang: "ts", why: "Vertonen, zusammenfügen, speichern", code: src("src-podcast"), notes: [
-      { m: "let progressWrites = Promise.resolve()", t: "Eine Kette aus [[promise|Promises]]. Jeder Fortschritt wird hinten angehängt, die Schreibvorgänge laufen also nacheinander." },
-      { m: ".then(() => saveData", t: "Erst wenn der vorige Stand gespeichert ist, kommt der nächste. So überschreibt nie „11 von 22“ ein schon gespeichertes „12 von 22“." },
-      { m: ".catch((error)", t: "Der Fortschritt ist nur Anzeige. Scheitert ein Schreibvorgang, wird er geloggt, der Podcast läuft weiter." },
-      { m: "mapWithConcurrency(turns", t: "Ein Aufruf pro Redebeitrag, höchstens 4 [[concurrency|gleichzeitig]]. Die Ergebnisse kommen in der Reihenfolge der Redebeiträge zurück." },
-      { m: "text: spokenText(turn.text)", t: "Ohne [n]. Sonst würde die Stimme „eckige Klammer eins“ vorlesen." },
-      { m: "voice: SPEAKERS[turn.speaker].voice", t: "Lea spricht mit „marin“, Tom mit „cedar“. Beide hat OpenAI für die beste Qualität empfohlen, beide haben im Hörtest überzeugt." },
-      { m: "AbortSignal.timeout(SPEECH_TIMEOUT_MS)", t: "60 Sekunden pro Aufruf ([[abort|AbortSignal]]). Ein hängender Aufruf darf nicht die ganzen 300 Sekunden aufbrauchen." },
-      { m: "joinMp3(parts)", t: "Hängt die Frames aller Teile aneinander und gibt die Dauer jedes Teils zurück." },
-      { m: "startTimes(durations)", t: "0, Dauer 1, Dauer 1 + Dauer 2 … So weiß das Transkript, wann jeder Redebeitrag beginnt." },
-      { m: ".from(\"studio\")", t: "Mit dem Admin-Schlüssel: Nutzer dürfen in diesen [[bucket|Bucket]] nicht schreiben." },
-      { m: "uploadedPath = path", t: "Ab hier liegt eine Datei in Storage. Scheitert der letzte Schritt, löscht der catch-Block sie wieder. Keine Datei ohne fertiges Element." },
-      { m: "start: Math.round(starts[i] * 1000) / 1000", t: "Startzeiten auf Millisekunden gerundet. Genauer braucht kein Sprung im Player zu sein." }
-    ] },
-    { file: "mp3.ts", lang: "ts", why: "Frames lesen und die Dauer messen", code: src("src-mp3"), notes: [
-      { m: "b0 !== 0xff || (b1 & 0xe0) !== 0xe0", t: "Jeder Frame beginnt mit 11 Bits, die alle 1 sind. Fehlen sie, steht hier kein Frame." },
-      { m: "const versionBits", t: "Zwei Bits für die MPEG-Version. Genau hier lag der Fehler im Hörtest: „10“ heißt MPEG-2, nicht MPEG-1. Probier es in der Demo." },
-      { m: "layerBits !== 1", t: "Nur Layer III, das „3“ in MP3. Alles andere lehnen wir ab." },
-      { m: "const bitrateIndex", t: "Vier Bits zeigen in eine Tabelle mit [[bitrate|Bitraten]]. Bei OpenAI: Index 12, also 128 kbit/s." },
-      { m: "const sampleRateIndex", t: "Zwei Bits zeigen in eine Tabelle mit [[samplerate|Abtastraten]]. Bei OpenAI: Index 1, bei MPEG-2 also 24.000 Hz." },
-      { m: "const samples = version", t: "Wie viele Messwerte ein Frame enthält: 1152 bei MPEG-1, 576 bei MPEG-2. 576 ÷ 24.000 = 24 Millisekunden pro Frame." },
-      { m: "const length = Math.floor", t: "Bytes pro Frame. Bei OpenAI: 72 × 128.000 ÷ 24.000 = 384. Damit weiß der Code, wo der nächste Frame beginnt." },
-      { m: "throw new Error", t: "Steht kein gültiger Frame da, gibt es einen Fehler. Lieber das als ein Podcast mit einer stummen oder kaputten Stelle." },
-      { m: "seconds += header.samples / header.sampleRate", t: "Die genaue Dauer: alle Messwerte durch die Abtastrate. Gegen die echten Dateien geprüft, gleich wie das macOS-Werkzeug afinfo: 8,808 s." }
-    ] },
-    { file: "concurrency.ts", lang: "ts", why: "Höchstens 4 gleichzeitig, Reihenfolge bleibt", code: src("src-concurrency"), notes: [
-      { m: "const results = new Array<R>(items.length)", t: "Eine Liste mit festen Plätzen. Jedes Ergebnis kommt an den Platz seines Redebeitrags, egal wann es fertig wird." },
-      { m: "let failed = false", t: "Nach dem ersten Fehler startet niemand mehr einen neuen Aufruf. Der Podcast scheitert sowieso, jeder weitere Aufruf würde Geld kosten." },
-      { m: "const index = next++", t: "Jeder Worker nimmt sich die nächste freie Nummer. JavaScript führt immer nur ein Stück Code zur Zeit aus, darum bekommen zwei Worker nie dieselbe." },
-      { m: "results[index] = await fn", t: "Warten auf OpenAI. Während dieser Worker wartet, arbeiten die anderen weiter." },
-      { m: "failed = true", t: "Fehler merken und weiterwerfen. Promise.all bricht dann ab, der Job speichert den Fehler." },
-      { m: "Math.min(limit, items.length)", t: "4 Worker, bei weniger Redebeiträgen entsprechend weniger. Ein Test misst: Nie laufen mehr als 4 gleichzeitig." }
+    { tab: "MP3 erzeugen", file: "generate-podcast.ts · Ausschnitt", io: ["das geprüfte Skript, zum Beispiel 22 Redebeiträge", "eine MP3 in Storage und die Startzeit jedes Redebeitrags"], parts: [
+      { title: "Jeden Beitrag vertonen", text: "Für jeden Redebeitrag ein Aufruf bei OpenAI, höchstens 4 [[concurrency|gleichzeitig]]. Ohne [n] im Text und mit der Stimme der Person. Nach 60 Sekunden wird ein Aufruf abgebrochen.", code: src("w-pod-1"),
+        de: "Für jeden Redebeitrag (höchstens 4 gleichzeitig):\n  Entferne die Belegnummern aus dem Text.\n  Lass OpenAI ihn vorlesen, mit Leas oder Toms Stimme.\n  Länger als 60 Sekunden? → abbrechen.\n  Melde den Fortschritt, zum Beispiel „12 von 22“.\nErgebnis: eine kleine MP3 pro Beitrag, in der richtigen Reihenfolge." },
+      { title: "Zu einer MP3 zusammenfügen", text: "joinMp3 hängt die Stücke aller kleinen MP3s aneinander und misst dabei die Dauer jeder einzelnen. startTimes rechnet daraus die Startzeiten. Die Demo „Wann spricht wer?“ zeigt genau das.", code: src("w-pod-2"),
+        de: "Hänge alle kleinen MP3s zu einer großen zusammen.\nMerke dir dabei die Dauer jeder kleinen MP3.\nStartzeit eines Beitrags = alle Dauern davor zusammen." },
+      { title: "In Storage speichern", text: "Mit dem Admin-Schlüssel in den [[bucket|Bucket]] „studio“. Ab hier liegt eine Datei in Storage. Scheitert der letzte Schritt, löscht der Job sie wieder.", code: src("w-pod-3"),
+        de: "Lade die MP3 in den privaten Speicher hoch,\n  Pfad: Notebook-ID/Element-ID.mp3.\n  Fehler? → abbrechen.\nMerke dir: Jetzt liegt dort eine Datei.\n  (Scheitert danach etwas, wird sie wieder gelöscht.)" },
+      { title: "Fertig melden", text: "Status „bereit“, dazu die Startzeiten, die Dauer und die Größe. Die Seite merkt das beim nächsten Nachfragen und zeigt den Player.", code: src("w-pod-4"),
+        de: "Speichere in der Datenbank:\n  Status „bereit“,\n  jeden Beitrag mit seiner Startzeit (auf Millisekunden gerundet),\n  Dauer und Größe der MP3." }
     ] }
   ];
-  var KW_TS = /^(import|from|export|default|const|let|function|async|await|return|type|true|false|for|of|if|else|try|catch|throw|new|break|continue|instanceof|null|unknown)$/;
-  var KW_SQL = /^(create|or|replace|function|returns|table|language|sql|stable|security|invoker|set|as|with|select|from|where|and|order|by|limit|over|row_number|join|full|outer|on|coalesce|desc|any|default|least|integer|text|uuid|bigint|double|precision)$/i;
-  function hlLine(line, lang) {
-    var out = "", last = 0, m, kw = lang === "sql" ? KW_SQL : KW_TS;
-    var re = lang === "sql"
-      ? /(--.*$)|('(?:[^'])*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_][\w]*)()/g
-      : /(\/\/.*$)|("(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(\s*:)?/g;
+  var KW_TS = /^(import|from|export|default|const|let|function|async|await|return|type|true|false|for|of|if|else|try|catch|throw|new|null|unknown|while)$/;
+  function hlLine(line) {
+    var out = "", last = 0, m;
+    var re = /(\/\/.*$)|("(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(\s*:)?/g;
     while ((m = re.exec(line))) {
       out += esc(line.slice(last, m.index));
       if (m[1]) out += '<span class="tok-com">' + esc(m[1]) + '</span>';
       else if (m[2]) out += '<span class="tok-str">' + esc(m[2]) + '</span>';
       else if (m[3]) out += '<span class="tok-num">' + m[3] + '</span>';
       else if (m[4]) {
-        if (kw.test(m[4])) out += '<span class="tok-kw">' + m[4] + '</span>' + esc(m[5] || "");
+        if (KW_TS.test(m[4])) out += '<span class="tok-kw">' + m[4] + '</span>' + esc(m[5] || "");
         else if (m[5]) out += '<span class="tok-key">' + m[4] + '</span>' + esc(m[5]);
         else out += esc(m[4]);
       }
@@ -1063,46 +1033,30 @@ export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: numbe
     }
     return out + esc(line.slice(last));
   }
-  // Turn the list of notes into { lineNumber: text }.
-  snippets.forEach(function (s) {
-    var lines = s.code.split("\n"), byLine = {};
-    s.notes.forEach(function (n) {
-      for (var i = 0; i < lines.length; i++) {
-        var hit = n.m.charAt(0) === "=" ? lines[i] === n.m.slice(1) : lines[i].indexOf(n.m) >= 0;
-        if (hit && !byLine[i + 1]) { byLine[i + 1] = n.t; break; }
-      }
-    });
-    s.lineNotes = byLine;
-  });
-  var tabs = document.getElementById("codeTabs"), pre = document.getElementById("codePre"), note = document.getElementById("codeNote");
-  var active = 0;
-  function defaultNote() { note.innerHTML = '<span class="muted">Klick auf eine Zeile mit Punkt.</span>'; }
-  function renderCode(i) {
-    active = i; var s = snippets[i];
-    Array.prototype.forEach.call(tabs.children, function (t, k) { t.setAttribute("aria-selected", String(k === i)); });
-    document.getElementById("codeFile").textContent = s.file;
-    document.getElementById("codeWhy").textContent = s.why;
-    pre.innerHTML = s.code.split("\n").map(function (l, k) {
-      var n = k + 1, has = s.lineNotes[n] ? " has-note" : "";
-      return '<div class="ln' + has + '" data-n="' + n + '"' + (has ? ' role="button" tabindex="0"' : "") + '><span class="n">' + n + '</span><span class="t">' + (hlLine(l, s.lang) || " ") + '</span></div>';
+  var codeTabs = document.getElementById("codeTabs"), codeWalk = document.getElementById("codeWalk");
+  var codeMode = document.getElementById("codeMode"), activeWalk = 0, mode = "code";
+  function renderWalk() {
+    var w = walks[activeWalk];
+    Array.prototype.forEach.call(codeTabs.children, function (t, k) { t.setAttribute("aria-selected", String(k === activeWalk)); });
+    Array.prototype.forEach.call(codeMode.children, function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-mode") === mode)); });
+    document.getElementById("codeFile").textContent = w.file;
+    document.getElementById("codeIO").innerHTML = '<span><b>REIN</b>' + esc(w.io[0]) + '</span><span><b>RAUS</b>' + esc(w.io[1]) + '</span>';
+    codeWalk.innerHTML = w.parts.map(function (p, i) {
+      var right = mode === "code"
+        ? '<pre class="walk-code">' + p.code.split("\n").map(hlLine).join("\n") + '</pre>'
+        : '<pre class="walk-code de">' + esc(p.de) + '</pre>';
+      return '<div class="walk-step"><div class="walk-text"><span class="walk-num">' + (i + 1) + '</span><div><h4>' + esc(p.title) + '</h4><p>' + rich(p.text) + '</p></div></div>' + right + '</div>';
     }).join("");
-    defaultNote();
   }
-  function selectLine(el) {
-    pre.querySelectorAll(".sel").forEach(function (x) { x.classList.remove("sel"); });
-    el.classList.add("sel"); var n = el.getAttribute("data-n");
-    note.innerHTML = '<b>Zeile ' + n + '</b> · ' + rich(snippets[active].lineNotes[n]);
-  }
-  pre.addEventListener("click", function (e) { var el = e.target.closest(".ln.has-note"); if (el) selectLine(el); });
-  pre.addEventListener("keydown", function (e) { var el = e.target.closest(".ln.has-note"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectLine(el); } });
-  snippets.forEach(function (s, i) {
-    var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = s.file;
-    b.addEventListener("click", function () { renderCode(i); }); tabs.appendChild(b);
+  walks.forEach(function (w, i) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = w.tab;
+    b.addEventListener("click", function () { activeWalk = i; renderWalk(); }); codeTabs.appendChild(b);
   });
-  renderCode(0);
+  codeMode.addEventListener("click", function (e) { var b = e.target.closest("button[data-mode]"); if (!b) return; mode = b.getAttribute("data-mode"); renderWalk(); });
+  renderWalk();
   var copyBtn = document.getElementById("copyBtn");
   copyBtn.addEventListener("click", function () {
-    var text = snippets[active].code, label = copyBtn.querySelector("span");
+    var text = walks[activeWalk].parts.map(function (p) { return p.code; }).join("\n"), label = copyBtn.querySelector("span");
     function done() { label.textContent = "Kopiert"; setTimeout(function () { label.textContent = "Kopieren"; }, 1400); }
     function fallback() { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
     if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
@@ -1117,7 +1071,6 @@ export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: numbe
       document.getElementById(x.getAttribute("data-pane")).hidden = !on;
     });
   });
-
   /* ---------- Demo 1: pickChunks (same rules as src/lib/studio/pick-chunks.ts) ---------- */
   var PICK_SOURCES = [
     { id: "pickA", name: "Hausordnung" },
@@ -1142,6 +1095,30 @@ export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: numbe
     for (var i = 0; i < k; i++) out.push(Math.floor(((i + 0.5) * n) / k));
     return out;
   }
+  var EVERY = ["", "", "zweiten", "dritten", "vierten", "fünften", "sechsten", "siebten", "achten", "neunten", "zehnten"];
+  function sum(list) { return list.reduce(function (a, b) { return a + b; }, 0); }
+  // The result in plain words.
+  function pickExplain(sizes, counts, max) {
+    var total = sum(sizes);
+    if (total === 0) return "Keine Quelle hat Abschnitte. Dann gibt es keinen Podcast, Faden meldet einen Fehler.";
+    if (total <= max) return "Alle " + total + " Abschnitte passen in die " + max + " Plätze. Das Modell liest also alles, es gibt nichts auszuwählen.";
+    var withChunks = PICK_SOURCES.filter(function (s, i) { return sizes[i] > 0; });
+    if (withChunks.length === 1) {
+      var only = PICK_SOURCES.indexOf(withChunks[0]), step = Math.round(sizes[only] / counts[only]);
+      return "Es gibt nur eine Quelle, <b>" + withChunks[0].name + "</b>, mit " + sizes[only] + " Abschnitten. Faden nimmt " + counts[only] +
+        " davon mit gleichem Abstand, etwa jeden " + (EVERY[step] || step + ".") + ". So liest das Modell Anfang, Mitte und Ende, nicht nur den Anfang.";
+    }
+    var parts = [];
+    PICK_SOURCES.forEach(function (s, i) {
+      if (sizes[i] === 0) return;
+      if (counts[i] === sizes[i]) { parts.push("<b>" + s.name + "</b> bekommt alle " + sizes[i]); return; }
+      var r = Math.round(sizes[i] / counts[i]);
+      var how = r <= 1 ? "fast jeden" : r <= 10 ? "etwa jeden " + EVERY[r] : "etwa jeden " + r + ".";
+      parts.push("<b>" + s.name + "</b> bekommt " + counts[i] + " von " + sizes[i] + ", " + how);
+    });
+    return "Es gibt " + total + " Abschnitte, aber nur " + max + " Plätze. Reihum bekommt jede Quelle einen Platz, bis alle vergeben sind: " +
+      parts.join(", ") + ". Aus einer großen Quelle nimmt Faden Abschnitte mit gleichem Abstand. So liest das Modell Anfang, Mitte und Ende.";
+  }
   function renderPick() {
     var sizes = PICK_SOURCES.map(function (s) { return Number(el(s.id).value); });
     var max = Number(el("pickMax").value);
@@ -1149,6 +1126,7 @@ export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: numbe
     el("pickMaxVal").textContent = max;
 
     var counts = pickCounts(sizes, max), nr = 0;
+    el("pickExplain").innerHTML = pickExplain(sizes, counts, max);
     el("pickRows").innerHTML = PICK_SOURCES.map(function (s, i) {
       var picked = {};
       pickIndices(sizes[i], counts[i]).forEach(function (j) { picked[j] = true; });
@@ -1157,65 +1135,41 @@ export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: numbe
         if (picked[j]) { nr++; cells += '<span class="cell on" title="Abschnitt ' + (j + 1) + ' wird Beleg [' + nr + ']">' + nr + '</span>'; }
         else cells += '<span class="cell" title="Abschnitt ' + (j + 1) + '"></span>';
       }
-      return '<div class="pick-row"><div class="pl"><b>' + esc(s.name) + '</b> · ' + sizes[i] + ' Abschnitte · ' + counts[i] + ' ausgewählt</div>' +
+      return '<div class="pick-row"><div class="pl"><b>' + esc(s.name) + '</b> · ' + sizes[i] + ' Abschnitte · ' + counts[i] + ' gelesen</div>' +
         '<div class="cells">' + (cells || '<span class="muted small">keine Abschnitte</span>') + '</div></div>';
     }).join("");
 
     // Comparison: simply the first `max` chunks, in source order.
     var left = max, naive = sizes.map(function (n) { var c = Math.min(n, left); left -= c; return c; });
-    var missing = PICK_SOURCES.filter(function (s, i) { return sizes[i] > 0 && naive[i] === 0; }).map(function (s) { return s.name; });
-    var cut = PICK_SOURCES.filter(function (s, i) { return naive[i] > 0 && naive[i] < sizes[i]; }).map(function (s, k) { var i = PICK_SOURCES.indexOf(s); return s.name + " nur Abschnitt 1–" + naive[i] + " von " + sizes[i]; });
+    var missing = [], cut = [];
+    PICK_SOURCES.forEach(function (s, i) {
+      if (sizes[i] > 0 && naive[i] === 0) missing.push(s.name);
+      else if (naive[i] > 0 && naive[i] < sizes[i]) cut.push(s.name + " (nur 1–" + naive[i] + " von " + sizes[i] + ")");
+    });
     var naiveBad = missing.length > 0 || cut.length > 0;
-    var naiveText = naiveBad
-      ? (missing.length ? "Fehlt ganz: " + missing.join(", ") + ". " : "") + (cut.length ? "Nur der Anfang: " + cut.join(", ") + "." : "")
-      : "Hier passt alles, weil alle Abschnitte Platz haben.";
-    var used = counts.reduce(function (a, b) { return a + b; }, 0);
+    var naiveText = !naiveBad ? "Hier gleich gut, weil alles hineinpasst."
+      : (missing.length ? "Fehlt ganz: " + missing.join(", ") + ". " : "") + (cut.length ? "Nur der Anfang: " + cut.join(", ") + "." : "");
     el("pickCompare").innerHTML =
-      '<div class="gate ' + (naiveBad ? "fail" : "ok") + '"><div class="gh">DIE ERSTEN ' + max + ' NEHMEN<span class="st">' + naive.join(" · ") + '</span></div><p>' + esc(naiveText) + '</p></div>' +
-      '<div class="gate ok"><div class="gh">PICKCHUNKS<span class="st">' + counts.join(" · ") + '</span></div><p>' + (used === 0 ? "Keine Abschnitte, also kein Podcast: Faden meldet einen Fehler." : "Jede Quelle mit Abschnitten ist dabei, verteilt über Anfang, Mitte und Ende. " + used + " von " + max + " Plätzen belegt.") + '</p></div>';
+      '<div class="gate ' + (naiveBad ? "fail" : "ok") + '"><div class="gh">EINFACH DIE ERSTEN ' + max + '<span class="st">' + naive.join(" · ") + '</span></div><p>' + esc(naiveText) + '</p></div>' +
+      '<div class="gate ok"><div class="gh">SO MACHT ES FADEN<span class="st">' + counts.join(" · ") + '</span></div><p>' +
+      (sum(counts) === 0 ? "Keine Abschnitte, also ein Fehler statt eines Podcasts." : "Jede Quelle mit Abschnitten ist dabei, verteilt über den ganzen Text.") + '</p></div>';
   }
-  PICK_SOURCES.map(function (s) { return el(s.id); }).concat([el("pickMax")]).forEach(function (input) { input.addEventListener("input", renderPick); });
+  var pickTry = el("pickTry");
+  pickTry.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    el("pickA").value = b.getAttribute("data-a"); el("pickB").value = b.getAttribute("data-b"); el("pickC").value = b.getAttribute("data-c"); el("pickMax").value = 16;
+    Array.prototype.forEach.call(pickTry.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    renderPick();
+  });
+  PICK_SOURCES.map(function (s) { return el(s.id); }).concat([el("pickMax")]).forEach(function (input) {
+    input.addEventListener("input", function () {
+      Array.prototype.forEach.call(pickTry.children, function (x) { x.setAttribute("aria-pressed", "false"); });
+      renderPick();
+    });
+  });
   renderPick();
 
-  /* ---------- Demo 2: MP3 frames (same tables as src/lib/studio/mp3.ts) ---------- */
-  var BITRATES_V1 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320];
-  var BITRATES_V2 = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160];
-  var RATES_V1 = [44100, 48000, 32000], RATES_V2 = [22050, 24000, 16000];
-  var BIT_GROUPS = [
-    { bits: "11111111111", label: "Sync" },
-    { bits: "10", label: "Version", key: true },
-    { bits: "01", label: "Layer III" },
-    { bits: "1", label: "Schutz" },
-    { bits: "1100", label: "Bitrate-Index", key: true },
-    { bits: "01", label: "Abtastrate", key: true },
-    { bits: "0", label: "Padding" },
-    { bits: "0", label: "Privat" },
-    { bits: "11", label: "Mono" },
-    { bits: "000100", label: "Rest" }
-  ];
-  var mp3Bug = el("mp3Bug");
-  function renderHeader() {
-    var bug = mp3Bug.checked;
-    el("mp3Bits").innerHTML = BIT_GROUPS.map(function (g) {
-      var cls = g.key ? (bug && g.label === "Version" ? " bad" : " key") : "";
-      var label = g.label === "Version" ? (bug ? "als MPEG-1 gelesen" : "Version: MPEG-2") : g.label;
-      return '<div class="bitgroup' + cls + '"><b>' + g.bits + '</b><small>' + label + '</small></div>';
-    }).join("");
-    // Index 12 for the bit rate, index 1 for the sample rate (from the bits above).
-    var v1 = bug, bitrate = (v1 ? BITRATES_V1 : BITRATES_V2)[12], rate = (v1 ? RATES_V1 : RATES_V2)[1];
-    var samples = v1 ? 1152 : 576, length = Math.floor(((samples / 8) * bitrate * 1000) / rate);
-    var de = new Intl.NumberFormat("de-DE");
-    el("mp3Header").innerHTML =
-      '<div class="gate ' + (bug ? "fail" : "ok") + '"><div class="gh">' + (bug ? "MIT MPEG-1-TABELLEN" : "MIT MPEG-2-TABELLEN") + '<span class="st">' + bitrate + ' kbit/s</span></div>' +
-      '<p>' + de.format(rate) + ' Hz · ' + samples + ' Messwerte pro Frame · ' + length + ' Bytes pro Frame · ' + de.format(samples / rate * 1000) + ' ms</p></div>' +
-      '<div class="gate ' + (bug ? "fail" : "ok") + '"><div class="gh">NÄCHSTER FRAME<span class="st">Byte ' + length + '</span></div>' +
-      '<p>' + (bug
-        ? "Dort beginnt kein Frame, der echte ist nur 384 Bytes lang: „kein Sync bei Byte 672“. Gemerkt, weil afinfo 128 kbit/s meldete."
-        : "Dort beginnt genau der nächste Frame. So geht es durch die ganze Datei, 367 Frames = 8,808 s, wie bei afinfo.") + '</p></div>';
-  }
-  mp3Bug.addEventListener("change", renderHeader);
-  renderHeader();
-
+  /* ---------- Demo 2: when does who speak? (same rules as mp3.ts and currentTurnIndex) ---------- */
   // Six turns with frame counts like in a real episode. 1 frame = 24 ms.
   var TURNS = [
     { s: "Lea", frames: 367 }, { s: "Tom", frames: 405 }, { s: "Lea", frames: 142 },
@@ -1225,11 +1179,18 @@ export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: numbe
   TURNS.forEach(function (turn) { turn.start = t; turn.seconds = turn.frames * FRAME_SECONDS; t += turn.seconds; });
   var TOTAL = t, mp3Time = el("mp3Time");
   mp3Time.max = String(Math.floor(TOTAL * 10) / 10);
+  function secs(s) { return s.toFixed(1).replace(".", ",") + " s"; }
   function clock(sec, decimals) {
     var m = Math.floor(sec / 60), s = sec - m * 60;
     var str = decimals ? s.toFixed(2).replace(".", ",") : String(Math.floor(s));
     return m + ":" + (s < 10 ? "0" : "") + str;
   }
+  // Step 1: the first 40 frames of Lea's first MP3 as beads.
+  el("mp3Beads").innerHTML = new Array(41).join('<span class="bead"></span>') + '<span class="more-beads">… und 327 weitere = 367 Stücke</span>';
+  // Step 2: the six chains one after the other, with labels.
+  el("mp3Labels").innerHTML = TURNS.map(function (turn) {
+    return '<span style="flex-grow:' + turn.frames + '">' + turn.s + " " + secs(turn.seconds) + '</span>';
+  }).join("");
   // Same rule as currentTurnIndex: the last turn that has started.
   function currentTurn(time) {
     var index = -1;
@@ -1239,21 +1200,62 @@ export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: numbe
   function renderTurns() {
     var time = Number(mp3Time.value), cur = currentTurn(time);
     el("mp3TimeVal").textContent = clock(time, false) + " von " + clock(TOTAL, false);
-    el("mp3Turns").innerHTML = '<thead><tr><th>NR.</th><th>WER</th><th>FRAMES</th><th>DAUER</th><th>START</th></tr></thead><tbody>' +
-      TURNS.map(function (turn, i) {
-        return '<tr class="' + (i === cur ? "cur" : "") + '"><td>' + (i + 1) + '</td><td>' + turn.s + '</td><td>' + turn.frames + '</td><td>' +
-          turn.seconds.toFixed(3).replace(".", ",") + ' s</td><td>' + clock(turn.start, true) + '</td></tr>';
-      }).join("") + '</tbody>';
     el("mp3Track").innerHTML = TURNS.map(function (turn, i) {
-      var cls = "mseg " + turn.s.toLowerCase() + (i === cur ? " on" : i < cur ? " past" : "");
-      return '<span class="' + cls + '" style="flex-grow:' + turn.frames + '"></span>';
+      return '<span class="mseg ' + turn.s.toLowerCase() + (i === cur ? " on" : "") + '" style="flex-grow:' + turn.frames + '"></span>';
     }).join("");
+    var before = 0;
+    el("mp3Turns").innerHTML = '<thead><tr><th>NR.</th><th>WER</th><th>STÜCKE</th><th>STÜCKE DAVOR</th><th>BEGINNT BEI</th></tr></thead><tbody>' +
+      TURNS.map(function (turn, i) {
+        var row = '<tr class="' + (i === cur ? "cur" : "") + '"><td>' + (i + 1) + '</td><td>' + turn.s + '</td><td>' + turn.frames + '</td><td>' + before + '</td><td>' +
+          before + ' × 24 ms = ' + clock(turn.start, true) + '</td></tr>';
+        before += turn.frames;
+        return row;
+      }).join("") + '</tbody>';
     var turn = TURNS[cur];
     el("mp3Now").innerHTML = '<div class="verdict in">Bei ' + clock(time, false) + ' spricht ' + turn.s + ' (Redebeitrag ' + (cur + 1) + ')' +
-      '<small>Er hat bei ' + clock(turn.start, true) + ' begonnen: die Summe der Frames davor × 24 ms. Genau so markiert „Mitlesen“ im Transkript die richtige Zeile.</small></div>';
+      '<small>Beitrag ' + (cur + 1) + ' hat bei ' + clock(turn.start, true) + ' begonnen, Beitrag ' + (cur + 2 <= TURNS.length ? (cur + 2) + ' beginnt erst bei ' + clock(TURNS[cur + 1].start, true) : "ist der letzte") + '. Darum markiert der Player diese Zeile.</small></div>';
   }
   mp3Time.addEventListener("input", renderTurns);
   renderTurns();
+
+  // For the curious: the 4-byte label of every frame, in bits.
+  var BITRATES_V1 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320];
+  var BITRATES_V2 = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160];
+  var RATES_V1 = [44100, 48000, 32000], RATES_V2 = [22050, 24000, 16000];
+  var BIT_GROUPS = [
+    { bits: "11111111111", label: "Anfang" },
+    { bits: "10", label: "Version", key: true },
+    { bits: "01", label: "MP3" },
+    { bits: "1", label: "Schutz" },
+    { bits: "1100", label: "Datenmenge", key: true },
+    { bits: "01", label: "Messwerte/s", key: true },
+    { bits: "0", label: "Füllbyte" },
+    { bits: "0", label: "privat" },
+    { bits: "11", label: "Mono" },
+    { bits: "000100", label: "Rest" }
+  ];
+  var mp3Bug = el("mp3Bug");
+  function renderHeader() {
+    var bug = mp3Bug.checked;
+    el("mp3Bits").innerHTML = BIT_GROUPS.map(function (g) {
+      var cls = g.key ? (bug && g.label === "Version" ? " bad" : " key") : "";
+      var label = g.label === "Version" ? (bug ? "falsch: MPEG-1" : "Version: MPEG-2") : g.label;
+      return '<div class="bitgroup' + cls + '"><b>' + g.bits + '</b><small>' + label + '</small></div>';
+    }).join("");
+    // The bits say: index 12 for the data rate, index 1 for the samples per second.
+    var bitrate = (bug ? BITRATES_V1 : BITRATES_V2)[12], rate = (bug ? RATES_V1 : RATES_V2)[1];
+    var samples = bug ? 1152 : 576, length = Math.floor(((samples / 8) * bitrate * 1000) / rate);
+    var de = new Intl.NumberFormat("de-DE");
+    el("mp3Header").innerHTML =
+      '<div class="gate ' + (bug ? "fail" : "ok") + '"><div class="gh">' + (bug ? "FALSCH GELESEN" : "RICHTIG GELESEN") + '<span class="st">' + length + ' Bytes</span></div>' +
+      '<p>' + bitrate + ' kbit/s und ' + de.format(rate) + ' Messwerte pro Sekunde. Ein Stück hat ' + samples + ' Messwerte, also ' + de.format(samples / rate * 1000) + ' ms, und ist ' + length + ' Bytes lang.</p></div>' +
+      '<div class="gate ' + (bug ? "fail" : "ok") + '"><div class="gh">DAS NÄCHSTE STÜCK<span class="st">bei Byte ' + length + '</span></div>' +
+      '<p>' + (bug
+        ? "Dort beginnt aber kein Stück, das echte ist nur 384 Bytes lang. Der Code verliert den Faden. Gemerkt hat die KI das, weil das Mac-Werkzeug afinfo 128 kbit/s meldete."
+        : "Dort beginnt genau das nächste Stück. So geht es durch die ganze Datei: 367 Stücke = 8,808 s, gleich wie beim Mac-Werkzeug afinfo.") + '</p></div>';
+  }
+  mp3Bug.addEventListener("change", renderHeader);
+  renderHeader();
 
   /* ---------- Flashcards ---------- */
   var qa = [
