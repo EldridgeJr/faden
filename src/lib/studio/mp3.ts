@@ -6,9 +6,10 @@
 // frames one after the other, and the exact duration is the sum of all
 // samples divided by the sample rate.
 //
-// OpenAI's speech API returns MPEG-2 Layer III, 24 kHz, 128 kbit/s, mono,
-// without ID3 tag (checked in step 6a). The code reads MPEG-1, 2 and 2.5
-// Layer III, so it stays correct if the format changes.
+// The code reads MPEG-1, 2 and 2.5 Layer III. Checked against real files:
+// - OpenAI (step 6a): MPEG-2, 24 kHz, 128 kbit/s, no tags at all.
+// - ElevenLabs: MPEG-1, 44.1 kHz, 128 kbit/s, with an ID3v2 tag and an
+//   Info frame at the start. Both are skipped (see below).
 
 // Bit rates in kbit/s by index (header bits 12–15). 0 = "free", 15 = bad.
 const BITRATES_V1 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320];
@@ -60,11 +61,28 @@ function id3v2Length(bytes: Uint8Array): number {
   return 10 + size + (hasFooter ? 10 : 0);
 }
 
+// Does the frame at offset carry "Xing" or "Info"? Encoders put this
+// metadata frame first: it looks like a frame of audio, but holds the frame
+// count of its own file. In the middle of a joined MP3 it would make some
+// players show a wrong length or stop early, so we drop it.
+// The word sits right after the "side info", whose size depends on the
+// MPEG version and on mono or stereo.
+function isInfoFrame(bytes: Uint8Array, offset: number): boolean {
+  const mpeg1 = ((bytes[offset + 1] >> 3) & 0b11) === 3;
+  const mono = bytes[offset + 3] >> 6 === 3;
+  const sideInfo = mpeg1 ? (mono ? 17 : 32) : mono ? 9 : 17;
+  const at = offset + 4 + sideInfo;
+  const word = String.fromCharCode(...bytes.subarray(at, at + 4));
+  return word === "Xing" || word === "Info";
+}
+
 // The audio frames of one MP3 (without tags) and their exact duration.
 // Throws if the data is not a clean row of frames: better an error than a
 // podcast with a silent or broken part.
 export function readMp3(bytes: Uint8Array): { frames: Uint8Array; seconds: number } {
-  const start = id3v2Length(bytes);
+  let start = id3v2Length(bytes);
+  const first = readFrameHeader(bytes, start);
+  if (first && start + first.length <= bytes.length && isInfoFrame(bytes, start)) start += first.length;
   let offset = start;
   let seconds = 0;
 

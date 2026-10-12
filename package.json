@@ -16,6 +16,7 @@
     "db:types": "supabase gen types typescript --project-id jafmkgotsauaxmfnsacd --schema public > src/lib/supabase/database.types.ts"
   },
   "dependencies": {
+    "@ai-sdk/elevenlabs": "^3.0.59",
     "@ai-sdk/openai": "^4.0.91",
     "@ai-sdk/react": "^4.0.140",
     "@mozilla/readability": "^0.6.0",

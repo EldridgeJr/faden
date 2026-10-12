@@ -1,12 +1,6 @@
 import "server-only";
 import { generateSpeech, generateText, Output } from "ai";
-import {
-  SPEECH_INSTRUCTIONS,
-  speechModel,
-  STUDIO_REASONING,
-  studioModel,
-  textProviderOptions,
-} from "@/lib/ai/models";
+import { speechModel, STUDIO_REASONING, studioModel, textProviderOptions } from "@/lib/ai/models";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { mapWithConcurrency } from "./concurrency";
 import { claimStudioItem, failStudioItem, StudioError } from "./job";
@@ -28,9 +22,9 @@ import {
 // tokens, plus JSON and reasoning.
 const MAX_OUTPUT_TOKENS = 12000;
 
-// Speech calls at the same time. Enough to be fast (about 30 turns in well
-// under a minute), few enough not to hit OpenAI's rate limit.
-const CONCURRENT_SPEECH_CALLS = 4;
+// Speech calls at the same time. The ElevenLabs Starter plan allows 3
+// concurrent requests, a fourth would be refused (Free plan: 2).
+const CONCURRENT_SPEECH_CALLS = 3;
 
 // One turn takes 2–4 seconds. A call that hangs must not use up the whole
 // maxDuration of 300 seconds.
@@ -114,9 +108,9 @@ export async function generatePodcast(itemId: string): Promise<void> {
       const { audio } = await generateSpeech({
         model: speechModel,
         // Without [n], or the voice would read "eckige Klammer eins".
+        // Audio tags like [laughs] stay in, the voice acts them out.
         text: spokenText(turn.text),
         voice: SPEAKERS[turn.speaker].voice,
-        instructions: SPEECH_INSTRUCTIONS,
         outputFormat: "mp3",
         abortSignal: AbortSignal.timeout(SPEECH_TIMEOUT_MS),
       });

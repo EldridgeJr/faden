@@ -1,3 +1,4 @@
+import { elevenlabs } from "@ai-sdk/elevenlabs";
 import { openai, type OpenAILanguageModelResponsesOptions } from "@ai-sdk/openai";
 
 // The one place where the app chooses its AI models.
@@ -36,10 +37,9 @@ export const textProviderOptions = {
   } satisfies OpenAILanguageModelResponsesOptions,
 };
 
-// Text to speech for the podcast. The voices per host are in
-// src/lib/studio/podcast.ts (SPEAKERS). The voices are tuned for English,
-// the instructions keep them on German without an accent (listening test,
-// step 6a).
-export const speechModel = openai.speech("gpt-4o-mini-tts");
-export const SPEECH_INSTRUCTIONS =
-  "Sprich natürliches Hochdeutsch ohne englischen Akzent. Locker, freundlich und lebendig, wie in einem Podcast.";
+// Text to speech for the podcast: ElevenLabs, model v3. The voices per host
+// are in src/lib/studio/podcast.ts (SPEAKERS), native German voices.
+// v3 understands audio tags like [laughs] in the text. It does not support
+// a language code: it detects German by itself.
+// The provider reads ELEVENLABS_API_KEY itself.
+export const speechModel = elevenlabs.speech("eleven_v3");

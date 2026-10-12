@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { splitCitations, type Citation } from "@/lib/chat/citations";
 import { formatBuildTime, formatDuration, formatMegabytes } from "@/lib/format";
-import { countWords, currentTurnIndex, SPEAKERS, type Turn } from "@/lib/studio/podcast";
+import { countWords, currentTurnIndex, SPEAKERS, stripAudioTags, type Turn } from "@/lib/studio/podcast";
 import { cn } from "@/lib/utils";
 import { CitationPanel, type OpenCitation } from "../../citation-panel";
 import { CitedText, usedCitations } from "../../cited-text";
@@ -137,7 +137,8 @@ function Transcript({
 
       <ol className="flex flex-col gap-0.5">
         {turns.map((turn, i) => {
-          const segments = splitCitations(turn.text, validNumbers);
+          // Audio tags like [laughs] are for the voice, not for the reader.
+          const segments = splitCitations(stripAudioTags(turn.text), validNumbers);
           // The citation view knows citations by "messageId". Here: one id per turn.
           const turnKey = `turn-${i}`;
           const activeNumber = openCitation?.messageId === turnKey ? openCitation.n : null;

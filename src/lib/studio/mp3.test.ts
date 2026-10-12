@@ -58,6 +58,23 @@ describe("readMp3", () => {
     expect(readMp3(new Uint8Array([...mp3(2), ...tag])).frames.length).toBe(768);
   });
 
+  it("skips an Info frame at the start (ElevenLabs), but keeps normal frames", () => {
+    // MPEG-1, 128 kbit/s, 44.1 kHz, mono (C4): side info is 17 bytes, so
+    // "Info" sits at byte 4 + 17 = 21 of the first frame.
+    const info = frame(0xfb, 0x90, 417);
+    info.splice(21, 4, 0x49, 0x6e, 0x66, 0x6f);
+    const audio = [...frame(0xfb, 0x90, 417), ...frame(0xfb, 0x90, 417)];
+    const { frames, seconds } = readMp3(new Uint8Array([...info, ...audio]));
+    expect(frames.length).toBe(834);
+    expect(seconds).toBeCloseTo((2 * 1152) / 44100, 10);
+  });
+
+  it("does not drop a frame that has the word somewhere else", () => {
+    const audio = frame(0xfb, 0x90, 417);
+    audio.splice(100, 4, 0x49, 0x6e, 0x66, 0x6f);
+    expect(readMp3(new Uint8Array(audio)).frames.length).toBe(417);
+  });
+
   it("throws on broken data and on a cut-off last frame", () => {
     expect(() => readMp3(new Uint8Array([...mp3(2), 1, 2, 3, 4, 5]))).toThrow(/byte 768/);
     expect(() => readMp3(mp3(2).subarray(0, 700))).toThrow();

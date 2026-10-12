@@ -6,9 +6,11 @@ import {
   currentTurnIndex,
   describeProgress,
   downloadFileName,
+  keepKnownTags,
   MAX_TURNS,
   scriptCitations,
   spokenText,
+  stripAudioTags,
 } from "./podcast";
 
 describe("cleanScript", () => {
@@ -136,5 +138,41 @@ describe("downloadFileName", () => {
 
   it("falls back to a fixed name", () => {
     expect(downloadFileName("???")).toBe("audio-zusammenfassung.mp3");
+  });
+});
+
+describe("audio tags", () => {
+  it("keeps allowed tags in lower case and leaves citations alone", () => {
+    expect(keepKnownTags("[Laughs] Genau so [3].")).toBe("[laughs] Genau so [3].");
+  });
+
+  it("removes tags that are not allowed, with the space before them", () => {
+    expect(keepKnownTags("Ja [lacht] genau [Musik].")).toBe("Ja genau.");
+  });
+
+  it("strips all tags for the transcript, but keeps citations", () => {
+    expect(stripAudioTags("[excited] Hallo! Ruhe ab 22 Uhr [2]. [laughs] Ja.")).toBe("Hallo! Ruhe ab 22 Uhr [2]. Ja.");
+  });
+
+  it("keeps tags for the voice but removes citations", () => {
+    expect(spokenText("[laughs] Ab 22 Uhr [1].")).toBe("[laughs] Ab 22 Uhr.");
+  });
+
+  it("drops a turn that is only a tag, and does not count tags as words", () => {
+    const turns = cleanScript(
+      [
+        { speaker: "lea", text: "[laughs]" },
+        { speaker: "tom", text: "[curious] Und dann [1]?" },
+      ],
+      3,
+    );
+    expect(turns).toEqual([{ speaker: "tom", text: "[curious] Und dann [1]?" }]);
+    expect(countWords(turns)).toBe(2);
+  });
+
+  it("lists the allowed tags in the prompt", () => {
+    const prompt = buildPodcastInstructions([{ sourceTitle: "A", page: null, content: "B" }]);
+    expect(prompt).toContain("[laughs], [excited], [curious], [sighs], [thoughtful], [surprised]");
+    expect(prompt).toContain("in etwa jedem zweiten Redebeitrag");
   });
 });
