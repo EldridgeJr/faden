@@ -64,7 +64,8 @@ Nicht bauen, solange der Muss-Teil nicht fertig und getestet ist.
 - Next.js (App Router) + TypeScript (strict) + Tailwind CSS + shadcn/ui, Icons: Lucide
 - Supabase, Region Frankfurt: Postgres + pgvector, Storage, Auth, Row Level Security
 - Vercel AI SDK für Chat und Streaming (`streamText`, `useChat`); Modell an einer Stelle konfigurierbar
-- OpenAI: Embeddings `text-embedding-3-small` (1.536 Dimensionen), Text-to-Speech für den Podcast
+- OpenAI: Embeddings `text-embedding-3-small` (1.536 Dimensionen)
+- ElevenLabs (`eleven_v3`): Text-to-Speech für den Podcast, zwei deutsche Stimmen mit Audio-Tags
 - Zod für alle Eingaben von außen (Requests, Tool-Argumente, Modell-JSON)
 - Upstash Redis für Rate Limiting pro Nutzer
 - Vitest für die Kernlogik, Playwright für einen End-to-End-Test

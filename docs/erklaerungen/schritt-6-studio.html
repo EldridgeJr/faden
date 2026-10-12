@@ -461,12 +461,12 @@
       <ol class="tldr-list">
         <li><b>Ein Klick startet einen Job im Hintergrund.</b> Der Server prüft erst Login, Eingabe, Limit und Rechte. Dann antwortet er sofort, und die Arbeit läuft danach weiter. Die Seite fragt alle 2 Sekunden nach dem Stand.</li>
         <li><b>Das Modell schreibt ein Skript mit Belegen.</b> Es bekommt 16 Abschnitte, gleichmäßig aus allen Quellen. Lea fragt, Tom erklärt. Ein Skript ganz ohne Beleg lehnt Faden ab.</li>
-        <li><b>Jeder Redebeitrag wird einzeln vertont, mein Code fügt die Teile zu einer MP3 zusammen.</b> Dabei zählt er die Ton-Stücke jeder Datei. So kennt er die Startzeit jedes Redebeitrags, und das Transkript läuft beim Hören mit.</li>
+        <li><b>Jeder Redebeitrag wird einzeln vertont, mein Code fügt die Teile zu einer MP3 zusammen.</b> Zwei deutsche Stimmen von ElevenLabs sprechen, mit Gefühlen wie Lachen. Mein Code zählt die Ton-Stücke jeder Datei. So kennt er die Startzeit jedes Redebeitrags, und das Transkript läuft beim Hören mit.</li>
       </ol>
       <div class="facts">
-        <div class="tile fact"><div class="k">PODCAST FERTIG IN</div><div class="v mono small">37–58 s (live 47 s)</div></div>
-        <div class="tile fact"><div class="k">LÄNGE</div><div class="v mono small">ca. 5 Min.</div></div>
-        <div class="tile fact"><div class="k">STIMMEN</div><div class="v mono small">Lea: marin · Tom: cedar</div></div>
+        <div class="tile fact"><div class="k">PODCAST FERTIG IN</div><div class="v mono small">40–49 s (live 49 s)</div></div>
+        <div class="tile fact"><div class="k">LÄNGE</div><div class="v mono small">ca. 3,5–4 Min.</div></div>
+        <div class="tile fact"><div class="k">STIMMEN</div><div class="v mono small">Mila · Ben (ElevenLabs)</div></div>
         <div class="tile fact"><div class="k">KARTEIKARTEN</div><div class="v mono small">bis 12 in 10–25 s</div></div>
       </div>
     </div>
@@ -484,14 +484,14 @@
         <div class="step-dots" id="dots" role="tablist" aria-label="Schritte im Ablauf"></div>
       </div>
       <div class="scroll-x">
-        <svg class="diagram" id="diagram" viewBox="0 0 900 380" role="img" aria-label="Datenfluss beim Podcast: Ein Klick im Studio ruft eine Server Action auf. Sie prüft alles und legt eine Zeile in Postgres an. Mit after() startet ein Hintergrundjob. Er holt 16 Abschnitte, lässt OpenAI das Skript schreiben und jeden Redebeitrag vertonen. Die Teile werden zu einer MP3 zusammengefügt und in Supabase Storage gespeichert. Die Seite fragt alle 2 Sekunden nach dem Status. Der Player holt die MP3 über eine signierte URL.">
+        <svg class="diagram" id="diagram" viewBox="0 0 900 380" role="img" aria-label="Datenfluss beim Podcast: Ein Klick im Studio ruft eine Server Action auf. Sie prüft alles und legt eine Zeile in Postgres an. Mit after() startet ein Hintergrundjob. Er holt 16 Abschnitte, lässt OpenAI das Skript schreiben und ElevenLabs jeden Redebeitrag vertonen. Die Teile werden zu einer MP3 zusammengefügt und in Supabase Storage gespeichert. Die Seite fragt alle 2 Sekunden nach dem Status. Der Player holt die MP3 über eine signierte URL.">
           <defs>
             <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0 0 10 5 0 10z"/></marker>
           </defs>
 
           <text class="zone" x="10" y="26">BROWSER</text>
           <text class="zone" x="250" y="26">SERVER (VERCEL, FRANKFURT)</text>
-          <text class="zone" x="740" y="26">OPENAI</text>
+          <text class="zone" x="740" y="26">KI-DIENSTE</text>
 
           <!-- edges -->
           <g class="edge" data-id="e1"><path class="hit" d="M150 76 H250"/><path d="M150 76 H248" marker-end="url(#ah)"/><rect class="label-bg" x="168" y="46" width="64" height="18" rx="9"/><text x="200" y="59" text-anchor="middle">Klick</text></g>
@@ -521,10 +521,10 @@
             <circle class="ico" cx="513" cy="64" r="6"/><path class="ico" d="M513 54v3M513 71v3M503 64h3M520 64h3"/>
             <text x="532" y="68">Job</text><text class="sub" x="506" y="96">generatePodcast</text>
           </g>
-          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="OpenAI: Skript und Sprache">
+          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="KI-Dienste: OpenAI schreibt das Skript, ElevenLabs spricht">
             <rect x="740" y="40" width="140" height="72" rx="18"/>
             <path class="ico" d="M765 55l2.5 6.5L774 64l-6.5 2.5L765 73l-2.5-6.5L756 64l6.5-2.5z"/>
-            <text x="784" y="68">OpenAI</text><text class="sub" x="756" y="96">Skript · Sprache</text>
+            <text x="784" y="68">KI-Dienste</text><text class="sub" x="756" y="96">Skript · Stimmen</text>
           </g>
           <g class="node" data-id="n8" tabindex="0" role="button" aria-label="Player im Browser">
             <rect x="10" y="250" width="140" height="72" rx="18"/>
@@ -560,7 +560,7 @@
       <div class="block"><div class="block-num">1</div><h3>Start und Prüfung</h3><p>Der Klick landet bei einer [[serveraction|Server Action]]. Sie prüft Login, Eingabe, Limit und Rechte. Erst dann legt sie das Element an.</p><p class="why">Warum: Jeder kann eine Server Action aufrufen. Also muss sie alles selbst prüfen.</p><div class="files">studio-actions.ts · schemas.ts · rate-limit.ts</div></div>
       <div class="block"><div class="block-num">2</div><h3>Arbeit im Hintergrund</h3><p>Ein [[job|Job]] nimmt das Element an, erledigt die Arbeit und speichert das Ergebnis oder den Fehler. Die Seite fragt alle 2 Sekunden nach.</p><p class="why">Warum: Ein Podcast dauert fast eine Minute. So wartet niemand auf eine Antwort.</p><div class="files">job.ts · status.ts · generate-flashcards.ts · generate-podcast.ts · use-polling.ts</div></div>
       <div class="block"><div class="block-num">3</div><h3>Was das Modell liest</h3><p>16 [[chunk|Abschnitte]], gleichmäßig aus allen Quellen, nummeriert von [1] bis [16]. Dazu feste Regeln für Karten und Skript.</p><p class="why">Warum: Belege brauchen Nummern. Und Text aus Quellen darf nie zur Anweisung werden.</p><div class="files">pick-chunks.ts · load-chunks.ts · source-blocks.ts · flashcards.ts · podcast.ts</div></div>
-      <div class="block"><div class="block-num">4</div><h3>Ton</h3><p>Jeder Redebeitrag wird einzeln vertont, höchstens 4 gleichzeitig. Ein kleiner eigener Code fügt die MP3s zusammen und misst die Dauer.</p><p class="why">Warum: Kein großes Zusatzprogramm nötig, und die Startzeiten fallen nebenbei ab.</p><div class="files">mp3.ts · concurrency.ts · models.ts</div></div>
+      <div class="block"><div class="block-num">4</div><h3>Ton</h3><p>Zwei deutsche Stimmen von ElevenLabs vertonen jeden Redebeitrag einzeln, höchstens 3 gleichzeitig, mit Gefühlen wie Lachen. Ein kleiner eigener Code fügt die MP3s zusammen und misst die Dauer.</p><p class="why">Warum: Kein großes Zusatzprogramm nötig, und die Startzeiten fallen nebenbei ab.</p><div class="files">mp3.ts · concurrency.ts · models.ts</div></div>
       <div class="block"><div class="block-num">5</div><h3>Oberfläche</h3><p>Studio-Spalte mit Status, eine eigene Seite pro Element, Karten zum Umdrehen, Player mit Transkript zum Mitlesen.</p><p class="why">Warum so: Chat, Karten und Transkript zeigen Belege mit demselben Baustein. Sie sehen überall gleich aus.</p><div class="files">studio-panel.tsx · studio/[itemId]/page.tsx · flashcards-view.tsx · podcast-view.tsx · podcast-player.tsx · cited-text.tsx</div></div>
       <div class="block"><div class="block-num">6</div><h3>Speicher und Sicherheit</h3><p>Die MP3s liegen in einem privaten [[bucket|Bucket]]. Nur der Server schreibt dort. Nutzer dürfen ihre Dateien hören und löschen.</p><p class="why">Warum: So kann niemand eigene Dateien unterschieben. Löschen entfernt erst die Datei, dann die Zeile.</p><div class="files">…_studio_bucket.sql · rls.sql · notebooks/actions.ts</div></div>
     </div>
@@ -581,8 +581,8 @@
             <tr data-k="cards"><td><code>src/lib/studio/generate-flashcards.ts</code></td><td>Der Hintergrundjob für Karteikarten</td><td>Gleiches Muster wie beim Einlesen: wartet → in Arbeit → bereit oder Fehler.</td></tr>
             <tr data-k="pod"><td><code>src/lib/studio/podcast.ts</code></td><td>Skript-Schema, Prompt, Hilfsfunktionen</td><td>Lea fragt, Tom erklärt. Vor der Sprache werden die Belege entfernt. Dazu: welcher Beitrag läuft gerade, Dateiname für den Download.</td></tr>
             <tr data-k="pod"><td><code>src/lib/studio/generate-podcast.ts</code></td><td>Skript → Sprache → MP3 → Storage</td><td>Der Fortschritt steht nach jedem Teil in der Datenbank. Scheitert ein späterer Schritt, löscht der Job die MP3 wieder.</td></tr>
-            <tr data-k="pod"><td><code>src/lib/studio/mp3.ts</code></td><td>MP3 lesen, Dauer messen, zusammenfügen</td><td>Eigener kleiner Parser statt ffmpeg. Gegen die echten OpenAI-Dateien geprüft: gleiche Dauer wie das macOS-Werkzeug.</td></tr>
-            <tr data-k="pod"><td><code>src/lib/studio/concurrency.ts</code></td><td>Höchstens 4 Aufrufe gleichzeitig</td><td>Ergebnisse in der richtigen Reihenfolge. Nach einem Fehler startet kein neuer, bezahlter Aufruf.</td></tr>
+            <tr data-k="pod"><td><code>src/lib/studio/mp3.ts</code></td><td>MP3 lesen, Dauer messen, zusammenfügen</td><td>Eigener kleiner Parser statt ffmpeg. Gegen echte Dateien von OpenAI und ElevenLabs geprüft: gleiche Dauer wie das macOS-Werkzeug. Info-Stücke am Anfang lässt er weg.</td></tr>
+            <tr data-k="pod"><td><code>src/lib/studio/concurrency.ts</code></td><td>Höchstens 3 Aufrufe gleichzeitig</td><td>Ergebnisse in der richtigen Reihenfolge. Nach einem Fehler startet kein neuer, bezahlter Aufruf.</td></tr>
             <tr data-k="ui"><td><code>notebooks/[id]/studio-actions.ts</code></td><td>Server Actions: erstellen, löschen</td><td>Prüft Login, Eingabe, Rate Limit und Rechte selbst. Erst danach startet der Job.</td></tr>
             <tr data-k="ui"><td><code>studio-panel.tsx</code><br><code>use-polling.ts</code></td><td>Die Studio-Spalte mit Status</td><td>Fragt nach, solange etwas in Arbeit ist (Polling). Die Polling-Logik der Quellenliste nutzt jetzt denselben Hook.</td></tr>
             <tr data-k="ui"><td><code>cited-text.tsx</code></td><td>Belege überall gleich</td><td>Aus dem Chat herausgezogen. Chat, Karteikarten und Transkript zeigen [1] gleich.</td></tr>
@@ -655,20 +655,20 @@
       </div>
 
       <div class="pane" id="paneMp3" hidden>
-        <div class="demo-q"><b>Die Frage:</b> Faden bekommt von OpenAI für jeden Redebeitrag eine eigene kleine MP3. Wie weiß der Player später, dass Tom bei 0:21 zu sprechen beginnt?</div>
+        <div class="demo-q"><b>Die Frage:</b> Faden bekommt von ElevenLabs für jeden Redebeitrag eine eigene kleine MP3. Wie weiß der Player später, wann Tom zu sprechen beginnt?</div>
         <div class="dsteps" data-rich>
-          <div class="dstep"><span class="dnum">1</span><div class="dbody"><h4>Eine MP3 ist eine Kette aus kleinen Stücken</h4><p>Die Stücke heißen [[frame|Frames]]. Jedes Stück ist genau 24 Millisekunden Ton. Leas erste MP3 hat 367 Stücke: 367 × 24 ms = 8,8 Sekunden.</p><div class="beads" id="mp3Beads" aria-hidden="true"></div></div></div>
-          <div class="dstep"><span class="dnum">2</span><div class="dbody"><h4>Faden hängt die Ketten einfach aneinander</h4><p>Sechs Redebeiträge, sechs Ketten. Hintereinander ergeben sie eine einzige MP3. Dunkel ist Lea, hell ist Tom.</p><div class="mtrack" id="mp3Track" aria-hidden="true"></div><div class="mlabels" id="mp3Labels" aria-hidden="true"></div></div></div>
-          <div class="dstep"><span class="dnum">3</span><div class="dbody"><h4>Startzeit = alle Stücke davor × 24 ms</h4><p>Toms erster Beitrag beginnt nach Leas 367 Stücken, also bei 8,8 Sekunden. So rechnet Faden für jeden Beitrag.</p><div class="table-wrap"><table class="rowtable" id="mp3Turns"></table></div></div></div>
+          <div class="dstep"><span class="dnum">1</span><div class="dbody"><h4>Eine MP3 ist eine Kette aus kleinen Stücken</h4><p>Die Stücke heißen [[frame|Frames]]. Jedes Stück ist gut 26 Millisekunden Ton. Milas erste MP3 hat 286 Stücke: 286 × 26,1 ms = 7,5 Sekunden.</p><div class="beads" id="mp3Beads" aria-hidden="true"></div></div></div>
+          <div class="dstep"><span class="dnum">2</span><div class="dbody"><h4>Faden hängt die Ketten einfach aneinander</h4><p>Sechs Redebeiträge, sechs Ketten. Vorher lässt Faden das [[infoframe|Info-Stück]] am Anfang jeder Kette weg. Hintereinander ergeben sie eine einzige MP3. Dunkel ist Lea, hell ist Tom.</p><div class="mtrack" id="mp3Track" aria-hidden="true"></div><div class="mlabels" id="mp3Labels" aria-hidden="true"></div></div></div>
+          <div class="dstep"><span class="dnum">3</span><div class="dbody"><h4>Startzeit = alle Stücke davor × 26,1 ms</h4><p>Toms erster Beitrag beginnt nach Leas 286 Stücken, also bei 7,5 Sekunden. So rechnet Faden für jeden Beitrag.</p><div class="table-wrap"><table class="rowtable" id="mp3Turns"></table></div></div></div>
           <div class="dstep"><span class="dnum">4</span><div class="dbody"><h4>Mitlesen: Wer spricht gerade?</h4><p>Zieh den Regler. Faden sucht den letzten Beitrag, der schon begonnen hat. Genau so markiert der Player die Zeile im Transkript.</p>
             <div class="sliders one"><div class="slider"><label for="mp3Time">Position im Podcast <b id="mp3TimeVal"></b></label><input type="range" id="mp3Time" min="0" max="48" step="0.1" value="23"></div></div>
             <div id="mp3Now" aria-live="polite"></div></div></div>
         </div>
         <details class="more">
-          <summary>Für Neugierige: Woher weiß Faden, dass ein Stück 24 ms lang ist?</summary>
-          <p class="muted small">Jedes Stück beginnt mit 4 Bytes, einer Art Etikett. Darin stehen Version, Datenmenge und Messwerte pro Sekunde. Unten das echte Etikett aus dem Hörtest, in Bits. Mit dem Häkchen siehst du den Fehler, den die KI dabei zuerst gemacht hat: Sie hat die Version falsch gelesen.</p>
+          <summary>Für Neugierige: Woher weiß Faden, wie lang ein Stück ist?</summary>
+          <p class="muted small">Jedes Stück beginnt mit 4 Bytes, einer Art Etikett. Darin stehen Version, Datenmenge und Messwerte pro Sekunde. Unten das echte Etikett einer MP3 von ElevenLabs, in Bits. Mit dem Häkchen siehst du, was passiert, wenn man die Version falsch liest. Genau diesen Fehler hat die KI im ersten Hörtest gemacht.</p>
           <div class="bitgroups" id="mp3Bits"></div>
-          <label class="bugtoggle"><input type="checkbox" id="mp3Bug"> Fehler aus dem Hörtest zeigen: Version falsch gelesen</label>
+          <label class="bugtoggle"><input type="checkbox" id="mp3Bug"> Version falsch lesen (Fehler aus dem Hörtest)</label>
           <div class="gates" id="mp3Header"></div>
         </details>
       </div>
@@ -682,9 +682,10 @@
     <div class="says" data-rich>
       <div class="say"><p class="said">„Das Modell bekommt 16 Abschnitte, gleichmäßig aus allen Quellen. Gesucht wird nicht.“</p><p>Es gibt keine Frage, nach der man suchen könnte. So kommt jede Quelle vor, mit Anfang, Mitte und Ende.</p><p class="whynot"><b>Warum nicht erst jede Quelle zusammenfassen?</b> Das kostet mehr Zeit und Geld. Die Belege würden dann auf Zusammenfassungen zeigen statt auf den Originaltext.</p></div>
       <div class="say"><p class="said">„Die Arbeit läuft im Hintergrund, die Seite fragt alle 2 Sekunden nach.“</p><p>Ein Podcast dauert fast eine Minute. Niemand soll so lange auf eine Antwort warten.</p><p class="whynot"><b>Warum keine echte Warteschlange?</b> Für unter eine Minute reicht [[after|after()]]. Eine [[queue|Warteschlange]] ist mehr Aufbau und steht unter „Nächste Schritte“.</p></div>
-      <div class="say"><p class="said">„Ich füge die MP3s selbst zusammen, ohne Zusatzprogramm.“</p><p>Im Hörtest habe ich gesehen: OpenAI liefert saubere Stücke ohne Extras. Dann reicht Aneinanderhängen, und die Startzeiten bekomme ich nebenbei.</p><p class="whynot"><b>Warum nicht [[ffmpeg|ffmpeg]]?</b> Das ist ein Programm von etwa 70 MB in der Vercel-Funktion, nur zum Aneinanderhängen.</p></div>
+      <div class="say"><p class="said">„Ich füge die MP3s selbst zusammen, ohne Zusatzprogramm.“</p><p>In Hörtests habe ich die Dateien untersucht: Sie bestehen aus gleich gebauten Stücken. Den Kopf und das Info-Stück am Anfang jeder Datei lässt mein Code weg. Dann reicht Aneinanderhängen, und die Startzeiten bekomme ich nebenbei.</p><p class="whynot"><b>Warum nicht [[ffmpeg|ffmpeg]]?</b> Das ist ein Programm von etwa 70 MB in der Vercel-Funktion, nur zum Aneinanderhängen.</p></div>
       <div class="say"><p class="said">„Die Länge steuere ich über die Zahl der Redebeiträge, nicht über Wörter.“</p><p>Das Modell kann Wörter nicht zählen: 600 verlangt, einmal 962 bekommen, das waren 8 Minuten. Mit 20 bis 24 Beiträgen waren es 4:54 Minuten.</p><p class="whynot"><b>Warum nicht im Code nach 600 Wörtern abschneiden?</b> Dann fehlt das Ende, also Zusammenfassung und Abschied.</p></div>
-      <div class="say"><p class="said">„Belege stehen im Skript und werden vor dem Vorlesen entfernt.“</p><p>Das Transkript macht aus [3] einen Knopf. Die Stimme würde sonst „eckige Klammer drei“ sagen.</p><p class="whynot"><b>Warum nicht ein eigenes Feld für Belege?</b> Dann wüsste man nicht, welcher Satz welchen Beleg hat.</p></div>
+      <div class="say"><p class="said">„Die Stimmen kommen von ElevenLabs, das Skript von OpenAI.“</p><p>Zwei deutsche Muttersprachler klingen natürlicher, und [[audiotag|Audio-Tags]] wie [laughs] geben dem Gespräch Gefühl. Ausgewählt in drei Hörtests.</p><p class="whynot"><b>Warum nicht alles bei OpenAI?</b> Das wäre ein Dienst weniger. Aber die OpenAI-Stimmen sind für Englisch gemacht und kennen keine Emotionen.</p></div>
+      <div class="say"><p class="said">„Belege stehen im Skript und werden vor dem Vorlesen entfernt.“</p><p>Das Transkript macht aus [3] einen Knopf. Die Stimme würde sonst „eckige Klammer drei“ sagen. Audio-Tags dagegen bleiben für die Stimme drin, im Transkript blendet Faden sie aus.</p><p class="whynot"><b>Warum nicht ein eigenes Feld für Belege?</b> Dann wüsste man nicht, welcher Satz welchen Beleg hat.</p></div>
       <div class="say"><p class="said">„Die Leiste im Player zeigt echte Redebeiträge, keine erfundene Wellenform.“</p><p>Jeder Abschnitt der Leiste ist ein Redebeitrag, so breit wie seine Dauer. Darunter liegt ein normaler Schieberegler, so geht Spulen auch mit Tastatur.</p><p class="whynot"><b>Warum nicht Balken wie im Design?</b> Deren Höhen wären erfunden. Echte Lautstärken müsste man erst aus der MP3 ausrechnen.</p></div>
     </div>
   </section>
@@ -695,9 +696,9 @@
     <div class="risks" data-rich>
       <div class="risk"><span class="chip err">Betrieb</span><h3>Vercel bricht nach 300 Sekunden ab</h3><p>Ein Podcast braucht heute unter einer Minute. Bricht ein Job trotzdem ab, bleibt er „in Arbeit“. Nach 10 Minuten zeigt Faden ihn als Fehler, und man kann ihn löschen.</p></div>
       <div class="risk"><span class="chip warn">Qualität</span><h3>Die Länge schwankt</h3><p>Das Modell hält die Grenzen nicht genau ein: 27 statt höchstens 24 Redebeiträge, ein Beitrag mit 70 Wörtern. Die Folgen liegen trotzdem bei 4 bis 6 Minuten.</p></div>
-      <div class="risk"><span class="chip warn">Qualität</span><h3>Aussprache</h3><p>Die Stimmen sind für Englisch optimiert. Die Anweisung „Hochdeutsch ohne Akzent“ hilft. Abkürzungen wie „NSDAP“ liest die Stimme Buchstabe für Buchstabe.</p></div>
+      <div class="risk"><span class="chip warn">Qualität</span><h3>Gefühle und Aussprache</h3><p>Ein Audio-Tag an der falschen Stelle klingt seltsam, etwa ein Lachen bei einem ernsten Thema. Abkürzungen wie „NSDAP“ liest die Stimme womöglich Buchstabe für Buchstabe.</p></div>
       <div class="risk"><span class="chip warn">Qualität</span><h3>Ein Beleg ist kein Beweis</h3><p>Karten ohne Beleg fliegen raus, ein Skript ohne Beleg ist ein Fehler. Eine falsch zusammengefasste Aussage kann trotzdem einen Beleg haben. Darum springt jeder Beleg zur Stelle: Man kann nachprüfen.</p></div>
-      <div class="risk"><span class="chip">Kosten</span><h3>Jeder Podcast kostet Geld</h3><p>Skript und Sprache. Das [[ratelimit|Rate Limit]] erlaubt 5 pro Stunde und 20 pro Tag. Die Sprach-API meldet keine Token-Zahlen, die echten Kosten pro Minute stehen nur im OpenAI-Dashboard.</p></div>
+      <div class="risk"><span class="chip">Kosten</span><h3>Jeder Podcast kostet Geld</h3><p>Skript und Sprache. Das [[ratelimit|Rate Limit]] erlaubt 5 pro Stunde und 20 pro Tag. Die Stimmen kosten Credits bei ElevenLabs: Der Starter-Tarif hat 30.000 pro Monat, eine Folge braucht geschätzt 1.000 bis 2.000. Und der Skript-Text geht an einen zweiten Dienst.</p></div>
       <div class="risk"><span class="chip">Betrieb</span><h3>Die MP3-Adresse läuft ab</h3><p>Die [[signedurl|signierte URL]] gilt eine Stunde. Wer die Seite länger offen hat, muss neu laden, bevor er wieder abspielt.</p></div>
       <div class="risk"><span class="chip">Sicherheit</span><h3>Text aus Quellen im Prompt</h3><p>Steht in einer Quelle „Ignoriere alle Regeln“, ist das nur Material. Die [[quelle|Quellblöcke]] lassen sich nicht schließen, die Regeln sagen das ausdrücklich. Skript und Karten werden als Text gezeigt, nie als HTML.</p></div>
       <div class="risk"><span class="chip">Sicherheit</span><h3>Löschen erreicht auch die MP3</h3><p>Erst die Datei, dann die Zeile. Getestet: Podcast im Browser gelöscht, danach per Skript in [[storage|Storage]] nachgesehen. Die MP3 war weg, die des anderen Podcasts blieb. Läuft ein Job noch, sperrt Faden das Löschen.</p></div>
@@ -784,7 +785,6 @@
     model: speechModel,
     text: spokenText(turn.text),
     voice: SPEAKERS[turn.speaker].voice,
-    instructions: SPEECH_INSTRUCTIONS,
     abortSignal: AbortSignal.timeout(SPEECH_TIMEOUT_MS),
   });
   done++;
@@ -837,10 +837,10 @@ await supabase
     quelle: ["Quellblock", "Im Prompt steht jeder Abschnitt in einem Block <quelle nr=\"3\">…</quelle>. So weiß das Modell, welche Nummer zu welchem Text gehört."],
     injection: ["Prompt Injection", "Ein Angriff über Text: In einer Quelle steht etwa „Ignoriere alle Regeln“. Faden behandelt Quelltext als Material, nie als Anweisung."],
     reasoning: ["Reasoning (Nachdenken)", "Manche Modelle denken vor der Antwort intern nach. Mehr Nachdenken heißt bessere Qualität, aber mehr Zeit und Kosten. Das Studio nutzt „medium“, der Chat „low“."],
-    tts: ["Text-to-Speech", "Ein Modell, das Text in gesprochene Sprache verwandelt. Faden nutzt gpt-4o-mini-tts von OpenAI mit zwei Stimmen."],
-    concurrency: ["Gleichzeitig (parallel)", "Mehrere Aufrufe laufen zur selben Zeit statt nacheinander. Faden erlaubt höchstens 4, damit OpenAI nicht bremst."],
-    frame: ["Frame (MP3)", "Ein kleines Stück einer MP3, hier 24 Millisekunden Ton. Jeder Frame beginnt mit 4 Bytes, die seine Länge verraten. Eine MP3 ist einfach eine Reihe von Frames."],
-    samplerate: ["Abtastrate", "Wie oft pro Sekunde der Ton gemessen wird. Die MP3s von OpenAI haben 24.000 Messwerte pro Sekunde (24 kHz)."],
+    tts: ["Text-to-Speech", "Ein Modell, das Text in gesprochene Sprache verwandelt. Faden nutzt das Modell eleven_v3 von ElevenLabs mit zwei deutschen Stimmen: Mila und Ben."],
+    concurrency: ["Gleichzeitig (parallel)", "Mehrere Aufrufe laufen zur selben Zeit statt nacheinander. Faden erlaubt höchstens 3, mehr erlaubt der ElevenLabs-Tarif nicht."],
+    frame: ["Frame (MP3)", "Ein kleines Stück einer MP3, hier gut 26 Millisekunden Ton. Jeder Frame beginnt mit 4 Bytes, die seine Länge verraten. Eine MP3 ist einfach eine Reihe von Frames."],
+    samplerate: ["Abtastrate", "Wie oft pro Sekunde der Ton gemessen wird. Die MP3s von ElevenLabs haben 44.100 Messwerte pro Sekunde (44,1 kHz)."],
     bitrate: ["Bitrate", "Wie viele Daten eine Sekunde Ton braucht. 128 kbit/s sind 16 KB pro Sekunde, also etwa 5 MB für 5 Minuten."],
     ffmpeg: ["ffmpeg", "Ein bekanntes Programm, das fast jedes Audio- und Videoformat bearbeiten kann. Mächtig, aber groß."],
     bucket: ["Bucket", "Ein Ordner-Bereich in Supabase Storage mit eigenen Regeln. „sources“ hat die Quellen, „studio“ die Podcast-MP3s."],
@@ -856,6 +856,8 @@ await supabase
     http404: ["404", "Der Code für „nicht gefunden“. Faden zeigt ihn auch bei fremden Elementen. So verrät es nicht, dass es sie gibt."],
     claim: ["Annehmen (Claim)", "Ein einziger Datenbank-Befehl ändert „wartet“ in „in Arbeit“, aber nur, wenn die Zeile noch „wartet“. So arbeitet nie ein Job doppelt."],
     promise: ["Promise", "Ein Versprechen auf ein Ergebnis, das später kommt, etwa die Antwort von OpenAI. Mit await wartet der Code darauf."],
+    audiotag: ["Audio-Tag", "Ein Wort in eckigen Klammern wie [laughs]. ElevenLabs liest es nicht vor, sondern spielt es: ein Lachen, ein Seufzen, Neugier in der Stimme."],
+    infoframe: ["Info-Stück (Info-Frame)", "Ein Stück am Anfang einer MP3, das keinen Ton enthält, sondern Angaben wie die Länge der Datei. Mitten in einer zusammengefügten MP3 würde es Player verwirren, darum lässt Faden es weg."],
     abort: ["AbortSignal", "Ein Signal zum Abbrechen. AbortSignal.timeout(60 000) bricht einen Aufruf nach 60 Sekunden ab."]
   };
   function rich(s) {
@@ -921,8 +923,8 @@ await supabase
     { id: "e4", tag: "6 · Abschnitte", title: "16 Abschnitte, gut verteilt", text: "Es gibt keine Frage, also keine Suche. [[pickchunks|pickChunks]] verteilt 16 [[chunk|Abschnitte]] reihum auf die Quellen und gleichmäßig über jede Quelle. Probier es unten in der Demo. Den Fortschritt schreibt der Job in dieselbe Zeile." },
     { id: "e5", tag: "7 · Prompt", title: "Das Modell schreibt das Skript", text: "Feste Regeln: Lea fragt, Tom erklärt, 20 bis 24 Redebeiträge, gesprochene Sprache, jede Aussage mit Beleg. Die Abschnitte stehen als [1] bis [16] in [[quelle|Quellblöcken]]. Text darin ist Material, keine Anweisung." },
     { id: "e6", tag: "8 · Skript", title: "Zod prüft die Antwort", text: "Das Modell liefert [[json|JSON]] nach einem [[schema|Schema]]. Unser Code entfernt Belegnummern, die es nicht gibt. Hat das ganze Skript keinen einzigen Beleg, gibt es einen Fehler statt eines Podcasts aus eigenem Wissen." },
-    { id: "n4", tag: "9 · Sprache", title: "Jeder Redebeitrag einzeln vertont", text: "[[tts|Text-to-Speech]] mit gpt-4o-mini-tts. Lea spricht mit der Stimme „marin“, Tom mit „cedar“. Vorher fliegen die [n] aus dem Text, sonst sagt die Stimme „eckige Klammer eins“. Höchstens 4 Aufrufe laufen [[concurrency|gleichzeitig]]." },
-    { id: "n6", tag: "10 · Zusammenfügen", title: "Aus 22 Teilen wird eine MP3", text: "Eine MP3 ist eine Reihe von [[frame|Frames]]. Unser Code liest jeden Frame-Kopf, zählt den Ton und hängt die Teile aneinander. Aus der Dauer jedes Teils folgt die Startzeit jedes Redebeitrags. Die zweite Demo zeigt das." },
+    { id: "n4", tag: "9 · Sprache", title: "Jeder Redebeitrag einzeln vertont", text: "[[tts|Text-to-Speech]] mit eleven_v3 von ElevenLabs. Lea spricht mit der deutschen Stimme Mila, Tom mit Ben. Vorher fliegen die [n] aus dem Text, sonst sagt die Stimme „eckige Klammer eins“. [[audiotag|Audio-Tags]] wie [laughs] bleiben drin, die Stimme spielt sie. Höchstens 3 Aufrufe laufen [[concurrency|gleichzeitig]]." },
+    { id: "n6", tag: "10 · Zusammenfügen", title: "Aus 22 Teilen wird eine MP3", text: "Eine MP3 ist eine Reihe von [[frame|Frames]]. Unser Code lässt das [[infoframe|Info-Stück]] am Anfang jeder Datei weg, liest jeden Frame-Kopf, zählt den Ton und hängt die Teile aneinander. Aus der Dauer jedes Teils folgt die Startzeit jedes Redebeitrags. Die zweite Demo zeigt das." },
     { id: "e8", tag: "11 · Upload", title: "Die MP3 kommt in Storage", text: "In den privaten [[bucket|Bucket]] „studio“ in [[storage|Storage]], Pfad: Notebook-ID/Element-ID.mp3. Nur der Server darf dort schreiben. Scheitert danach noch etwas, löscht der Job die Datei wieder." },
     { id: "n5", tag: "12 · Postgres", title: "Das Element ist bereit", text: "Status „bereit“, dazu Skript, Startzeiten, Belege, Dauer, Größe und Erstellungszeit. Alles steht in einer [[jsonb|jsonb]]-Spalte derselben Zeile." },
     { id: "e9", tag: "13 · Polling", title: "Die Seite merkt es von selbst", text: "Solange etwas in Arbeit ist, lädt die Seite alle 2 Sekunden neu ([[polling|Polling]]). So sieht man auch „Sprache wird erzeugt: 12 von 22“." },
@@ -931,7 +933,7 @@ await supabase
   ];
   var extras = {
     e1: { tag: "Klick", title: "Nur IDs, kein Text", text: "Der Browser schickt keine Quelltexte und keinen Prompt. Alles Wichtige entscheidet und liest der Server." },
-    e7: { tag: "22 Teile", title: "Ein Teil pro Redebeitrag", text: "Jeder Teil ist eine kleine MP3 von OpenAI. Die Reihenfolge bleibt erhalten, auch wenn ein späterer Teil zuerst fertig ist." },
+    e7: { tag: "22 Teile", title: "Ein Teil pro Redebeitrag", text: "Jeder Teil ist eine kleine MP3 von ElevenLabs. Die Reihenfolge bleibt erhalten, auch wenn ein späterer Teil zuerst fertig ist." },
     n7: { tag: "Storage", title: "Der Bucket „studio“", text: "Privat, höchstens 25 MB pro Datei, nur audio/mpeg. Lesen und Löschen darf nur der Besitzer des Notebooks, Hochladen nur der Server." }
   };
   var diagram = document.getElementById("diagram"), detail = document.getElementById("detail"), dots = document.getElementById("dots");
@@ -1005,9 +1007,9 @@ await supabase
         de: "Für jede Quelle mit n Abschnitten und k Plätzen:\n  Teile ihre Abschnitte in k gleich große Teile.\n  Nimm aus jedem Teil den mittleren Abschnitt.\n  (Beispiel: 40 Abschnitte, 12 Plätze → etwa jeder dritte)" }
     ] },
     { tab: "MP3 erzeugen", file: "generate-podcast.ts · Ausschnitt", io: ["das geprüfte Skript, zum Beispiel 22 Redebeiträge", "eine MP3 in Storage und die Startzeit jedes Redebeitrags"], parts: [
-      { title: "Jeden Beitrag vertonen", text: "Für jeden Redebeitrag ein Aufruf bei OpenAI, höchstens 4 [[concurrency|gleichzeitig]]. Ohne [n] im Text und mit der Stimme der Person. Nach 60 Sekunden wird ein Aufruf abgebrochen.", code: src("w-pod-1"),
-        de: "Für jeden Redebeitrag (höchstens 4 gleichzeitig):\n  Entferne die Belegnummern aus dem Text.\n  Lass OpenAI ihn vorlesen, mit Leas oder Toms Stimme.\n  Länger als 60 Sekunden? → abbrechen.\n  Melde den Fortschritt, zum Beispiel „12 von 22“.\nErgebnis: eine kleine MP3 pro Beitrag, in der richtigen Reihenfolge." },
-      { title: "Zu einer MP3 zusammenfügen", text: "joinMp3 hängt die Stücke aller kleinen MP3s aneinander und misst dabei die Dauer jeder einzelnen. startTimes rechnet daraus die Startzeiten. Die Demo „Wann spricht wer?“ zeigt genau das.", code: src("w-pod-2"),
+      { title: "Jeden Beitrag vertonen", text: "Für jeden Redebeitrag ein Aufruf bei ElevenLabs, höchstens 3 [[concurrency|gleichzeitig]]. Ohne [n] im Text, aber mit [[audiotag|Audio-Tags]] wie [laughs], und mit der Stimme der Person. Nach 60 Sekunden wird ein Aufruf abgebrochen.", code: src("w-pod-1"),
+        de: "Für jeden Redebeitrag (höchstens 3 gleichzeitig):\n  Entferne die Belegnummern aus dem Text (Audio-Tags bleiben drin).\n  Lass ElevenLabs ihn vorlesen, mit Milas oder Bens Stimme.\n  Länger als 60 Sekunden? → abbrechen.\n  Melde den Fortschritt, zum Beispiel „12 von 22“.\nErgebnis: eine kleine MP3 pro Beitrag, in der richtigen Reihenfolge." },
+      { title: "Zu einer MP3 zusammenfügen", text: "joinMp3 lässt das [[infoframe|Info-Stück]] am Anfang jeder kleinen MP3 weg, hängt die Ton-Stücke aneinander und misst dabei die Dauer jeder einzelnen. startTimes rechnet daraus die Startzeiten. Die Demo „Wann spricht wer?“ zeigt genau das.", code: src("w-pod-2"),
         de: "Hänge alle kleinen MP3s zu einer großen zusammen.\nMerke dir dabei die Dauer jeder kleinen MP3.\nStartzeit eines Beitrags = alle Dauern davor zusammen." },
       { title: "In Storage speichern", text: "Mit dem Admin-Schlüssel in den [[bucket|Bucket]] „studio“. Ab hier liegt eine Datei in Storage. Scheitert der letzte Schritt, löscht der Job sie wieder.", code: src("w-pod-3"),
         de: "Lade die MP3 in den privaten Speicher hoch,\n  Pfad: Notebook-ID/Element-ID.mp3.\n  Fehler? → abbrechen.\nMerke dir: Jetzt liegt dort eine Datei.\n  (Scheitert danach etwas, wird sie wieder gelöscht.)" },
@@ -1170,12 +1172,14 @@ await supabase
   renderPick();
 
   /* ---------- Demo 2: when does who speak? (same rules as mp3.ts and currentTurnIndex) ---------- */
-  // Six turns with frame counts like in a real episode. 1 frame = 24 ms.
+  // Six turns with frame counts like in a real episode (the first two are the
+  // listening test files of Mila and Ben). ElevenLabs: 1152 samples at
+  // 44,100 per second = about 26.1 ms per frame.
   var TURNS = [
-    { s: "Lea", frames: 367 }, { s: "Tom", frames: 405 }, { s: "Lea", frames: 142 },
-    { s: "Tom", frames: 560 }, { s: "Lea", frames: 198 }, { s: "Tom", frames: 331 }
+    { s: "Lea", frames: 286 }, { s: "Tom", frames: 329 }, { s: "Lea", frames: 142 },
+    { s: "Tom", frames: 520 }, { s: "Lea", frames: 198 }, { s: "Tom", frames: 331 }
   ];
-  var FRAME_SECONDS = 0.024, t = 0;
+  var FRAME_SECONDS = 1152 / 44100, t = 0;
   TURNS.forEach(function (turn) { turn.start = t; turn.seconds = turn.frames * FRAME_SECONDS; t += turn.seconds; });
   var TOTAL = t, mp3Time = el("mp3Time");
   mp3Time.max = String(Math.floor(TOTAL * 10) / 10);
@@ -1186,7 +1190,7 @@ await supabase
     return m + ":" + (s < 10 ? "0" : "") + str;
   }
   // Step 1: the first 40 frames of Lea's first MP3 as beads.
-  el("mp3Beads").innerHTML = new Array(41).join('<span class="bead"></span>') + '<span class="more-beads">… und 327 weitere = 367 Stücke</span>';
+  el("mp3Beads").innerHTML = new Array(41).join('<span class="bead"></span>') + '<span class="more-beads">… und 246 weitere = 286 Stücke</span>';
   // Step 2: the six chains one after the other, with labels.
   el("mp3Labels").innerHTML = TURNS.map(function (turn) {
     return '<span style="flex-grow:' + turn.frames + '">' + turn.s + " " + secs(turn.seconds) + '</span>';
@@ -1207,7 +1211,7 @@ await supabase
     el("mp3Turns").innerHTML = '<thead><tr><th>NR.</th><th>WER</th><th>STÜCKE</th><th>STÜCKE DAVOR</th><th>BEGINNT BEI</th></tr></thead><tbody>' +
       TURNS.map(function (turn, i) {
         var row = '<tr class="' + (i === cur ? "cur" : "") + '"><td>' + (i + 1) + '</td><td>' + turn.s + '</td><td>' + turn.frames + '</td><td>' + before + '</td><td>' +
-          before + ' × 24 ms = ' + clock(turn.start, true) + '</td></tr>';
+          before + ' × 26,1 ms = ' + clock(turn.start, true) + '</td></tr>';
         before += turn.frames;
         return row;
       }).join("") + '</tbody>';
@@ -1222,13 +1226,14 @@ await supabase
   var BITRATES_V1 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320];
   var BITRATES_V2 = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160];
   var RATES_V1 = [44100, 48000, 32000], RATES_V2 = [22050, 24000, 16000];
+  // FF FB 90 C4: the first 4 bytes of every frame from ElevenLabs.
   var BIT_GROUPS = [
     { bits: "11111111111", label: "Anfang" },
-    { bits: "10", label: "Version", key: true },
+    { bits: "11", label: "Version", key: true },
     { bits: "01", label: "MP3" },
     { bits: "1", label: "Schutz" },
-    { bits: "1100", label: "Datenmenge", key: true },
-    { bits: "01", label: "Messwerte/s", key: true },
+    { bits: "1001", label: "Datenmenge", key: true },
+    { bits: "00", label: "Messwerte/s", key: true },
     { bits: "0", label: "Füllbyte" },
     { bits: "0", label: "privat" },
     { bits: "11", label: "Mono" },
@@ -1239,31 +1244,32 @@ await supabase
     var bug = mp3Bug.checked;
     el("mp3Bits").innerHTML = BIT_GROUPS.map(function (g) {
       var cls = g.key ? (bug && g.label === "Version" ? " bad" : " key") : "";
-      var label = g.label === "Version" ? (bug ? "falsch: MPEG-1" : "Version: MPEG-2") : g.label;
+      var label = g.label === "Version" ? (bug ? "falsch: MPEG-2" : "Version: MPEG-1") : g.label;
       return '<div class="bitgroup' + cls + '"><b>' + g.bits + '</b><small>' + label + '</small></div>';
     }).join("");
-    // The bits say: index 12 for the data rate, index 1 for the samples per second.
-    var bitrate = (bug ? BITRATES_V1 : BITRATES_V2)[12], rate = (bug ? RATES_V1 : RATES_V2)[1];
-    var samples = bug ? 1152 : 576, length = Math.floor(((samples / 8) * bitrate * 1000) / rate);
+    // The bits say: index 9 for the data rate, index 0 for the samples per second.
+    // Which table these indexes point into depends on the version.
+    var bitrate = (bug ? BITRATES_V2 : BITRATES_V1)[9], rate = (bug ? RATES_V2 : RATES_V1)[0];
+    var samples = bug ? 576 : 1152, length = Math.floor(((samples / 8) * bitrate * 1000) / rate);
     var de = new Intl.NumberFormat("de-DE");
     el("mp3Header").innerHTML =
       '<div class="gate ' + (bug ? "fail" : "ok") + '"><div class="gh">' + (bug ? "FALSCH GELESEN" : "RICHTIG GELESEN") + '<span class="st">' + length + ' Bytes</span></div>' +
       '<p>' + bitrate + ' kbit/s und ' + de.format(rate) + ' Messwerte pro Sekunde. Ein Stück hat ' + samples + ' Messwerte, also ' + de.format(samples / rate * 1000) + ' ms, und ist ' + length + ' Bytes lang.</p></div>' +
       '<div class="gate ' + (bug ? "fail" : "ok") + '"><div class="gh">DAS NÄCHSTE STÜCK<span class="st">bei Byte ' + length + '</span></div>' +
       '<p>' + (bug
-        ? "Dort beginnt aber kein Stück, das echte ist nur 384 Bytes lang. Der Code verliert den Faden. Gemerkt hat die KI das, weil das Mac-Werkzeug afinfo 128 kbit/s meldete."
-        : "Dort beginnt genau das nächste Stück. So geht es durch die ganze Datei: 367 Stücke = 8,808 s, gleich wie beim Mac-Werkzeug afinfo.") + '</p></div>';
+        ? "Dort beginnt aber kein Stück, das echte ist 417 Bytes lang. Der Code verliert den Faden. Im ersten Hörtest hat die KI genau so falsch gelesen, nur andersherum. Gemerkt hat sie es, weil das Mac-Werkzeug afinfo etwas anderes meldete."
+        : "Dort beginnt genau das nächste Stück. So geht es durch die ganze Datei: Milas 286 Stücke = 7,471 s, gleich wie beim Mac-Werkzeug afinfo.") + '</p></div>';
   }
   mp3Bug.addEventListener("change", renderHeader);
   renderHeader();
 
   /* ---------- Flashcards ---------- */
   var qa = [
-    { q: "Erklär den Weg vom Klick auf „Audio-Zusammenfassung“ bis zum Player.", a: ["Die [[serveraction|Server Action]] prüft Login, Eingabe ([[zod|Zod]]), [[ratelimit|Rate Limit]] und Rechte ([[rls|RLS]]). Dann legt sie eine Zeile mit Status „wartet“ an, die bereiten Quellen stehen gleich darin. Mit [[after|after()]] antwortet sie sofort, der [[job|Job]] läuft weiter und nimmt das Element mit einem einzigen Befehl an ([[claim|Claim]]).", "[[pickchunks|pickChunks]] wählt 16 Abschnitte. Das Studio-Modell schreibt das Skript als [[json|JSON]] nach [[schema|Schema]], unser Code prüft die Belege. Dann wird jeder Redebeitrag ohne [n] vertont, höchstens 4 gleichzeitig. joinMp3 fügt die Teile zusammen und liefert die Startzeiten. Die MP3 kommt mit dem Admin-Schlüssel in den Bucket „studio“, die Zeile wird „bereit“. Die Seite merkt das per [[polling|Polling]] und spielt über eine [[signedurl|signierte URL]]. Live: 47 Sekunden."] },
-    { q: "Warum fügst du die MP3s ohne ffmpeg zusammen, und woher kommen die Startzeiten?", a: ["Eine MP3 ist eine Reihe von [[frame|Frames]]. Im Hörtest habe ich die Datei von OpenAI untersucht: kein ID3-Kopf, kein Info-Frame, immer 128 kbit/s, 24 kHz, Mono. Dann reicht es, die Frames hintereinanderzuhängen. [[ffmpeg|ffmpeg]] wäre ein Programm von etwa 70 MB in der Vercel-Funktion.", "readFrameHeader liest aus 4 Bytes Version, Bitrate und Abtastrate, daraus folgen Länge und Messwerte jedes Frames. Die Summe der Messwerte durch die Abtastrate ist die genaue Dauer, geprüft gegen afinfo: 391,008 Sekunden auf beiden Seiten. startTimes addiert die Dauern zu Startzeiten. Ein Fehler dabei: Zuerst las die KI die Bits mit MPEG-1-Tabellen. Gemerkt, weil afinfo etwas anderes meldete."] },
+    { q: "Erklär den Weg vom Klick auf „Audio-Zusammenfassung“ bis zum Player.", a: ["Die [[serveraction|Server Action]] prüft Login, Eingabe ([[zod|Zod]]), [[ratelimit|Rate Limit]] und Rechte ([[rls|RLS]]). Dann legt sie eine Zeile mit Status „wartet“ an, die bereiten Quellen stehen gleich darin. Mit [[after|after()]] antwortet sie sofort, der [[job|Job]] läuft weiter und nimmt das Element mit einem einzigen Befehl an ([[claim|Claim]]).", "[[pickchunks|pickChunks]] wählt 16 Abschnitte. Das Studio-Modell schreibt das Skript als [[json|JSON]] nach [[schema|Schema]], unser Code prüft die Belege. Dann vertont ElevenLabs jeden Redebeitrag ohne [n], aber mit Audio-Tags, höchstens 3 gleichzeitig. joinMp3 fügt die Teile zusammen und liefert die Startzeiten. Die MP3 kommt mit dem Admin-Schlüssel in den Bucket „studio“, die Zeile wird „bereit“. Die Seite merkt das per [[polling|Polling]] und spielt über eine [[signedurl|signierte URL]]. Live: unter einer Minute."] },
+    { q: "Warum fügst du die MP3s ohne ffmpeg zusammen, und woher kommen die Startzeiten?", a: ["Eine MP3 ist eine Reihe von [[frame|Frames]]. In Hörtests habe ich die Dateien untersucht: immer dasselbe Format, bei ElevenLabs 128 kbit/s, 44,1 kHz, Mono. Am Anfang jeder Datei stehen aber ein ID3-Kopf und ein [[infoframe|Info-Stück]] mit Metadaten. Die lasse ich weg, dann reicht es, die Frames hintereinanderzuhängen. [[ffmpeg|ffmpeg]] wäre ein Programm von etwa 70 MB in der Vercel-Funktion.", "readFrameHeader liest aus 4 Bytes Version, Bitrate und Abtastrate, daraus folgen Länge und Messwerte jedes Frames. Die Summe der Messwerte durch die Abtastrate ist die genaue Dauer, geprüft gegen das Mac-Werkzeug afinfo, auf die Millisekunde gleich. startTimes addiert die Dauern zu Startzeiten. Ein Fehler dabei: Zuerst las die KI die Bits mit MPEG-1-Tabellen. Gemerkt, weil afinfo etwas anderes meldete."] },
     { q: "Wie stellst du sicher, dass Podcast und Karteikarten nur aus den Quellen kommen?", a: ["Im Prompt: Nur die Quellen nutzen, jede Aussage mit Beleg, nur die Nummern 1 bis n. Der Quelltext steht in [[quelle|Quellblöcken]], die sich nicht schließen lassen. So bleibt Text wie „Ignoriere alle Regeln“ Material ([[injection|Prompt Injection]]).", "Im Code: Nummern außerhalb 1 bis n werden entfernt. Eine Karte ohne gültigen Beleg fliegt raus. Ein Skript ganz ohne Beleg ist ein Fehler. Die Belege speichern wir mit Text, ein Klick zeigt die Stelle. Grenze: Ein Beleg ist kein Beweis, eine falsch zusammengefasste Aussage kann trotzdem einen haben. Darum macht Faden das Nachprüfen leicht."] },
     { q: "Was passiert, wenn ein Job mittendrin scheitert oder hängt?", a: ["Jeder Fehler landet im catch-Block. failStudioItem speichert eine deutsche Meldung, bei unerwarteten Fehlern eine allgemeine, die Details nur im Server-Log. Liegt die MP3 schon in Storage, löscht der Job sie wieder. Der Parallel-Helfer startet nach dem ersten Fehler keine neuen, bezahlten Aufrufe.", "Bricht Vercel nach 300 Sekunden ab, läuft kein catch mehr. Dafür gibt es studioState: Was nach 10 Minuten noch „in Arbeit“ ist, gilt als Fehler. Die Seite hört auf nachzufragen, man kann es löschen. Solange ein Job läuft, sperren wir das Löschen von Element und Notebook. Sonst könnte der Job eine MP3 in einen geleerten Ordner hochladen."] },
-    { q: "Der Podcast sollte 5 Minuten dauern, wurde aber 8. Wie bist du vorgegangen?", a: ["Erst gemessen statt geraten: 779 Wörter ergaben 6:31 Minuten, die Stimmen sprechen also etwa 120 Wörter pro Minute, nicht 140. Ziel 600 Wörter ergab 701 Wörter lokal und 962 live, das waren 8:04 Minuten.", "Ein Modell kann seine eigenen Wörter nicht zählen. Die Wörter pro Redebeitrag waren aber stabil, 26 bis 35. Darum verlangt der Prompt jetzt 20 bis 24 Redebeiträge mit höchstens 40 Wörtern. Gleiche Quellen: 604 Wörter, 4:54 Minuten. Die Lehre: Modell-Ausgaben messen und über das steuern, was das Modell einhalten kann. Steht mit allen Zahlen in den Notizen."] }
+    { q: "Der Podcast sollte 5 Minuten dauern, wurde aber 8. Wie bist du vorgegangen?", a: ["Erst gemessen statt geraten: 779 Wörter ergaben 6:31 Minuten, die Stimmen sprechen also etwa 120 Wörter pro Minute, nicht 140. Ziel 600 Wörter ergab 701 Wörter lokal und 962 live, das waren 8:04 Minuten.", "Ein Modell kann seine eigenen Wörter nicht zählen. Die Wörter pro Redebeitrag waren aber stabil, 26 bis 35. Darum verlangt der Prompt jetzt 20 bis 24 Redebeiträge mit höchstens 40 Wörtern. Gleiche Quellen: 604 Wörter, 4:54 Minuten. Mit Mila und Ben von ElevenLabs, die schneller sprechen, sind es jetzt etwa 3,5 Minuten. Die Lehre: Modell-Ausgaben messen und über das steuern, was das Modell einhalten kann. Steht mit allen Zahlen in den Notizen."] }
   ];
   var known = {};
   try { known = JSON.parse(store("faden-doc-s6-quiz") || "{}") || {}; } catch (e) { known = {}; }

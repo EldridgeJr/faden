@@ -11,7 +11,7 @@ Faden antwortet **nur aus diesen Quellen** – mit klickbaren Belegen, die direk
 
 - Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS 4
 - Supabase (Postgres + pgvector, Storage, Auth, RLS)
-- Vercel AI SDK · OpenAI (Embeddings `text-embedding-3-small`, Chat `gpt-6-luna`, Text-to-Speech)
+- Vercel AI SDK · OpenAI (Embeddings `text-embedding-3-small`, Chat `gpt-6-luna`) · ElevenLabs (Text-to-Speech `eleven_v3`, zwei deutsche Stimmen)
 - Upstash Redis (Rate Limiting pro Nutzer)
 - Vitest · Playwright
 
