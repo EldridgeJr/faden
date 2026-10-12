@@ -1,5 +1,6 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { NO_ANSWER } from "../src/lib/chat/citations";
+import { createNotebook, deleteNotebook, deleteSource, uniqueTitle } from "./helpers";
 
 // The core path of Faden in one test: notebook → text source → question
 // with a citation → citation view → refusal → delete source and notebook.
@@ -17,37 +18,21 @@ const SOURCE_TEXT = [
   "Die Bibliothek hat 23.000 Medien, darunter 4.200 Hörbücher.",
 ].join("\n\n");
 
-// Unique per run, so the "…" menu of this notebook has a unique name.
-const notebookTitle = `E2E ${new Date().toISOString()}`;
-
 // Set as soon as the notebook exists. afterEach deletes it if the test
 // stopped before it could delete it itself.
-let notebookUrl: string | null = null;
-
-async function deleteNotebook(page: Page) {
-  await page.getByRole("button", { name: `Aktionen für ${notebookTitle}` }).click();
-  await page.getByRole("menuitem", { name: "Löschen" }).click();
-  await page.getByRole("button", { name: "Endgültig löschen" }).click();
-  await page.waitForURL("/notebooks");
-}
+let notebook: { id: string; title: string } | null = null;
 
 test.afterEach(async ({ page }) => {
-  if (!notebookUrl) return;
-  await page.goto(notebookUrl);
-  await deleteNotebook(page);
+  if (!notebook) return;
+  await page.goto(`/notebooks/${notebook.id}`);
+  await deleteNotebook(page, notebook.title);
+  notebook = null;
 });
 
 test("answers only from the sources, with a citation that opens the passage", async ({ page }) => {
-  // 1. Create a notebook. The action redirects to the new notebook.
-  await page.goto("/notebooks");
-  // The overview also shows the form on the page, so we stay inside the dialog.
-  await page.getByRole("button", { name: "Neues Notebook" }).first().click();
-  const createDialog = page.getByRole("dialog", { name: "Neues Notebook" });
-  await createDialog.getByLabel("Titel des neuen Notebooks").fill(notebookTitle);
-  await createDialog.getByRole("button", { name: "Notebook anlegen" }).click();
-  await page.waitForURL(/\/notebooks\/[0-9a-f-]{36}$/);
-  notebookUrl = page.url();
-  await expect(page.getByRole("heading", { name: notebookTitle })).toBeVisible();
+  // 1. Create a notebook.
+  const title = uniqueTitle("Kernpfad");
+  notebook = { id: await createNotebook(page, title), title };
 
   // 2. Paste a text as a source.
   await page.getByRole("button", { name: "Quelle hinzufügen" }).first().click();
@@ -91,12 +76,10 @@ test("answers only from the sources, with a citation that opens the passage", as
   await expect(chat.getByRole("listitem").nth(3)).toContainText(NO_ANSWER, { timeout: 60_000 });
 
   // 7. Delete the source (with confirmation). The row disappears.
-  await sources.getByRole("button", { name: `${SOURCE_TITLE} löschen` }).click();
-  await page.getByRole("alertdialog").getByRole("button", { name: "Löschen" }).click();
-  await expect(sources.getByText(SOURCE_TITLE)).toBeHidden();
+  await deleteSource(page, SOURCE_TITLE);
 
   // 8. Delete the notebook. Afterwards it is gone from the overview.
-  await deleteNotebook(page);
-  notebookUrl = null;
-  await expect(page.getByText(notebookTitle)).toBeHidden();
+  await deleteNotebook(page, title);
+  notebook = null;
+  await expect(page.getByText(title)).toBeHidden();
 });
