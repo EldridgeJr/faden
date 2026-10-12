@@ -119,7 +119,7 @@ Vorlage: Design-Artefakt „Faden“ (5 Screens: Startseite, Notebook mit Quelle
 - [x] 4. Chat: hybride Suche, Prompt, Streaming, Belege
 - [x] 5. UI nach dem Design: drei Spalten, Beleg-Ansicht, Quellen-Dialog
 - [x] 6. Podcast + Karteikarten
-- [ ] 7. Tests (Vitest + Playwright), README, Demo-Notebook, Loom
+- [x] 7. Tests (Vitest + Playwright), README, Demo-Notebook (Loom-Video: Aufnahme folgt)
 
 ## Befehle
 Node 24 (`.nvmrc`). In der Claude-Shell vor npm-Befehlen `export PATH="$HOME/.nvm/versions/node/v24.21.0/bin:$PATH"` setzen.

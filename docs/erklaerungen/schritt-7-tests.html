@@ -1,0 +1,1191 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schritt 7 · Tests und Abgabe</title>
+<meta name="description" content="Faden, Schritt 7: Unit-Tests mit Vitest, E2E-Tests mit Playwright gegen echte Dienste, README und Demo-Notebook. Einfach erklärt, mit zwei Mini-Demos.">
+<style>
+  :root {
+    --bg: #E9EBEE; --surface: #F6F7F8; --card: #FFFFFF; --tile: #F3F4F6; --line: #E3E5E8;
+    --text: #111315; --muted: #6B7078; --accent: #D6EE57; --on-accent: #111315;
+    --ok: #6E9A1C; --warn-bg: #FDF0D5; --warn: #8A5A00; --err-bg: #FDE4DB; --err: #A3361A;
+    --primary: #111315; --on-primary: #FFFFFF;
+    --c-kw: #8B3FA8; --c-str: #3B7A12; --c-num: #B25A00; --c-com: #8A9099; --c-key: #1F5FA8;
+    --shadow: 0 1px 2px rgba(17,19,21,.04), 0 8px 24px rgba(17,19,21,.06);
+    --r-card: 28px; --r-tile: 18px; --r-pill: 999px;
+    --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+      --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+      --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+      --primary: #EDEFF1; --on-primary: #111315;
+      --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E1012; --surface: #15181B; --card: #1B1F23; --tile: #23282D; --line: #2D3339;
+    --text: #EDEFF1; --muted: #9BA1A9; --on-accent: #111315;
+    --ok: #A6CF55; --warn-bg: #3A2E12; --warn: #F2C46B; --err-bg: #3D1F17; --err: #F3A088;
+    --primary: #EDEFF1; --on-primary: #111315;
+    --c-kw: #D9A8F2; --c-str: #B7DC72; --c-num: #F4B870; --c-com: #6F767F; --c-key: #8FC3F6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  code, .mono { font-family: var(--mono); }
+  :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 6px; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 96px; }
+  .topbar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .topbar-in { max-width: 980px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; text-decoration: none; }
+  .brand-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+  .crumb { color: var(--muted); font-size: 14px; }
+  .spacer { flex: 1; }
+  .icon-btn { border: 1px solid var(--line); background: var(--card); color: var(--text); width: 36px; height: 36px; border-radius: var(--r-pill); display: grid; place-items: center; cursor: pointer; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .toc { display: flex; gap: 6px; overflow-x: auto; padding: 14px 0 4px; scrollbar-width: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc a { flex: none; text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); color: var(--muted); transition: color .2s, border-color .2s; }
+  .toc a:hover { color: var(--text); border-color: var(--muted); }
+
+  .hero { padding: 40px 0 8px; }
+  .eyebrow { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+  h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.05; letter-spacing: -0.03em; margin: 10px 0 14px; font-weight: 650; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 640px; margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line); }
+  .chip.ok::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+  .chip.err { background: var(--err-bg); color: var(--err); border-color: transparent; }
+
+  section { margin-top: 56px; scroll-margin-top: 70px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .sec-num { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  h2 { font-size: 26px; letter-spacing: -0.02em; margin: 0; font-weight: 620; }
+  h3 { font-size: 17px; margin: 0 0 6px; font-weight: 600; }
+  p { margin: 0 0 12px; }
+  .card { background: var(--card); border-radius: var(--r-card); padding: 28px; box-shadow: var(--shadow); }
+  .tile { background: var(--tile); border-radius: var(--r-tile); padding: 18px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+
+  /* 1. Was funktioniert */
+  .facts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 20px; }
+  .fact .k { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .fact .v { font-weight: 600; margin-top: 2px; word-break: break-word; }
+
+  /* 2. Diagramm */
+  .diagram-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer; font: 500 14px var(--sans); padding: 10px 16px; border-radius: var(--r-pill); background: var(--primary); color: var(--on-primary); transition: transform .15s; }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: var(--tile); color: var(--text); }
+  .btn.accent { background: var(--accent); color: var(--on-accent); }
+  .btn svg { width: 16px; height: 16px; }
+  .scroll-x { overflow-x: auto; margin: 0 -8px; padding: 0 8px; }
+  .diagram { display: block; width: 100%; min-width: 760px; height: auto; }
+  .diagram .node rect { fill: var(--tile); stroke: var(--line); stroke-width: 1.5; transition: fill .25s, stroke .25s; }
+  .diagram .node text { fill: var(--text); font: 600 13px var(--sans); }
+  .diagram .node .sub { fill: var(--muted); font: 400 11px var(--mono); }
+  .diagram .node .ico { stroke: var(--text); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .diagram .node, .diagram .edge { cursor: pointer; }
+  .diagram .node.later rect { fill: none; stroke-dasharray: 5 5; }
+  .diagram .node.later text, .diagram .node.later .ico { opacity: .55; }
+  .diagram .edge path { stroke: var(--muted); stroke-width: 1.8; fill: none; transition: stroke .25s; }
+  .diagram .edge .hit { stroke: transparent; stroke-width: 18; }
+  .diagram .edge.later path { stroke-dasharray: 4 5; opacity: .6; }
+  .diagram .edge text { fill: var(--muted); font: 500 11px var(--mono); }
+  .diagram .edge .label-bg { fill: var(--surface); }
+  .diagram .arrowhead { fill: var(--muted); }
+  .diagram .is-active rect { fill: var(--accent); stroke: var(--accent); }
+  .diagram .is-active text, .diagram .is-active .sub { fill: #111315; }
+  .diagram .is-active .ico { stroke: #111315; }
+  .diagram .edge.is-active path:not(.hit) { stroke: var(--text); stroke-width: 2.4; stroke-dasharray: 7 6; animation: flow .8s linear infinite; }
+  .diagram .edge.is-active text { fill: var(--text); }
+  @keyframes flow { to { stroke-dashoffset: -13; } }
+  .detail { margin-top: 14px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; min-height: 92px; }
+  .detail .badge { font-family: var(--mono); font-size: 12px; background: var(--accent); color: var(--on-accent); padding: 4px 10px; border-radius: var(--r-pill); white-space: nowrap; }
+  .detail h3 { margin-bottom: 4px; }
+  .detail p { margin: 0; color: var(--muted); }
+  .detail.swap { animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 520px) { .detail { grid-template-columns: 1fr; gap: 8px; } .detail .badge { justify-self: start; } }
+  .step-dots { display: flex; gap: 6px; margin-left: auto; }
+  .step-dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; transition: background .2s, transform .2s; }
+  .step-dots button.on { background: var(--text); transform: scale(1.25); }
+
+  /* 3. Dateien */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; font-size: 12px; font-weight: 500; color: var(--muted); font-family: var(--mono); padding: 0 12px 10px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { white-space: nowrap; }
+  td code { font-size: 13px; background: var(--tile); padding: 2px 7px; border-radius: 6px; }
+  .filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter button { font: 500 13px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 6px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .filter button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  tr.hidden { display: none; }
+
+  /* 4. Code */
+  .code-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .code-tabs button { font: 500 13px var(--mono); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 7px 12px; border-radius: var(--r-pill); cursor: pointer; }
+  .code-tabs button[aria-selected="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .code-card { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .code-head { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .code-head .file { font: 500 13px var(--mono); }
+  .code-head .why { color: var(--muted); font-size: 14px; flex: 1; min-width: 0; }
+  .copy { font: 500 12px var(--sans); border: 1px solid var(--line); background: var(--tile); color: var(--text); border-radius: var(--r-pill); padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .copy svg { width: 14px; height: 14px; }
+  pre { margin: 0; padding: 14px 0; overflow-x: auto; font: 13.5px/1.7 var(--mono); }
+  .ln { display: flex; padding: 0 20px 0 0; }
+  .ln .n { width: 44px; flex: none; text-align: right; padding-right: 16px; color: var(--c-com); user-select: none; }
+  .ln .t { white-space: pre; }
+  .ln.has-note { cursor: pointer; position: relative; }
+  .ln.has-note .n { color: var(--text); }
+  .ln.has-note .n::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 6px; vertical-align: middle; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .ln.has-note:hover { background: var(--tile); }
+  .ln.sel { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+  .note { margin: 0 20px 18px; padding: 14px 16px; border-radius: var(--r-tile); background: var(--tile); font-size: 15px; min-height: 52px; }
+  .note b { font-family: var(--mono); font-weight: 500; font-size: 13px; }
+  .tok-kw { color: var(--c-kw); } .tok-str { color: var(--c-str); } .tok-num { color: var(--c-num); }
+  .tok-com { color: var(--c-com); font-style: italic; } .tok-key { color: var(--c-key); } .tok-neg { color: var(--ok); font-weight: 600; }
+
+  /* Demo */
+  .demo-grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .demo-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; gap: 8px; }
+  .field input { flex: 1; min-width: 0; font: 15px var(--mono); padding: 12px 16px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); color: var(--text); }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .presets button { font: 12px var(--mono); border: 1px dashed var(--line); background: transparent; color: var(--muted); padding: 5px 10px; border-radius: var(--r-pill); cursor: pointer; }
+  .presets button:hover { color: var(--text); border-color: var(--muted); }
+  .verdict { margin-top: 16px; padding: 16px; border-radius: var(--r-tile); font-weight: 600; transition: background .25s, color .25s; }
+  .verdict.in { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+  .verdict.out { background: var(--err-bg); color: var(--err); }
+  .verdict small { display: block; font-weight: 400; color: var(--text); margin-top: 4px; font-size: 14px; }
+  .rules { list-style: none; margin: 0; padding: 0; font: 13.5px var(--mono); }
+  .rules li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 12px; border-radius: 10px; transition: background .2s; }
+  .rules li .hint { color: var(--muted); font-family: var(--sans); font-size: 12px; }
+  .rules li.hit { background: var(--tile); }
+  .rules li.win { background: var(--accent); color: #111315; }
+  .rules li.win .hint { color: #111315; }
+
+  /* Entscheidungen */
+  .decisions { display: grid; gap: 12px; }
+  .decision { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--card); border-radius: var(--r-card); overflow: hidden; box-shadow: var(--shadow); }
+  .decision > div { padding: 20px 24px; }
+  .decision .alt { background: var(--tile); }
+  .decision .lbl { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .decision .pick .lbl::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; box-shadow: 0 0 0 1px rgba(17,19,21,.25); }
+  .decision p { margin: 0; font-size: 15px; }
+  @media (max-width: 640px) { .decision { grid-template-columns: 1fr; } }
+
+  /* Risiken */
+  .risks { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .risk { background: var(--card); border-radius: var(--r-tile); padding: 18px 20px; box-shadow: var(--shadow); }
+  .risk .chip { margin-bottom: 10px; }
+  .risk p { margin: 0; font-size: 15px; color: var(--muted); }
+
+  /* Lernkarten */
+  .quiz-top { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .progress { flex: 1; min-width: 160px; height: 10px; background: var(--card); border-radius: var(--r-pill); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+  .progress span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: var(--r-pill); transition: width .4s ease; }
+  .score { font: 500 14px var(--mono); }
+  .cards { display: grid; gap: 12px; }
+  .fc { background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .fc-q { width: 100%; text-align: left; border: 0; background: transparent; color: var(--text); font: 600 17px/1.4 var(--sans); padding: 22px 24px; display: flex; gap: 14px; align-items: flex-start; cursor: pointer; }
+  .fc-q .num { font: 500 12px var(--mono); color: var(--muted); padding-top: 4px; }
+  .fc-q .chev { margin-left: auto; flex: none; width: 20px; height: 20px; transition: transform .3s; color: var(--muted); }
+  .fc.open .fc-q .chev { transform: rotate(180deg); }
+  .fc-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  .fc.open .fc-a { grid-template-rows: 1fr; }
+  .fc-a > div { overflow: hidden; }
+  .fc-a .inner { padding: 0 24px 22px 58px; }
+  .fc-a p { color: var(--text); }
+  .fc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .fc.known { box-shadow: var(--shadow), inset 0 0 0 2px var(--accent); }
+  .fc.known .num { color: var(--ok); }
+  @media (max-width: 520px) { .fc-a .inner { padding-left: 24px; } .card { padding: 22px; } }
+
+  footer { margin-top: 72px; color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+
+  /* Schritt 2: RLS-Demo */
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--muted); padding: 8px 14px; border-radius: var(--r-pill); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .2s, color .2s, border-color .2s; }
+  .seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .seg .av { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 600 11px var(--sans); background: var(--tile); color: var(--text); }
+  .seg button[aria-pressed="true"] .av { background: var(--accent); color: #111315; }
+  .demo-label { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; }
+  .demo-label:first-child { margin-top: 0; }
+  .actions { display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .actions button { text-align: left; font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 10px 14px; border-radius: var(--r-tile); cursor: pointer; transition: border-color .2s, background .2s; }
+  .actions button small { display: block; color: var(--muted); font: 12px var(--mono); margin-top: 2px; }
+  .actions button[aria-pressed="true"] { border-color: var(--text); background: var(--tile); }
+  .uid { display: inline-flex; gap: 6px; align-items: center; font: 13px var(--mono); color: var(--muted); margin-top: 10px; }
+  .uid b { color: var(--text); font-weight: 500; }
+  .demo-sql { margin: 18px 0 0; padding: 14px 18px; background: var(--tile); border-radius: var(--r-tile); font: 13.5px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .gates { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; margin-top: 12px; }
+  @media (max-width: 640px) { .gates { grid-template-columns: 1fr; } }
+  .gate { border-radius: var(--r-tile); padding: 14px 16px; border: 1px solid var(--line); transition: background .25s, border-color .25s; }
+  .gate .gh { display: flex; align-items: center; gap: 8px; font: 500 12px var(--mono); color: var(--muted); }
+  .gate .st { margin-left: auto; font: 600 12px var(--mono); padding: 2px 9px; border-radius: var(--r-pill); background: var(--tile); color: var(--muted); }
+  .gate p { margin: 8px 0 0; font-size: 14.5px; }
+  .gate.ok { border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+  .gate.ok .st { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .gate.fail { border-color: color-mix(in srgb, var(--err) 45%, transparent); }
+  .gate.fail .st { background: var(--err-bg); color: var(--err); }
+  .gate.skip { opacity: .55; }
+  .rowtable { margin-top: 12px; }
+  .rowtable td, .rowtable th { font-size: 14px; }
+  .rowtable td:first-child { font-family: var(--mono); font-size: 13px; }
+  .rowtable tr { transition: opacity .25s; }
+  .rowtable tr.off td:not(:last-child) { opacity: .38; text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+  .state { font: 500 12px var(--mono); padding: 2px 9px; border-radius: var(--r-pill); white-space: nowrap; background: var(--tile); color: var(--muted); }
+  .state.on { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .state.hit { background: var(--accent); color: #111315; }
+  .state.bad { background: var(--err-bg); color: var(--err); }
+  .verdict.warn { background: var(--warn-bg); color: var(--warn); }
+  .result-swap { animation: fade .3s ease; }
+
+  /* Begriffe zum Antippen */
+  .term { display: inline; cursor: help; padding: 0 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; text-decoration: underline dotted; text-decoration-color: var(--muted); text-decoration-thickness: 1.5px; text-underline-offset: 3px; border-radius: 4px; transition: background .2s; }
+  .term:hover, .term[aria-expanded="true"] { background: color-mix(in srgb, var(--accent) 45%, transparent); text-decoration-color: transparent; }
+  .detail .badge .term, .lbl .term { text-decoration: none; }
+  .pop { position: fixed; z-index: 50; width: max-content; max-width: min(320px, calc(100vw - 24px)); background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: var(--r-tile); box-shadow: 0 12px 32px rgba(17,19,21,.18); padding: 12px 14px; font: 14.5px/1.5 var(--sans); text-align: left; animation: fade .18s ease; }
+  .pop[hidden] { display: none; }
+  .pop b { display: block; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 4px; letter-spacing: .02em; }
+  .pop p { margin: 0; color: var(--text); }
+  .hint { font-size: 14px; color: var(--muted); margin-top: 14px; }
+
+  /* ---------- Step 3: demos ---------- */
+  .demo-tabs { margin-bottom: 18px; }
+  .pane[hidden] { display: none; }
+  .demo-text { width: 100%; min-height: 150px; font: 14px/1.6 var(--sans); padding: 14px 16px; border-radius: var(--r-tile); border: 1px solid var(--line); background: var(--surface); color: var(--text); resize: vertical; }
+  .sliders { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; margin-top: 14px; }
+  .slider label { display: flex; justify-content: space-between; gap: 8px; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 6px; }
+  .slider label b { color: var(--text); font-weight: 600; }
+  .slider input[type=range] { width: 100%; accent-color: var(--text); }
+  .chunk-sum { margin-top: 18px; font-size: 14px; color: var(--muted); }
+  .chunk-sum b { color: var(--text); }
+  .chunk-list { display: grid; gap: 10px; margin-top: 10px; }
+  .chunk { border: 1px solid var(--line); border-radius: var(--r-tile); padding: 12px 14px; animation: fade .3s ease; }
+  .chunk .ch { display: flex; align-items: center; gap: 10px; font: 500 12px var(--mono); color: var(--muted); margin-bottom: 6px; }
+  .chunk .meter { flex: 1; height: 6px; border-radius: var(--r-pill); background: var(--tile); overflow: hidden; }
+  .chunk .meter span { display: block; height: 100%; border-radius: var(--r-pill); background: var(--text); transition: width .3s ease; }
+  .chunk p { margin: 0; font-size: 14px; line-height: 1.6; }
+  .chunk mark { background: var(--warn-bg); color: var(--warn); border-radius: 4px; padding: 0 2px; }
+  .chunk .para { color: var(--muted); font-family: var(--mono); }
+  .gates.three { grid-template-columns: repeat(3, 1fr); margin-top: 16px; }
+  @media (max-width: 760px) { .sliders, .gates.three { grid-template-columns: 1fr; } }
+
+  /* ---------- Step 4: demos ---------- */
+  .rrf-mode { margin-bottom: 4px; }
+  .rrf-grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr 1.35fr; margin-top: 18px; }
+  @media (max-width: 860px) { .rrf-grid { grid-template-columns: 1fr; } }
+  .rrf-query { font-family: var(--mono); font-size: 12px; margin: -2px 0 8px; }
+  .rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .rank li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 14px; font-size: 14px; animation: fade .25s ease; }
+  .rank .pl { font: 500 12px var(--mono); color: var(--muted); width: 16px; padding-top: 2px; flex: none; }
+  .rank .it { flex: 1; min-width: 0; }
+  .rank .it b { font-family: var(--mono); font-weight: 600; }
+  .rank .it small { display: block; color: var(--muted); font: 12px var(--mono); }
+  .rank .it code { display: block; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+  .rank .mvs { display: flex; gap: 4px; flex: none; }
+  .rank .mv { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; font-size: 13px; line-height: 1; }
+  .rank .mv:disabled { opacity: .35; cursor: default; }
+  .rank li.empty { color: var(--muted); border-style: dashed; justify-content: center; }
+  .rank.fused li.top { background: color-mix(in srgb, var(--accent) 30%, transparent); border-color: color-mix(in srgb, var(--accent) 70%, var(--line)); }
+  .rank.fused li.cut { border: 0; padding: 2px 0; justify-content: center; font: 500 11px var(--mono); color: var(--muted); }
+  .rrf-bar { display: flex; height: 6px; margin-top: 6px; border-radius: var(--r-pill); background: var(--tile); overflow: hidden; }
+  .rrf-bar .v { background: var(--text); transition: width .3s ease; }
+  .rrf-bar .f { background: var(--ok); transition: width .3s ease; }
+  .sliders.one { grid-template-columns: 1fr; max-width: 420px; }
+  .demo-text.short { min-height: 96px; font-family: var(--mono); font-size: 13.5px; }
+  .answer-preview { background: var(--surface); border-radius: var(--r-tile); padding: 14px 16px; white-space: pre-wrap; line-height: 1.7; }
+  .cite-btn { margin: 0 2px; border: 0; cursor: pointer; border-radius: var(--r-pill); padding: 0 6px; font: 600 11px var(--mono); vertical-align: super; background: var(--accent); color: #111315; }
+  .cite-btn.on { background: #111315; color: var(--accent); }
+  .cite-panel { margin-top: 8px; border: 1px solid var(--line); border-radius: var(--r-tile); padding: 12px 14px; font-size: 14px; animation: fade .25s ease; }
+  .cite-panel b { font-weight: 600; }
+  .cite-panel p { margin: 6px 0 0; color: var(--muted); }
+  .prompt-view { background: var(--surface); border-radius: var(--r-tile); padding: 14px 16px; font: 13px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .prompt-view .own { background: var(--accent); color: #111315; border-radius: 4px; padding: 0 3px; }
+  .prompt-view mark { background: var(--warn-bg); color: var(--warn); border-radius: 4px; padding: 0 2px; }
+  /* ---------- Step 6 ---------- */
+  .diagram .zone { fill: var(--muted); font: 500 11px var(--mono); letter-spacing: .06em; }
+  .sliders.three { grid-template-columns: repeat(3, 1fr); }
+  .sliders.one { margin-top: 14px; }
+  .pick-row { margin-top: 12px; }
+  .pick-row .pl { font: 500 12px var(--mono); color: var(--muted); }
+  .pick-row .pl b { color: var(--text); font-weight: 600; }
+  .cells { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .cell { width: 22px; height: 22px; border-radius: 6px; background: var(--tile); border: 1px solid var(--line); display: grid; place-items: center; font: 600 10px var(--mono); color: #111315; transition: background .2s, border-color .2s; }
+  .cell.on { background: var(--accent); border-color: var(--accent); }
+  #pickCompare { margin-top: 16px; }
+  .bitgroups { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bitgroup { border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; text-align: center; transition: background .2s, border-color .2s; }
+  .bitgroup b { display: block; font: 600 13px var(--mono); letter-spacing: .08em; }
+  .bitgroup small { display: block; font: 11px var(--mono); color: var(--muted); }
+  .bitgroup.key { border-color: var(--text); background: var(--tile); }
+  .bitgroup.bad { border-color: color-mix(in srgb, var(--err) 60%, transparent); background: var(--err-bg); }
+  .bitgroup.bad small { color: var(--err); }
+  .rowtable tr.cur td { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+  .mtrack { display: flex; align-items: center; gap: 3px; height: 40px; margin-top: 14px; }
+  .mseg { height: 12px; border-radius: 999px; background: var(--line); min-width: 3px; flex-basis: 0; transition: background .2s; }
+  .mseg.lea { height: 22px; }
+  .mseg.past { background: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+  .mseg.on { background: var(--accent); }
+  #mp3Now .verdict { margin-top: 10px; }
+  #fileRows td:first-child { line-height: 2; }
+  @media (max-width: 760px) { .sliders.three { grid-template-columns: 1fr; } }
+  /* ---------- Step 6, easier to read ---------- */
+  .tldr { background: color-mix(in srgb, var(--accent) 24%, var(--card)); border-radius: var(--r-card); padding: 28px; box-shadow: var(--shadow); }
+  .tldr-intro { font: 500 12px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--text); opacity: .7; margin-bottom: 12px; }
+  .tldr-list { margin: 0; padding-left: 22px; display: grid; gap: 14px; font-size: 17px; line-height: 1.55; }
+  .tldr-list li::marker { font: 600 15px var(--mono); }
+  .tldr-list b { font-weight: 650; }
+  .tldr .facts { margin-top: 22px; }
+  .tldr .fact { background: color-mix(in srgb, var(--card) 70%, transparent); }
+
+  .blocks { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); }
+  .block { background: var(--card); border-radius: var(--r-tile); padding: 20px 22px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+  .block-num { width: 26px; height: 26px; border-radius: 50%; background: var(--tile); font: 600 13px var(--mono); display: grid; place-items: center; margin-bottom: 10px; }
+  .block p { font-size: 15px; margin: 0 0 8px; }
+  .block .why { color: var(--muted); }
+  .block .files { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); font: 12px/1.6 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+  details.more { margin-top: 14px; background: var(--card); border-radius: var(--r-tile); padding: 14px 18px; box-shadow: var(--shadow); }
+  .card details.more { background: var(--tile); box-shadow: none; }
+  details.more summary { cursor: pointer; font-weight: 500; }
+  details.more[open] summary { margin-bottom: 12px; }
+  #fileRows td:first-child { white-space: normal; min-width: 180px; }
+
+  .code-head .spacer { flex: 1; }
+  .seg.mini button { padding: 5px 12px; font-size: 13px; }
+  .io { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 14px 20px; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  .io span { display: flex; gap: 8px; align-items: baseline; }
+  .io b { font: 600 11px var(--mono); letter-spacing: .06em; background: var(--tile); padding: 2px 8px; border-radius: var(--r-pill); }
+  .walk-step { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); border-bottom: 1px solid var(--line); }
+  .walk-step:last-child { border-bottom: 0; }
+  .walk-text { padding: 18px 20px; display: flex; gap: 12px; align-items: flex-start; }
+  .walk-num, .dnum { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #111315; font: 600 13px var(--mono); display: grid; place-items: center; }
+  .walk-text h4 { margin: 2px 0 4px; font-size: 15.5px; }
+  .walk-text p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .walk-code { margin: 0; padding: 16px 20px; background: var(--surface); font: 13px/1.65 var(--mono); overflow-x: auto; white-space: pre; }
+  .walk-code.de { font: 14.5px/1.75 var(--sans); white-space: pre-wrap; }
+  @media (max-width: 760px) { .walk-step { grid-template-columns: minmax(0, 1fr); } .walk-text { padding-bottom: 10px; } .code-head { flex-wrap: wrap; } .code-head .file { flex-basis: 100%; } }
+
+  .demo-q { background: var(--tile); border-radius: var(--r-tile); padding: 14px 16px; font-size: 15.5px; }
+  .try { display: flex; flex-wrap: wrap; gap: 8px; }
+  .try button { font: 500 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 9px 14px; border-radius: var(--r-pill); cursor: pointer; transition: background .2s, color .2s; }
+  .try button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .explain { margin-top: 14px; padding: 16px 18px; border-radius: var(--r-tile); background: color-mix(in srgb, var(--accent) 22%, transparent); font-size: 15.5px; line-height: 1.6; }
+  .dsteps { display: grid; gap: 22px; margin-top: 18px; }
+  .dstep { display: flex; gap: 14px; align-items: flex-start; }
+  .dbody { flex: 1; min-width: 0; }
+  .dbody h4 { margin: 2px 0 4px; font-size: 16px; }
+  .dbody p { margin: 0 0 10px; color: var(--muted); font-size: 15px; }
+  .beads { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .bead { width: 12px; height: 12px; border-radius: 50%; background: var(--text); }
+  .more-beads { font: 12px var(--mono); color: var(--muted); margin-left: 6px; }
+  .mtrack { display: flex; align-items: center; gap: 3px; height: 30px; }
+  .mseg { height: 18px; border-radius: 999px; min-width: 3px; flex-basis: 0; transition: box-shadow .2s; }
+  .mseg.lea { background: var(--text); }
+  .mseg.tom { background: color-mix(in srgb, var(--muted) 50%, var(--line)); }
+  .mseg.on { box-shadow: 0 0 0 3px var(--accent); }
+  .mlabels { display: flex; gap: 3px; font: 11px var(--mono); color: var(--muted); }
+  .mlabels span { flex-basis: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+  #mp3Now .verdict { margin-top: 10px; }
+
+  .says { display: grid; gap: 12px; }
+  .say { background: var(--card); border-radius: var(--r-tile); padding: 20px 22px; box-shadow: var(--shadow); }
+  .say p { font-size: 15px; margin: 0 0 8px; }
+  .say .said { font-weight: 650; font-size: 17px; line-height: 1.45; }
+  .say .whynot { color: var(--muted); margin: 0; }
+  .say .whynot b { color: var(--text); font-weight: 600; }
+  /* ---------- Step 7 ---------- */
+  .tl { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 6px; }
+  .tl li { display: grid; grid-template-columns: 70px 78px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); font-size: 14.5px; animation: fade .3s ease; }
+  .tl .t { font: 500 12px var(--mono); color: var(--muted); padding-top: 2px; }
+  .tl .lane { font: 600 11px var(--mono); padding: 2px 8px; border-radius: var(--r-pill); background: var(--tile); color: var(--text); justify-self: start; }
+  .tl .lane.test { background: var(--primary); color: var(--on-primary); }
+  .tl .lane.server { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .tl li.bad { background: var(--err-bg); border-color: transparent; }
+  .tl li.bad .txt b { color: var(--err); }
+  .tl li.good { background: color-mix(in srgb, var(--ok) 14%, transparent); border-color: transparent; }
+  .tl li.good .txt b { color: var(--ok); }
+  @media (max-width: 560px) { .tl li { grid-template-columns: 56px minmax(0, 1fr); } .tl .txt { grid-column: 2; } }
+  .cover-gates .gate p { color: var(--text); }
+  .cover-gates .gate.skip { opacity: .7; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html" aria-label="Zur Übersicht aller Schritte">
+      <span class="brand-dot" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#111315" stroke-width="2.4" stroke-linecap="round"><path d="M4 12c4-8 12 8 16 0"/></svg></span>
+      Faden
+    </a>
+    <span class="crumb">/ Erklärungen / Schritt 7</span>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten"></button>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Abschnitte">
+    <a href="#kurz">In 60 Sekunden</a>
+    <a href="#ablauf">Ablauf</a>
+    <a href="#bausteine">Bausteine</a>
+    <a href="#code">Code</a>
+    <a href="#demo">Demos</a>
+    <a href="#entscheidungen">Entscheidungen</a>
+    <a href="#risiken">Was schiefgehen kann</a>
+    <a href="#selbsttest">Selbsttest</a>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">SCHRITT 7 VON 7 · 12.10.2026</div>
+    <h1>Tests, README und Demo: Faden ist fertig zur Abgabe</h1>
+    <p class="lead">Faden prüft sich jetzt selbst: kleine Tests für die Kernlogik und große Tests, die wie ein Mensch durch die App klicken. Dazu kommen ein README für fremde Leser und ein fertiges Demo-Notebook „Bauhaus“ auf der Live-Seite.</p>
+    <div class="chips">
+      <span class="chip ok">lint</span><span class="chip ok">typecheck</span><span class="chip ok">test 193/193</span><span class="chip ok">e2e 6/6</span><span class="chip ok">Demo live</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section id="kurz">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Das Wichtigste in 60 Sekunden</h2></div>
+    <div class="tldr" data-rich>
+      <p class="tldr-intro">Der ganze Schritt in drei Sätzen:</p>
+      <ol class="tldr-list">
+        <li><b>Zwei Arten von Tests prüfen Faden.</b> 193 kleine Tests ([[unittest|Unit-Tests]]) prüfen einzelne Funktionen, ohne Netz, in unter einer Sekunde. 6 große Tests ([[e2e|E2E-Tests]]) klicken in einem echten Browser durch die App, mit echter Datenbank und echtem Modell.</li>
+        <li><b>Der wichtigste Test geht den ganzen Weg eines Nutzers.</b> Notebook anlegen, Text einfügen, Frage stellen, Beleg anklicken, eine fremde Frage stellen, alles löschen. Die Tests fanden einen Fehler in der App und drei Fehler in den Tests selbst.</li>
+        <li><b>README und Demo machen Faden für Fremde prüfbar.</b> Das README erklärt, was Faden kann, wie es gebaut ist und wo die Grenzen sind. Das Demo-Notebook „Bauhaus“ hat drei Quellen, einen Podcast und Karteikarten.</li>
+      </ol>
+      <div class="facts">
+        <div class="tile fact"><div class="k">UNIT-TESTS</div><div class="v mono small">193 in unter 1 s</div></div>
+        <div class="tile fact"><div class="k">E2E-TESTS</div><div class="v mono small">6 in ca. 30 s</div></div>
+        <div class="tile fact"><div class="k">KOSTEN PRO E2E-LAUF</div><div class="v mono small">ca. 0,001 $</div></div>
+        <div class="tile fact"><div class="k">DEMO „BAUHAUS“</div><div class="v mono small">3 Quellen · 46 Abschnitte</div></div>
+      </div>
+    </div>
+    <div class="hint" data-rich>Tipp: [[term|Gepunktet unterstrichene Wörter]] antippen. Dann erscheint eine kurze Erklärung.</div>
+  </section>
+
+  <!-- 2 -->
+  <section id="ablauf">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Ablauf: Ein E2E-Test von Anfang bis Ende</h2></div>
+    <div class="card">
+      <div class="diagram-tools">
+        <button class="btn" id="playBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg><span>Abspielen</span></button>
+        <button class="btn ghost" id="prevBtn" type="button" aria-label="Vorheriger Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button class="btn ghost" id="nextBtn" type="button" aria-label="Nächster Schritt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        <div class="step-dots" id="dots" role="tablist" aria-label="Schritte im Ablauf"></div>
+      </div>
+      <div class="scroll-x">
+        <svg class="diagram" id="diagram" viewBox="0 0 900 360" role="img" aria-label="Datenfluss beim E2E-Test: Playwright steuert einen Chromium-Browser ohne Fenster. Der Browser klickt durch Faden auf dem lokalen Server. Faden speichert in Supabase und fragt OpenAI. Danach sieht der Test mit einem eigenen, lesenden Zugang direkt in Supabase nach, ob gelöschte Daten wirklich weg sind.">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0 0 10 5 0 10z"/></marker>
+          </defs>
+
+          <text class="zone" x="10" y="26">TESTPROGRAMM</text>
+          <text class="zone" x="250" y="26">BROWSER</text>
+          <text class="zone" x="490" y="26">FADEN (LOKAL)</text>
+          <text class="zone" x="740" y="26">DIENSTE</text>
+
+          <!-- edges -->
+          <g class="edge" data-id="e1"><path class="hit" d="M150 76 H250"/><path d="M150 76 H248" marker-end="url(#ah)"/><rect class="label-bg" x="172" y="46" width="56" height="18" rx="9"/><text x="200" y="59" text-anchor="middle">Klicks</text></g>
+          <g class="edge" data-id="e2"><path class="hit" d="M390 62 H490"/><path d="M390 62 H488" marker-end="url(#ah)"/><rect class="label-bg" x="408" y="38" width="64" height="16" rx="8"/><text x="440" y="50" text-anchor="middle">Actions</text></g>
+          <g class="edge" data-id="e8"><path class="hit" d="M490 96 H390"/><path d="M490 96 H392" marker-end="url(#ah)"/><rect class="label-bg" x="396" y="102" width="88" height="18" rx="9"/><text x="440" y="115" text-anchor="middle">HTML · Stream</text></g>
+          <g class="edge" data-id="e3"><path class="hit" d="M630 62 H740"/><path d="M630 62 H738" marker-end="url(#ah)"/><rect class="label-bg" x="645" y="38" width="80" height="16" rx="8"/><text x="685" y="50" text-anchor="middle">Text · Frage</text></g>
+          <g class="edge" data-id="e4"><path class="hit" d="M740 96 H630"/><path d="M740 96 H632" marker-end="url(#ah)"/><rect class="label-bg" x="652" y="102" width="66" height="18" rx="9"/><text x="685" y="115" text-anchor="middle">Antwort</text></g>
+          <g class="edge" data-id="e5"><path class="hit" d="M560 112 V272 H740"/><path d="M560 112 V272 H738" marker-end="url(#ah)"/><rect class="label-bg" x="566" y="170" width="90" height="18" rx="9"/><text x="611" y="183" text-anchor="middle">Daten (RLS)</text></g>
+          <g class="edge" data-id="e6"><path class="hit" d="M80 112 V250"/><path d="M80 112 V248" marker-end="url(#ah)"/><rect class="label-bg" x="88" y="170" width="62" height="18" rx="9"/><text x="119" y="183" text-anchor="middle">danach</text></g>
+          <g class="edge" data-id="e7"><path class="hit" d="M150 302 H740"/><path d="M150 302 H738" marker-end="url(#ah)"/><rect class="label-bg" x="292" y="308" width="150" height="18" rx="9"/><text x="367" y="321" text-anchor="middle">Secret Key · nur lesen</text></g>
+
+          <!-- nodes -->
+          <g class="node" data-id="n1" tabindex="0" role="button" aria-label="Playwright, das Testprogramm">
+            <rect x="10" y="40" width="140" height="72" rx="18"/>
+            <circle class="ico" cx="34" cy="64" r="9"/><path class="ico" d="M30 64l3 3 5-6"/>
+            <text x="52" y="68">Playwright</text><text class="sub" x="26" y="96">npm run e2e</text>
+          </g>
+          <g class="node" data-id="n2" tabindex="0" role="button" aria-label="Chromium, ein Browser ohne Fenster">
+            <rect x="250" y="40" width="140" height="72" rx="18"/>
+            <rect class="ico" x="265" y="56" width="20" height="16" rx="3"/><path class="ico" d="M265 61h20"/>
+            <text x="294" y="68">Chromium</text><text class="sub" x="266" y="96">ohne Fenster</text>
+          </g>
+          <g class="node" data-id="n3" tabindex="0" role="button" aria-label="Faden auf dem lokalen Entwicklungsserver">
+            <rect x="490" y="40" width="140" height="72" rx="18"/>
+            <rect class="ico" x="506" y="55" width="18" height="8" rx="2"/><rect class="ico" x="506" y="66" width="18" height="8" rx="2"/>
+            <text x="534" y="68">Faden</text><text class="sub" x="506" y="96">localhost:3000</text>
+          </g>
+          <g class="node" data-id="n4" tabindex="0" role="button" aria-label="OpenAI: Embeddings und Chat">
+            <rect x="740" y="40" width="140" height="72" rx="18"/>
+            <path class="ico" d="M765 55l2.5 6.5L774 64l-6.5 2.5L765 73l-2.5-6.5L756 64l6.5-2.5z"/>
+            <text x="784" y="68">OpenAI</text><text class="sub" x="756" y="96">Embeddings · Chat</text>
+          </g>
+          <g class="node" data-id="n5" tabindex="0" role="button" aria-label="Nachsehen: admin.ts liest direkt in Supabase">
+            <rect x="10" y="250" width="140" height="72" rx="18"/>
+            <circle class="ico" cx="32" cy="272" r="7"/><path class="ico" d="M37 277l6 6"/>
+            <text x="52" y="278">Nachsehen</text><text class="sub" x="26" y="306">e2e/admin.ts</text>
+          </g>
+          <g class="node" data-id="n6" tabindex="0" role="button" aria-label="Supabase: Postgres und Storage">
+            <rect x="740" y="250" width="140" height="72" rx="18"/>
+            <ellipse class="ico" cx="765" cy="268" rx="9" ry="4"/><path class="ico" d="M756 268v12c0 2 4 4 9 4s9-2 9-4v-12"/>
+            <text x="784" y="278">Supabase</text><text class="sub" x="756" y="306">Postgres · Storage</text>
+          </g>
+        </svg>
+      </div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="bausteine">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Die Bausteine</h2></div>
+    <p class="muted">Schritt 7 hat 17 Dateien geändert oder neu angelegt. Sie gehören zu sechs Bausteinen.</p>
+    <div class="blocks" data-rich>
+      <div class="block"><div class="block-num">1</div><h3>Kleine Tests (Vitest)</h3><p>193 [[unittest|Unit-Tests]] prüfen reine Funktionen: Abschnitte, Belege, Prompt, PDF-Erkennung, MP3. Ohne Netz, in unter einer Sekunde.</p><p class="why">Warum: Sie laufen bei jeder Änderung. Ein Fehler zeigt genau auf eine Funktion. In Schritt 7 kam keiner dazu, siehe Entscheidungen.</p><div class="files">src/lib/**/*.test.ts · vitest.config.ts</div></div>
+      <div class="block"><div class="block-num">2</div><h3>Grundgerüst für Playwright</h3><p>Eine Datei legt fest: welcher Browser, welcher Server, wie lange warten. Ein Setup-Test meldet sich einmal an und speichert die [[cookie|Cookies]].</p><p class="why">Warum: Jeder Test startet schon angemeldet. Das spart Zeit und Login-Versuche.</p><div class="files">playwright.config.ts · e2e/auth.setup.ts · package.json · .gitignore</div></div>
+      <div class="block"><div class="block-num">3</div><h3>Der Kernpfad</h3><p>Ein [[e2e|E2E-Test]] geht den ganzen Weg eines Nutzers: von „Notebook anlegen“ bis „Notebook löschen“.</p><p class="why">Warum: Er prüft das Versprechen von Faden in einem Lauf. Antwort nur aus den Quellen, mit Beleg, und ehrliche Ablehnung.</p><div class="files">e2e/core-flow.spec.ts</div></div>
+      <div class="block"><div class="block-num">4</div><h3>PDF und Zugriff</h3><p>Eine PDF mit Text, eine ohne Text. Dazu drei Prüfungen: fremde ID, kein Login, Chat-API ohne Login.</p><p class="why">Warum: Upload, Löschen und fremde Daten sind die riskantesten Wege. Hier schaut der Test auch hinter die Oberfläche.</p><div class="files">e2e/pdf.spec.ts · e2e/security.spec.ts · e2e/admin.ts · e2e/helpers.ts</div></div>
+      <div class="block"><div class="block-num">5</div><h3>README</h3><p>Die Startseite des Repos für fremde Leser: was Faden kann, wie es gebaut ist, wie man es startet und wo die Grenzen sind.</p><p class="why">Warum: Wer das Repo öffnet, soll in fünf Minuten verstehen, was er vor sich hat. Das [[mermaid|Mermaid-Diagramm]] zeigt GitHub direkt als Bild.</p><div class="files">README.md</div></div>
+      <div class="block"><div class="block-num">6</div><h3>Demo-Notebook</h3><p>„Bauhaus“ auf der Live-Seite, in einem eigenen Demo-Konto: eine Webseite, eine PDF und eigene Notizen. Dazu ein Podcast und Karteikarten.</p><p class="why">Warum: Prüfer sehen sofort ein volles Notebook. Der Zugang ist privat, nicht im Repo.</p><div class="files">live auf Vercel · NOTIZEN.md</div></div>
+    </div>
+    <details class="more">
+      <summary>Alle 17 Dateien einzeln anzeigen</summary>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>DATEI</th><th>AUFGABE</th><th>WARUM SO</th></tr></thead>
+          <tbody id="fileRows">
+            <tr><td><code>playwright.config.ts</code></td><td>Einstellungen für Playwright</td><td>Ein Worker, 90 s pro Test, 15 s pro Klick. Nutzt den laufenden Server und liest <code>.env.local</code>.</td></tr>
+            <tr><td><code>e2e/auth.setup.ts</code></td><td>Einmal anmelden</td><td>Speichert die Cookies in <code>playwright/.auth/</code>. Der Ordner steht in <code>.gitignore</code>: Mit der Datei könnte man sich als Testnutzer anmelden.</td></tr>
+            <tr><td><code>e2e/helpers.ts</code></td><td>Notebook anlegen und löschen, Quelle löschen</td><td>Drei Tests brauchen das. <code>deleteSource</code> wartet erst, bis der Dialog zu ist.</td></tr>
+            <tr><td><code>e2e/admin.ts</code></td><td>In Datenbank und Storage nachsehen</td><td>Nur lesend, nur lokal. Ein eigener Client, weil <code>src/lib/supabase/admin.ts</code> „server-only“ importiert. Das wirft außerhalb von Next.js einen Fehler.</td></tr>
+            <tr><td><code>e2e/core-flow.spec.ts</code></td><td>Der Kernpfad</td><td>Eine erfundene Quelle. So kann das Modell die Antwort nicht aus dem Training kennen.</td></tr>
+            <tr><td><code>e2e/pdf.spec.ts</code></td><td>PDF mit Text, PDF ohne Text</td><td>Die PDFs entstehen im Speicher mit <code>makePdf</code>. Es liegt keine Testdatei im Repo.</td></tr>
+            <tr><td><code>e2e/security.spec.ts</code></td><td>Zugriff von außen</td><td>404 statt 403, Umleitung zur Anmeldung, 401 von der Chat-API.</td></tr>
+            <tr><td><code>notebooks/notebook-dialogs.tsx</code></td><td>Fehler behoben: eigene ID pro Formular</td><td>Gefunden beim ersten Testlauf. <code>useId()</code> statt einer festen ID.</td></tr>
+            <tr><td><code>package.json</code><br><code>package-lock.json</code></td><td><code>@playwright/test</code> 1.64, Befehl <code>npm run e2e</code></td><td>Nur Chromium installiert, das spart Download.</td></tr>
+            <tr><td><code>.gitignore</code><br><code>.env.example</code></td><td>Sitzung und Berichte nicht ins Repo</td><td><code>playwright/.auth/</code>, <code>test-results/</code>, <code>playwright-report/</code>.</td></tr>
+            <tr><td><code>README.md</code></td><td>Neu geschrieben</td><td>Funktionen, Architektur, Entscheidungen, Sicherheit, Tests, Start, Grenzen.</td></tr>
+            <tr><td><code>NOTIZEN.md</code></td><td>Lerntagebuch</td><td>Ein Fehler in der App, drei in den Tests, falscher Lizenz-Vorschlag, Zahlen der Demo.</td></tr>
+            <tr><td><code>CLAUDE.md</code><br><code>docs/erklaerungen/</code></td><td>Schritt 7 abgehakt, diese Seite, Übersicht</td><td>Damit der Stand des Projekts an einer Stelle sichtbar ist.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <!-- 4 -->
+  <section id="code">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Wichtigster Code</h2></div>
+    <p class="muted">Die drei wichtigsten Stellen. Lies zuerst „Rein und raus“, dann Teil für Teil: links die Erklärung, rechts der Code. Mit <b>Auf Deutsch</b> steht rechts dasselbe ohne Programmiersprache.</p>
+    <div class="code-tabs" role="tablist" id="codeTabs"></div>
+    <div class="code-card">
+      <div class="code-head">
+        <span class="file" id="codeFile"></span>
+        <span class="spacer"></span>
+        <div class="seg mini" id="codeMode" role="group" aria-label="Ansicht">
+          <button type="button" data-mode="code" aria-pressed="true">Code</button>
+          <button type="button" data-mode="de" aria-pressed="false">Auf Deutsch</button>
+        </div>
+        <button class="copy" id="copyBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Kopieren</span></button>
+      </div>
+      <div class="io" id="codeIO"></div>
+      <div class="walk" id="codeWalk"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="demo">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Mini-Demos</h2></div>
+    <div class="card">
+      <div class="seg demo-tabs" id="demoTabs" role="group" aria-label="Demo wählen">
+        <button type="button" data-pane="paneRace" aria-pressed="true">Zu früh grün?</button>
+        <button type="button" data-pane="paneCover" aria-pressed="false">Welcher Test merkt es?</button>
+      </div>
+
+      <div class="pane" id="paneRace">
+        <div class="demo-q"><b>Die Frage:</b> Der Test klickt „Löschen“ und prüft dann: „Die Zeile ist nicht mehr zu sehen.“ Die Prüfung war grün. Trotzdem stand die Quelle noch in der Datenbank. Wie geht das?</div>
+        <div class="demo-label">Probier das</div>
+        <div class="try" id="raceTry" role="group" aria-label="Beispiele">
+          <button type="button" data-v="old" data-db="0" aria-pressed="true">Alter Kernpfad-Test</button>
+          <button type="button" data-v="old" data-db="1" aria-pressed="false">Alter PDF-Test</button>
+          <button type="button" data-v="new" data-db="1" aria-pressed="false">Neuer Test</button>
+        </div>
+        <div class="explain" id="raceExplain" aria-live="polite"></div>
+        <div class="demo-label">Was nacheinander passiert · Zeit ab dem Klick auf „Löschen“</div>
+        <ol class="tl" id="raceTimeline"></ol>
+        <details class="more">
+          <summary>Für Neugierige: Warum findet der Test die Spalte nicht?</summary>
+          <div data-rich>
+            <p class="muted small">Ein offener Bestätigungsdialog soll die Seite dahinter für Screenreader stummschalten. Radix setzt darum auf alles außerhalb des Dialogs [[ariahidden|aria-hidden="true"]]. Für einen Screenreader gibt es die Seite dann nicht.</p>
+            <p class="muted small">Ein Rollen-[[locator|Locator]] wie <code>getByRole("region", { name: "Quellen" })</code> sucht so, wie ein Screenreader sucht. Er überspringt also versteckte Elemente. Er findet keine Spalte „Quellen“ und damit auch keine Zeile darin. „Nicht sichtbar“ stimmt dann sofort, auch wenn der Server noch gar nichts gelöscht hat.</p>
+            <p class="muted small">Die Lösung: Erst warten, bis der Dialog zu ist. Er schließt sich nur, wenn das Löschen geklappt hat. Erst danach prüfen. Diese Lücke steckte auch im Kernpfad-Test. Dort fiel sie nicht auf, weil er danach nicht in der Datenbank nachsah.</p>
+          </div>
+          <div class="sliders one"><div class="slider"><label for="raceMs">Der Server braucht zum Löschen <b id="raceMsVal"></b></label><input type="range" id="raceMs" min="100" max="3000" step="100" value="400"></div></div>
+        </details>
+      </div>
+
+      <div class="pane" id="paneCover" hidden>
+        <div class="demo-q"><b>Die Frage:</b> Stell dir vor, eine Funktion geht kaputt. Welcher Test merkt es: ein Unit-Test, ein E2E-Test, eine SQL-Prüfung, oder nur du beim Ausprobieren?</div>
+        <div class="demo-label">Probier das: Was geht kaputt?</div>
+        <div class="try" id="coverTry" role="group" aria-label="Funktion wählen"></div>
+        <div class="explain" id="coverExplain" aria-live="polite"></div>
+        <div class="gates three cover-gates" id="coverGates"></div>
+        <details class="more">
+          <summary>Für Neugierige: Warum nicht alles mit E2E-Tests?</summary>
+          <p class="muted small">Ein E2E-Test ist langsam (Sekunden statt Millisekunden), kostet Geld (OpenAI) und sagt bei Rot nur „irgendwo auf dem Weg“. Ein Unit-Test ist schnell, kostenlos und zeigt auf eine Funktion. Darum: viele kleine Tests für die Logik, wenige große für die wichtigsten Wege. Was Geld kostet oder von fremden Seiten abhängt (Podcast, Webseiten), habe ich live von Hand geprüft.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="entscheidungen">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Entscheidungen und Alternativen</h2></div>
+    <p class="muted">Der fette Satz ist die Entscheidung in einem Satz. Darunter steht, warum, und was die Alternative gewesen wäre.</p>
+    <div class="says" data-rich>
+      <div class="say"><p class="said">„Der E2E-Test nutzt echte Dienste, keine Attrappen.“</p><p>Supabase und OpenAI laufen wirklich. Nur so prüft der Test, was zählt: Einlesen, Suche, Streaming und die Prüfung der Belege. Ein Lauf kostet etwa 0,001 $.</p><p class="whynot"><b>Warum keine [[mock|Mocks]]?</b> Dann wäre der Test grün, auch wenn die echte Suche nichts findet.</p></div>
+      <div class="say"><p class="said">„Der Test prüft Fakten, nicht den Wortlaut.“</p><p>Das Modell formuliert jedes Mal etwas anders. Der Test prüft darum nur: steht „vier Wochen“ drin, gibt es einen Beleg, kommt bei der fremden Frage genau der feste Ablehnungssatz.</p><p class="whynot"><b>Warum nicht die ganze Antwort vergleichen?</b> Dann wäre der Test oft rot, obwohl alles stimmt ([[flaky|flaky]]).</p></div>
+      <div class="say"><p class="said">„Die Quelle im Test ist erfunden.“</p><p>Eine Stadtteilbibliothek mit Ausleihe „vier Wochen“. Das Modell kann das nicht aus dem Training wissen. Steht es in der Antwort, kam es aus der Quelle.</p><p class="whynot"><b>Warum nicht ein Wikipedia-Artikel?</b> Den kennt das Modell schon. Dann beweist eine richtige Antwort nichts.</p></div>
+      <div class="say"><p class="said">„Nach dem Löschen sieht der Test direkt in der Datenbank nach.“</p><p>Die Oberfläche kann nicht zeigen, ob die Datei in Storage weg ist. Und die Demo oben zeigt: Die Oberfläche kann sogar täuschen. Der Test liest darum mit dem [[secretkey|Secret Key]] nach, nur lesend und nur lokal.</p><p class="whynot"><b>Warum nicht der Oberfläche glauben?</b> Genau so blieb ein Fehler im Test lange unbemerkt.</p></div>
+      <div class="say"><p class="said">„Podcast, Karteikarten und Webseiten teste ich nicht im E2E-Test.“</p><p>Ein Podcast kostet Credits bei ElevenLabs und braucht fast eine Minute. Eine Webseite kann sich ändern oder ausfallen. Die Logik dahinter prüfen Unit-Tests. Den ganzen Weg habe ich live mit dem Demo-Notebook geprüft.</p><p class="whynot"><b>Warum nicht trotzdem?</b> Jeder Testlauf würde Geld kosten und manchmal ohne eigene Schuld rot werden.</p></div>
+      <div class="say"><p class="said">„Keine neuen Unit-Tests in diesem Schritt.“</p><p>Alle Dateien ohne Test rufen vor allem Datenbank oder APIs auf. Ihre reine Logik ist schon ausgelagert und getestet. Die echte Lücke war der PDF-Weg, und den prüft jetzt ein E2E-Test.</p><p class="whynot"><b>Warum nicht Supabase nachbauen und alles testen?</b> Viel Code für die Attrappe, und der Test prüft dann die Attrappe statt der echten Datenbank.</p></div>
+      <div class="say"><p class="said">„Der Demo-Zugang ist privat.“</p><p>Es gibt keine Registrierung. Die Zugangsdaten gehen mit der Abgabe an die Prüfer. So kann kein Fremder Kosten verursachen oder die Demo löschen.</p><p class="whynot"><b>Warum nicht im README?</b> Dann könnte jeder hochladen, löschen und das Budget aufbrauchen, bis zum [[ratelimit|Rate Limit]].</p></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="risiken">
+    <div class="sec-head"><span class="sec-num">07</span><h2>Was schiefgehen kann</h2></div>
+    <div class="risks" data-rich>
+      <div class="risk"><span class="chip warn">Testlücke</span><h3>Nicht alles läuft automatisch</h3><p>Podcast, Karteikarten, Webseiten als Quelle und „Umbenennen“ hat kein E2E-Test. Die Logik prüfen Unit-Tests. Podcast, Karten und Webseite habe ich live mit dem Demo-Notebook geprüft. Geht dort etwas kaputt, merkt es nur ein Mensch.</p></div>
+      <div class="risk"><span class="chip warn">Qualität</span><h3>Der Test kann ohne eigene Schuld rot werden</h3><p>Das Modell antwortet einmal anders, oder das Netz hakt. Darum prüft der Test nur Fakten. Nach den Korrekturen waren alle Läufe grün: siebenmal der Kernpfad, zweimal alle Tests hintereinander.</p></div>
+      <div class="risk"><span class="chip">Kosten</span><h3>Jeder Lauf ruft OpenAI auf</h3><p>Etwa 0,001 $. Wichtiger: Pro Lauf zwei Fragen, das [[ratelimit|Rate Limit]] erlaubt 10 pro Minute. Mehr als fünf Läufe pro Minute werden rot.</p></div>
+      <div class="risk"><span class="chip">Betrieb</span><h3>Die Tests laufen nur auf meinem Rechner</h3><p>Sie brauchen den Testnutzer und den Secret Key aus <code>.env.local</code>. Auf GitHub laufen sie nicht. Vor jedem Push starte ich sie selbst.</p></div>
+      <div class="risk"><span class="chip">Betrieb</span><h3>Tests nutzen die echte Datenbank</h3><p>Es gibt nur ein Supabase-Projekt. Der Testnutzer ist ein eigenes Konto, [[rls|RLS]] trennt seine Daten. [[aftereach|afterEach]] räumt auf. Bricht man einen Lauf hart ab, bleibt vielleicht ein Notebook „E2E …“ beim Testnutzer liegen.</p></div>
+      <div class="risk"><span class="chip">Sicherheit</span><h3>Gespeicherte Sitzung und Secret Key</h3><p>Die Datei mit den [[cookie|Cookies]] könnte sich als Testnutzer anmelden. Darum steht sie in <code>.gitignore</code>. Der Secret Key bleibt im Testprozess, er kommt nie in den Browser.</p></div>
+      <div class="risk"><span class="chip">Sicherheit</span><h3>Das Demo-Passwort wird geteilt</h3><p>Prüfer bekommen es privat. Es ist neu und nur für dieses Konto. Nach der Bewertung ändere ich es oder lösche das Konto. Bis dahin begrenzen die Rate Limits die Kosten.</p></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section id="selbsttest">
+    <div class="sec-head"><span class="sec-num">08</span><h2>Selbsttest</h2></div>
+    <div class="quiz-top">
+      <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+      <span class="score" id="score">0 von 5 gewusst</span>
+      <button class="btn ghost" id="resetQuiz" type="button">Zurücksetzen</button>
+    </div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <footer>
+    <span>Faden · Erklärung zu Schritt 7</span>
+    <span><a href="schritt-6-studio.html">← Schritt 6</a> · <a href="index.html">Alle Schritte →</a></span>
+  </footer>
+</div>
+
+<div class="pop" id="pop" role="dialog" aria-live="polite" hidden><b id="popT"></b><p id="popD"></p></div>
+
+<!-- Code parts as plain text: no escaping needed -->
+<script type="text/plain" id="w-core-1">await page.getByRole("button", { name: "Quelle hinzufügen" }).first().click();
+const dialog = page.getByRole("dialog", { name: "Quelle hinzufügen" });
+await dialog.getByRole("button", { name: "Text einfügen" }).click();
+await dialog.getByLabel("Titel des Texts").fill(SOURCE_TITLE);
+await dialog.getByLabel("Text", { exact: true }).fill(SOURCE_TEXT);
+await dialog.getByRole("button", { name: "Text hinzufügen" }).click();
+await expect(dialog).toBeHidden();</script>
+<script type="text/plain" id="w-core-2">const sources = page.getByRole("region", { name: "Quellen" });
+await expect(sources.getByText("Text · 1 Abschnitt")).toBeVisible({ timeout: 60_000 });</script>
+<script type="text/plain" id="w-core-3">const chat = page.getByRole("region", { name: "Chat" });
+const question = chat.getByLabel("Frage an deine Quellen");
+await question.fill("Wie lange kann man Bücher ausleihen?");
+await question.press("Enter");
+
+const firstCitation = chat.getByRole("button", { name: "Beleg 1 anzeigen" }).first();
+await expect(firstCitation).toBeVisible({ timeout: 60_000 });
+await expect(chat.getByRole("listitem").nth(1)).toContainText(/(vier|4) Wochen/);</script>
+<script type="text/plain" id="w-core-4">await firstCitation.click();
+const citationView = page.getByRole("region", { name: SOURCE_TITLE });
+await expect(citationView.getByText("Beleg 1 von", { exact: false })).toBeVisible();
+await expect(citationView.locator("mark")).toContainText("vier Wochen");
+
+// The citation view takes the place of the source column. Close it.
+await citationView.getByRole("button", { name: "Schließen" }).click();</script>
+<script type="text/plain" id="w-core-5">await question.fill("Wer hat die Fußball-Weltmeisterschaft 2014 gewonnen?");
+await question.press("Enter");
+// List items: 0 question, 1 answer, 2 question, 3 answer.
+await expect(chat.getByRole("listitem").nth(3)).toContainText(NO_ANSWER, { timeout: 60_000 });</script>
+<script type="text/plain" id="w-del-1">export async function deleteSource(page: Page, sourceTitle: string): Promise<void> {
+  const sources = page.getByRole("region", { name: "Quellen" });
+  await sources.getByRole("button", { name: `${sourceTitle} löschen` }).click();
+  const confirm = page.getByRole("alertdialog");
+  await confirm.getByRole("button", { name: "Löschen" }).click();
+  await expect(confirm).toBeHidden();
+  await expect(sources.getByText(sourceTitle, { exact: true })).toBeHidden();
+}</script>
+<script type="text/plain" id="w-del-2">const [source] = await sourcesOf(notebookId);
+expect(source.status).toBe("ready");
+expect(await storageFiles(notebookId)).toContain(source.storage_path);
+expect(await embeddedChunkCount(source.id)).toBeGreaterThan(0);</script>
+<script type="text/plain" id="w-del-3">await deleteSource(page, "Lesesaal");
+
+expect(await sourcesOf(notebookId)).toHaveLength(0);
+expect(await storageFiles(notebookId)).toHaveLength(0);
+expect(await embeddedChunkCount(source.id)).toBe(0);</script>
+<script type="text/plain" id="w-cfg-1">if (existsSync(".env.local")) process.loadEnvFile(".env.local");</script>
+<script type="text/plain" id="w-cfg-2">timeout: 90_000,
+workers: 1,
+fullyParallel: false,
+use: {
+  baseURL,
+  locale: "de-DE",
+  actionTimeout: 15_000,
+  trace: "retain-on-failure",
+},</script>
+<script type="text/plain" id="w-cfg-3">projects: [
+  { name: "setup", testMatch: /.*\.setup\.ts/ },
+  {
+    name: "chromium",
+    use: {
+      ...devices["Desktop Chrome"],
+      viewport: { width: 1440, height: 900 },
+      storageState: "playwright/.auth/user.json",
+    },
+    dependencies: ["setup"],
+  },
+],</script>
+<script type="text/plain" id="w-cfg-4">webServer: {
+  command: "npm run dev",
+  url: baseURL,
+  reuseExistingServer: !process.env.CI,
+  timeout: 120_000,
+},</script>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function store(key, val) {
+    try { if (val === undefined) return localStorage.getItem(key); localStorage.setItem(key, val); } catch (e) { return null; }
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function el(id) { return document.getElementById(id); }
+
+  /* ---------- Begriffe ---------- */
+  var G = {
+    term: ["So funktioniert es", "Genau so: antippen, lesen, irgendwo anders hintippen. Die Erklärung verschwindet wieder."],
+    unittest: ["Unit-Test", "Ein kleiner Test für eine einzelne Funktion. Er gibt ihr eine Eingabe und prüft die Ausgabe. Ohne Browser, ohne Netz, in Millisekunden."],
+    e2e: ["E2E-Test (End-to-End)", "Ein großer Test, der die ganze App von außen bedient, wie ein Mensch: Seite öffnen, klicken, tippen, Ergebnis prüfen. Er geht durch alle Schichten bis zur Datenbank."],
+    vitest: ["Vitest", "Das Werkzeug für unsere Unit-Tests. npm test startet es."],
+    playwright: ["Playwright", "Ein Werkzeug von Microsoft, das einen echten Browser per Programm steuert. Unsere E2E-Tests laufen damit: npm run e2e."],
+    headless: ["Ohne Fenster (headless)", "Der Browser läuft vollständig, zeigt aber kein Fenster. Er lädt Seiten, führt JavaScript aus und klickt. Man sieht es nur nicht."],
+    locator: ["Locator", "Eine Beschreibung, wie der Test ein Element findet, etwa „der Knopf mit dem Namen Notebook anlegen“. Playwright sucht so lange, bis es da ist, höchstens bis zum Timeout."],
+    ariahidden: ["aria-hidden", "Ein Merkmal im HTML. Es sagt Screenreadern: Dieses Element gibt es für dich nicht. Ein offener Dialog setzt es auf den Rest der Seite."],
+    cookie: ["Cookie", "Ein kleiner Text, den der Browser für eine Seite speichert und bei jeder Anfrage mitschickt. Supabase legt die Anmeldung darin ab. Wer die Cookies hat, ist angemeldet."],
+    mock: ["Mock (Attrappe)", "Ein Ersatz für einen echten Dienst im Test. Er gibt feste Antworten zurück. Schnell und kostenlos, aber er prüft nicht den echten Dienst."],
+    flaky: ["Flaky (wackelig)", "Ein Test, der manchmal grün und manchmal rot ist, ohne dass sich der Code geändert hat. Solchen Tests vertraut bald niemand mehr."],
+    trace: ["Trace", "Eine Aufzeichnung eines Testlaufs: jeder Schritt mit Dauer, Bildschirmfotos und Netzwerk. Playwright behält sie bei einem Fehler. Damit fand ich den hängenden Klick nach 78 Sekunden."],
+    aftereach: ["afterEach", "Code, der nach jedem Test läuft, auch wenn der Test scheitert. Hier löscht er das Notebook des Tests."],
+    secretkey: ["Secret Key", "Der Schlüssel, mit dem der Server an allen Regeln der Datenbank vorbei lesen und schreiben darf. Er steht nur in .env.local und auf Vercel, nie im Browser und nie im Repo."],
+    rls: ["Zeilen-Regel (RLS)", "Die Datenbank prüft für jede Zeile, ob die fragende Person sie sehen darf. Der Testnutzer sieht nur seine eigenen Notebooks."],
+    ratelimit: ["Rate Limit", "Eine Obergrenze, wie oft jemand etwas tun darf. Beim Chat: 10 Fragen pro Minute, 200 pro Tag."],
+    assertion: ["Prüfung (expect)", "Eine Zeile im Test, die sagt, was stimmen muss, etwa „die Antwort enthält vier Wochen“. Stimmt sie nicht, ist der Test rot."],
+    worker: ["Worker", "Ein Prozess, der Tests ausführt. Mit mehreren laufen Tests gleichzeitig. Wir nutzen einen: Alle Tests teilen einen Nutzer und sein Rate Limit."],
+    timeout: ["Timeout", "Die längste Wartezeit. Wird sie überschritten, bricht der Test mit einem Fehler ab, statt ewig zu warten."],
+    mermaid: ["Mermaid", "Eine kleine Sprache für Diagramme als Text. GitHub zeigt sie im README direkt als Bild."],
+    serveraction: ["Server Action", "Eine Funktion auf dem Server, die der Browser direkt aufrufen kann. Der Test benutzt sie genauso wie ein Mensch, über die Knöpfe."],
+    streaming: ["Streaming", "Die Antwort kommt Stück für Stück, während das Modell noch schreibt. Der Test wartet, bis der Beleg-Knopf erscheint."],
+    embedding: ["Embedding", "Eine lange Zahlenreihe, die die Bedeutung eines Texts beschreibt. Ähnliche Texte haben ähnliche Zahlen. Damit findet die Suche passende Abschnitte."],
+    storage: ["Storage", "Der Dateispeicher von Supabase. Dort liegen PDFs, Texte und MP3s."],
+    http404: ["404", "Der Code für „nicht gefunden“. Faden zeigt ihn auch bei fremden Notebooks. So verrät es nicht, dass es sie gibt."],
+    http401: ["401", "Der Code für „nicht angemeldet“. Die Chat-API antwortet so, statt zur Login-Seite umzuleiten."]
+  };
+  function rich(s) {
+    return esc(s).replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) {
+      return G[k] ? '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>' : t;
+    });
+  }
+  document.querySelectorAll("[data-rich]").forEach(function (node) {
+    node.innerHTML = node.innerHTML.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, function (m, k, t) {
+      return G[k] ? '<span class="term" role="button" tabindex="0" data-t="' + k + '" aria-expanded="false">' + t + '</span>' : t;
+    });
+  });
+  var pop = el("pop"), openTerm = null;
+  function closePop() { if (openTerm) openTerm.setAttribute("aria-expanded", "false"); openTerm = null; pop.hidden = true; }
+  function openPop(btn) {
+    var g = G[btn.getAttribute("data-t")]; if (!g) return;
+    if (openTerm === btn) { closePop(); return; }
+    closePop();
+    el("popT").textContent = g[0];
+    el("popD").textContent = g[1];
+    pop.hidden = false; openTerm = btn; btn.setAttribute("aria-expanded", "true");
+    place();
+  }
+  function place() {
+    if (!openTerm) return;
+    var r = openTerm.getClientRects()[0] || openTerm.getBoundingClientRect();
+    var pw = pop.offsetWidth, ph = pop.offsetHeight, vw = document.documentElement.clientWidth;
+    if (r.bottom < 0 || r.top > window.innerHeight) { closePop(); return; }
+    var left = Math.min(Math.max(12, r.left + r.width / 2 - pw / 2), vw - pw - 12);
+    var top = r.bottom + 8; if (top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 8);
+    pop.style.left = left + "px"; pop.style.top = top + "px";
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest(".term");
+    if (t) { e.preventDefault(); e.stopPropagation(); openPop(t); return; }
+    if (!e.target.closest(".pop")) closePop();
+  }, true);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closePop(); return; }
+    var t = e.target.closest && e.target.closest(".term");
+    if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); openPop(t); }
+  }, true);
+  window.addEventListener("scroll", place, { passive: true });
+  window.addEventListener("resize", place);
+
+  /* ---------- Theme ---------- */
+  var root = document.documentElement, themeBtn = el("themeBtn");
+  var sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var moon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
+  function isDark() { var t = root.getAttribute("data-theme"); return t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches; }
+  function paintThemeBtn() { themeBtn.innerHTML = isDark() ? sun : moon; }
+  var saved = store("faden-doc-theme"); if (saved) root.setAttribute("data-theme", saved);
+  paintThemeBtn();
+  themeBtn.addEventListener("click", function () { var next = isDark() ? "light" : "dark"; root.setAttribute("data-theme", next); store("faden-doc-theme", next); paintThemeBtn(); });
+
+  /* ---------- Diagram ---------- */
+  var steps = [
+    { id: "n1", tag: "1 · Start", title: "npm run e2e startet Playwright", text: "[[playwright|Playwright]] liest .env.local mit dem Testnutzer und dem Secret Key. Läuft der Entwicklungsserver schon, nutzt es ihn, sonst startet es ihn selbst. Ein [[worker|Worker]]: Die Tests laufen nacheinander." },
+    { id: "e1", tag: "2 · Einmal anmelden", title: "Der Setup-Test meldet sich an", text: "Er füllt das Login-Formular aus wie ein Mensch und speichert danach die [[cookie|Cookies]] in playwright/.auth/user.json. Alle anderen Tests starten mit diesen Cookies, also schon angemeldet." },
+    { id: "n2", tag: "3 · Browser", title: "Ein echter Browser ohne Fenster", text: "Chromium läuft [[headless|ohne Fenster]], 1440 × 900 Pixel, Sprache Deutsch. Er führt JavaScript und React aus wie bei dir. Nur sieht man ihn nicht." },
+    { id: "e2", tag: "4 · Klicken", title: "Der Test klickt wie ein Mensch", text: "Er findet Knöpfe über ihren Namen ([[locator|Locator]]), etwa „Notebook anlegen“, und tippt in Felder. Dahinter laufen dieselben [[serveraction|Server Actions]] wie bei dir, ohne Abkürzung." },
+    { id: "e5", tag: "5 · Daten", title: "Alles landet in der echten Datenbank", text: "Notebook, Quelle und Abschnitte gehören dem Testnutzer. [[rls|RLS]] trennt sie von allen anderen Konten. Der Test wartet, bis die Quelle „Text · 1 Abschnitt“ zeigt." },
+    { id: "e3", tag: "6 · Modell", title: "Echte Embeddings, echte Frage", text: "Faden berechnet das [[embedding|Embedding]] des Texts und der Frage und fragt dann das Modell. Keine [[mock|Attrappe]]: Wenn die Suche nichts findet, merkt der Test es." },
+    { id: "e8", tag: "7 · Warten", title: "Warten, bis der Beleg da ist", text: "Die Antwort kommt per [[streaming|Streaming]]. Der Test wartet, bis der Knopf „Beleg 1 anzeigen“ erscheint, höchstens 60 Sekunden. Dann prüft er ([[assertion|expect]]): Steht „vier Wochen“ in der Antwort?" },
+    { id: "n2", tag: "8 · Beleg und Ablehnung", title: "Beleg öffnen, fremde Frage stellen", text: "Klick auf [1]: Die Beleg-Ansicht muss eine Markierung mit „vier Wochen“ zeigen. Danach eine Frage zur Fußball-WM: Die Antwort muss genau „Dazu habe ich in deinen Quellen nichts gefunden.“ enthalten." },
+    { id: "e6", tag: "9 · Danach", title: "Nicht nur der Oberfläche glauben", text: "Im PDF-Test löscht der Test die Quelle über die Oberfläche. Die Zeile verschwindet. Aber sind auch die Datei und die Embeddings weg? Das zeigt keine Oberfläche." },
+    { id: "e7", tag: "10 · Nachsehen", title: "Direkt in Supabase nachsehen", text: "e2e/admin.ts fragt mit dem [[secretkey|Secret Key]] direkt nach: keine Zeile, keine Datei in [[storage|Storage]], keine Abschnitte mit Embedding. Nur lesend, nur auf meinem Rechner." },
+    { id: "n1", tag: "11 · Ergebnis", title: "Grün oder ein Trace", text: "Grün: sechs Häkchen in etwa 30 Sekunden. Rot: Zeile, Meldung und ein [[trace|Trace]] zum Nachspielen. In jedem Fall löscht [[aftereach|afterEach]] das Notebook des Tests wieder." }
+  ];
+  var extras = {
+    n3: { tag: "Faden lokal", title: "Der Entwicklungsserver", text: "npm run dev auf localhost:3000. Derselbe Code wie live, nur auf meinem Rechner. Datenbank und Modell sind dieselben wie live." },
+    n4: { tag: "OpenAI", title: "Embeddings und Chat", text: "Pro Lauf ein Embedding für den Text, je eines für die zwei Fragen und zwei Antworten. Auch bei der Fußball-Frage liefert die Vektorsuche den einzigen Abschnitt, denn sie gibt immer die nächsten zurück. Das Modell sieht: passt nicht, und antwortet mit dem festen Satz." },
+    n5: { tag: "Nachsehen", title: "e2e/admin.ts", text: "Drei kleine Funktionen: sourcesOf, embeddedChunkCount, storageFiles. Sie lesen nur. Der Client ist eigens für die Tests, denn der Admin-Client der App darf nur in Next.js laufen." },
+    n6: { tag: "Supabase", title: "Postgres und Storage", text: "Dieselbe Datenbank wie live, Region Frankfurt. Der Testnutzer ist ein eigenes Konto. Nach jedem Lauf habe ich per SQL geprüft: kein Notebook „E2E …“ übrig, keine verwaiste Datei, kein verwaister Abschnitt." },
+    e4: { tag: "Antwort", title: "Vektoren und Text zurück", text: "OpenAI liefert die Zahlenreihen für die Suche und danach die Antwort Wort für Wort." }
+  };
+  var diagram = el("diagram"), detail = el("detail"), dots = el("dots");
+  var current = -1, timer = null, playBtn = el("playBtn");
+  steps.forEach(function (s, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.setAttribute("aria-label", "Schritt " + (i + 1) + ": " + s.title);
+    b.addEventListener("click", function () { stop(); show(i); });
+    dots.appendChild(b);
+  });
+  function highlight(id) {
+    diagram.querySelectorAll(".is-active").forEach(function (x) { x.classList.remove("is-active"); });
+    var node = diagram.querySelector('[data-id="' + id + '"]'); if (node) node.classList.add("is-active");
+  }
+  function renderDetail(d) {
+    detail.innerHTML = '<span class="badge">' + esc(d.tag) + '</span><div><h3>' + esc(d.title) + '</h3><p>' + rich(d.text) + '</p></div>';
+    detail.classList.remove("swap"); void detail.offsetWidth; detail.classList.add("swap");
+  }
+  function show(i) {
+    current = (i + steps.length) % steps.length;
+    highlight(steps[current].id); renderDetail(steps[current]);
+    Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle("on", k === current); d.setAttribute("aria-current", k === current ? "step" : "false"); });
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } playBtn.querySelector("span").textContent = "Abspielen"; }
+  function play() {
+    if (timer) { stop(); return; }
+    playBtn.querySelector("span").textContent = "Pause";
+    if (current >= steps.length - 1) current = -1;
+    show(current + 1);
+    timer = setInterval(function () { if (current >= steps.length - 1) { stop(); return; } show(current + 1); }, reduce ? 3600 : 2800);
+  }
+  playBtn.addEventListener("click", play);
+  el("prevBtn").addEventListener("click", function () { stop(); show(current <= 0 ? steps.length - 1 : current - 1); });
+  el("nextBtn").addEventListener("click", function () { stop(); show(current + 1); });
+  function pick(id) {
+    stop();
+    var idx = steps.findIndex(function (s) { return s.id === id; });
+    if (idx >= 0) { show(idx); return; }
+    current = -1; highlight(id); renderDetail(extras[id]);
+    Array.prototype.forEach.call(dots.children, function (d) { d.classList.remove("on"); });
+  }
+  diagram.querySelectorAll(".node, .edge").forEach(function (node) {
+    node.addEventListener("click", function () { pick(node.getAttribute("data-id")); });
+    node.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(node.getAttribute("data-id")); } });
+  });
+  show(0);
+
+  /* ---------- Code: guided walk ---------- */
+  function src(id) { return el(id).textContent; }
+  var walks = [
+    { tab: "Der Kernpfad", file: "e2e/core-flow.spec.ts · Ausschnitt", io: ["eine erfundene Quelle über eine Stadtteilbibliothek und zwei Fragen", "grün, wenn Antwort, Beleg, Markierung und Ablehnung stimmen"], parts: [
+      { title: "Text als Quelle einfügen", text: "Der Test öffnet den Dialog und füllt das Formular aus, wie ein Mensch. Jede Zeile mit await wartet, bis der Schritt fertig ist. Am Ende prüft er: Der Dialog ist zu, das Speichern hat also geklappt.", code: src("w-core-1"),
+        de: "Klicke auf „Quelle hinzufügen“.\nIm Dialog: Klicke auf „Text einfügen“.\nTrage Titel und Text ein.\nKlicke auf „Text hinzufügen“.\nPrüfe: Der Dialog ist geschlossen." },
+      { title: "Warten, bis die Quelle bereit ist", text: "Faden liest den Text im Hintergrund ein. Die Seite fragt den Stand selbst nach. Ist die Quelle fertig, zeigt ihre Zeile „Text · 1 Abschnitt“. Der Test wartet darauf, höchstens 60 Sekunden ([[timeout|Timeout]]).", code: src("w-core-2"),
+        de: "Suche die Spalte „Quellen“.\nWarte, bis dort „Text · 1 Abschnitt“ steht.\n  Nach 60 Sekunden immer noch nicht? → Test rot." },
+      { title: "Frage stellen, Antwort prüfen", text: "Der Test tippt die Frage und drückt Enter. Die Antwort kommt Stück für Stück. Fertig ist sie, wenn der Knopf „Beleg 1 anzeigen“ da ist. Dann prüft er nur den Fakt: „vier Wochen“ oder „4 Wochen“. Der Rest darf anders formuliert sein.", code: src("w-core-3"),
+        de: "Schreibe in das Fragefeld: „Wie lange kann man Bücher ausleihen?“\nDrücke Enter.\nWarte, bis der Knopf „Beleg 1 anzeigen“ erscheint (höchstens 60 s).\nPrüfe: Die Antwort enthält „vier Wochen“ oder „4 Wochen“." },
+      { title: "Beleg öffnen", text: "Klick auf [1]. Rechts erscheint die Quelle, die Stelle ist farbig markiert (HTML-Element mark). Die markierte Stelle muss „vier Wochen“ enthalten. Danach schließt der Test die Ansicht, denn sie ersetzt die Quellenspalte. Diese Annahme war im ersten Lauf falsch, siehe Notizen.", code: src("w-core-4"),
+        de: "Klicke auf den Beleg.\nPrüfe: Die Beleg-Ansicht zeigt „Beleg 1 von …“.\nPrüfe: Die markierte Stelle enthält „vier Wochen“.\nSchließe die Beleg-Ansicht." },
+      { title: "Ablehnung prüfen", text: "Eine Frage, die nichts mit der Bibliothek zu tun hat. Die Antwort muss den festen Satz NO_ANSWER enthalten. Der Test holt ihn aus dem App-Code. Ändert jemand den Satz, passt der Test automatisch.", code: src("w-core-5"),
+        de: "Schreibe: „Wer hat die Fußball-Weltmeisterschaft 2014 gewonnen?“\nDrücke Enter.\nPrüfe: Die zweite Antwort enthält genau\n  „Dazu habe ich in deinen Quellen nichts gefunden.“" }
+    ] },
+    { tab: "Löschen ehrlich prüfen", file: "e2e/helpers.ts · e2e/pdf.spec.ts", io: ["eine fertige PDF-Quelle im Notebook", "grün nur, wenn Zeile, Datei und Embeddings wirklich weg sind"], parts: [
+      { title: "Erst auf den Dialog warten", text: "Die wichtige Zeile ist expect(confirm).toBeHidden(). Solange der Dialog offen ist, ist die Seite dahinter [[ariahidden|aria-hidden]]. Der Test fände die Spalte nicht, und „Zeile weg“ wäre sofort wahr. Die Demo „Zu früh grün?“ zeigt das.", code: src("w-del-1"),
+        de: "Funktion „Quelle löschen“ (Titel der Quelle):\n  Klicke auf den Papierkorb dieser Quelle.\n  Klicke im Dialog auf „Löschen“.\n  WARTE, bis der Dialog zu ist (dann hat der Server gelöscht).\n  Erst jetzt: Prüfe, dass die Zeile weg ist." },
+      { title: "Vorher nachsehen", text: "Bevor gelöscht wird, prüft der Test: Es gibt die Quelle, ihre Datei liegt in [[storage|Storage]], sie hat Abschnitte mit Embedding. Sonst würde „danach ist nichts mehr da“ nichts beweisen.", code: src("w-del-2"),
+        de: "Lies die Quellen dieses Notebooks direkt aus der Datenbank.\nPrüfe: Die Quelle ist „bereit“.\nPrüfe: Ihre Datei liegt im Speicher.\nPrüfe: Sie hat mindestens einen Abschnitt mit Embedding." },
+      { title: "Löschen und wieder nachsehen", text: "Löschen über die Oberfläche, dann dieselben drei Fragen an die Datenbank. Alle drei müssen jetzt null ergeben. Die Abschnitte löscht Postgres über „on delete cascade“, die Datei löscht die Server Action selbst.", code: src("w-del-3"),
+        de: "Lösche die Quelle „Lesesaal“ über die Oberfläche.\nPrüfe: keine Quelle mehr in der Datenbank.\nPrüfe: keine Datei mehr im Speicher.\nPrüfe: keine Abschnitte mit Embedding mehr." }
+    ] },
+    { tab: "Einstellungen", file: "playwright.config.ts · Ausschnitt", io: ["die Datei .env.local und der Ordner e2e/", "wie, wo und wie lange die Tests laufen"], parts: [
+      { title: "Zugangsdaten lesen", text: "Node 24 kann .env-Dateien selbst lesen. Der Testnutzer und der Secret Key stehen danach in process.env. Sie bleiben in diesem Prozess und erscheinen nie in einer Ausgabe.", code: src("w-cfg-1"),
+        de: "Gibt es die Datei .env.local?\n  Ja → lies sie ein (Testnutzer, Schlüssel).\n  Nein → die Werte müssen schon in der Umgebung stehen." },
+      { title: "Wie lange warten, wie viele gleichzeitig", text: "90 Sekunden pro Test, weil echte Dienste mitspielen. 15 Sekunden pro Klick: Ein Klick auf etwas Unsichtbares scheitert schnell und mit Zeilennummer. Ein [[worker|Worker]], denn alle Tests teilen einen Nutzer und sein [[ratelimit|Rate Limit]]. Bei Fehlern bleibt ein [[trace|Trace]].", code: src("w-cfg-2"),
+        de: "Ein Test darf höchstens 90 Sekunden dauern.\nNur ein Test zur selben Zeit.\nDer Browser spricht Deutsch.\nEin einzelner Klick wartet höchstens 15 Sekunden.\nBei einem Fehler: Aufzeichnung behalten." },
+      { title: "Erst anmelden, dann testen", text: "Zwei Projekte: „setup“ meldet sich an, „chromium“ führt die Tests aus. dependencies sorgt für die Reihenfolge. storageState lädt die gespeicherten [[cookie|Cookies]], jeder Test ist so schon angemeldet.", code: src("w-cfg-3"),
+        de: "Zuerst: der Setup-Test (meldet sich an, speichert die Cookies).\nDanach: alle Tests in Chromium,\n  Fenstergröße 1440 × 900 (drei Spalten),\n  mit den gespeicherten Cookies." },
+      { title: "Den Server finden", text: "Läuft schon ein Entwicklungsserver auf Port 3000, nutzt Playwright ihn. Sonst startet es npm run dev und wartet, bis die Seite antwortet.", code: src("w-cfg-4"),
+        de: "Antwortet localhost:3000 schon?\n  Ja → diesen Server benutzen.\n  Nein → npm run dev starten und warten (höchstens 2 Minuten)." }
+    ] }
+  ];
+  var KW_TS = /^(import|from|export|default|const|let|function|async|await|return|type|true|false|for|of|if|else|try|catch|throw|new|null|unknown|while)$/;
+  function hlLine(line) {
+    var out = "", last = 0, m;
+    var re = /(\/\/.*$)|("(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`)|(\b\d+(?:[._]\d+)?\b)|([A-Za-z_$][\w$]*)(\s*:)?/g;
+    while ((m = re.exec(line))) {
+      out += esc(line.slice(last, m.index));
+      if (m[1]) out += '<span class="tok-com">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="tok-str">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="tok-num">' + m[3] + '</span>';
+      else if (m[4]) {
+        if (KW_TS.test(m[4])) out += '<span class="tok-kw">' + m[4] + '</span>' + esc(m[5] || "");
+        else if (m[5]) out += '<span class="tok-key">' + m[4] + '</span>' + esc(m[5]);
+        else out += esc(m[4]);
+      }
+      last = re.lastIndex;
+    }
+    return out + esc(line.slice(last));
+  }
+  var codeTabs = el("codeTabs"), codeWalk = el("codeWalk");
+  var codeMode = el("codeMode"), activeWalk = 0, mode = "code";
+  function renderWalk() {
+    var w = walks[activeWalk];
+    Array.prototype.forEach.call(codeTabs.children, function (t, k) { t.setAttribute("aria-selected", String(k === activeWalk)); });
+    Array.prototype.forEach.call(codeMode.children, function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-mode") === mode)); });
+    el("codeFile").textContent = w.file;
+    el("codeIO").innerHTML = '<span><b>REIN</b>' + esc(w.io[0]) + '</span><span><b>RAUS</b>' + esc(w.io[1]) + '</span>';
+    codeWalk.innerHTML = w.parts.map(function (p, i) {
+      var right = mode === "code"
+        ? '<pre class="walk-code">' + p.code.split("\n").map(hlLine).join("\n") + '</pre>'
+        : '<pre class="walk-code de">' + esc(p.de) + '</pre>';
+      return '<div class="walk-step"><div class="walk-text"><span class="walk-num">' + (i + 1) + '</span><div><h4>' + esc(p.title) + '</h4><p>' + rich(p.text) + '</p></div></div>' + right + '</div>';
+    }).join("");
+  }
+  walks.forEach(function (w, i) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = w.tab;
+    b.addEventListener("click", function () { activeWalk = i; renderWalk(); }); codeTabs.appendChild(b);
+  });
+  codeMode.addEventListener("click", function (e) { var b = e.target.closest("button[data-mode]"); if (!b) return; mode = b.getAttribute("data-mode"); renderWalk(); });
+  renderWalk();
+  var copyBtn = el("copyBtn");
+  copyBtn.addEventListener("click", function () {
+    var text = walks[activeWalk].parts.map(function (p) { return p.code; }).join("\n\n"), label = copyBtn.querySelector("span");
+    function done() { label.textContent = "Kopiert"; setTimeout(function () { label.textContent = "Kopieren"; }, 1400); }
+    function fallback() { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+  });
+
+  /* ---------- Demo tabs ---------- */
+  var demoTabs = el("demoTabs");
+  demoTabs.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-pane]"); if (!b) return;
+    Array.prototype.forEach.call(demoTabs.children, function (x) {
+      var on = x === b; x.setAttribute("aria-pressed", String(on));
+      el(x.getAttribute("data-pane")).hidden = !on;
+    });
+  });
+
+  /* ---------- Demo 1: too early green (the aria-hidden race) ---------- */
+  var raceVersion = "old", raceDb = false, raceMs = el("raceMs"), raceTry = el("raceTry");
+  // Time after the server finished until the dialog is closed (React update).
+  var CLOSE_MS = 60;
+  function ms(n) { return n.toLocaleString("de-DE") + " ms"; }
+  function renderRace() {
+    var server = Number(raceMs.value), closed = server + CLOSE_MS;
+    el("raceMsVal").textContent = ms(server);
+    var rows = [
+      { t: 0, lane: "test", text: "Der Test klickt im Dialog auf „Löschen“." },
+      { t: 0, lane: "page", text: "Der Dialog bleibt offen. Der Rest der Seite ist <b>aria-hidden</b>. Die Anfrage geht an den Server." }
+    ];
+    var uiCheck, dbCheck = null, verdict, cls;
+    if (raceVersion === "old") {
+      rows.push({ t: 5, lane: "test", cls: "bad", text: "Prüft „Zeile nicht sichtbar“. Der Locator findet die Spalte „Quellen“ nicht, weil sie versteckt ist. <b>Also: nicht sichtbar. Grün, aber aus falschem Grund.</b>" });
+      if (raceDb) {
+        rows.push({ t: 8, lane: "test", cls: "bad", text: "Fragt die Datenbank: Gibt es die Quelle noch? <b>Ja, 1 Zeile. Rot.</b>" });
+      }
+      rows.push({ t: server, lane: "server", text: "Der Server löscht Datei und Zeile." });
+      rows.push({ t: closed, lane: "page", text: "Der Dialog schließt sich, die Zeile verschwindet wirklich." });
+      if (raceDb) {
+        verdict = "Der Test ist <b>rot</b>, und das ist gut so. Die Oberfläche hat „weg“ gemeldet, obwohl der Server erst nach " + ms(server) + " gelöscht hat. Erst der Blick in die Datenbank hat das aufgedeckt. So habe ich den Fehler gefunden.";
+      } else {
+        verdict = "Der Test ist <b>grün</b>, aber er hat nichts bewiesen. Er hat nach 5 ms geprüft, der Server hat erst nach " + ms(server) + " gelöscht. Würde das Löschen scheitern, wäre er trotzdem grün. Genau so stand es im alten Kernpfad-Test.";
+      }
+    } else {
+      rows.push({ t: 5, lane: "test", text: "Wartet, bis der Dialog zu ist. Prüft noch nichts." });
+      rows.push({ t: server, lane: "server", text: "Der Server löscht Datei und Zeile." });
+      rows.push({ t: closed, lane: "page", text: "Der Dialog schließt sich. Die Seite ist wieder sichtbar, ohne die Zeile." });
+      rows.push({ t: closed + 1, lane: "test", cls: "good", text: "Der Dialog ist zu. Jetzt erst: „Zeile nicht sichtbar“. Die Spalte ist da, die Zeile nicht. <b>Grün, aus dem richtigen Grund.</b>" });
+      rows.push({ t: closed + 10, lane: "test", cls: "good", text: "Fragt die Datenbank: Zeile, Datei, Abschnitte? <b>Alles 0. Grün.</b>" });
+      verdict = "Der Test ist <b>grün, und diesmal zu Recht</b>. Er wartet " + ms(closed) + ", bis der Dialog zu ist. Erst dann prüft er Oberfläche und Datenbank. Wie lange der Server braucht, ist jetzt egal.";
+    }
+    rows.sort(function (a, b) { return a.t - b.t; });
+    var LANES = { test: "Test", page: "Seite", server: "Server" };
+    el("raceTimeline").innerHTML = rows.map(function (r) {
+      return '<li class="' + (r.cls || "") + '"><span class="t">' + ms(r.t) + '</span><span class="lane ' + r.lane + '">' + LANES[r.lane] + '</span><span class="txt">' + r.text + '</span></li>';
+    }).join("");
+    el("raceExplain").innerHTML = verdict;
+  }
+  raceTry.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    raceVersion = b.getAttribute("data-v"); raceDb = b.getAttribute("data-db") === "1";
+    Array.prototype.forEach.call(raceTry.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    renderRace();
+  });
+  raceMs.addEventListener("input", renderRace);
+  renderRace();
+
+  /* ---------- Demo 2: which test notices? ---------- */
+  // ok = this layer checks it, skip = it does not.
+  var COVER = [
+    { name: "Belege", what: "Belege [1] werden falsch erkannt",
+      unit: ["ok", "citations.test.ts: Nummern außerhalb 1 bis 8 fallen weg, [1] wird ein eigener Knopf, HTML bleibt Text."],
+      e2e: ["ok", "Kernpfad: Die Antwort braucht den Knopf „Beleg 1 anzeigen“, der Klick muss die Stelle markieren."],
+      other: ["skip", "Nicht nötig, zwei Ebenen prüfen es schon."],
+      say: "Zwei Ebenen. Der Unit-Test zeigt sofort auf die Funktion. Der E2E-Test merkt es auch, wenn die Funktion stimmt, aber die Oberfläche sie falsch benutzt." },
+    { name: "Ablehnung", what: "Faden antwortet auf fremde Fragen aus eigenem Wissen",
+      unit: ["ok", "prompt.test.ts: Der Prompt nennt den festen Satz und die gültigen Nummern."],
+      e2e: ["ok", "Kernpfad: Die Frage zur Fußball-WM muss genau den Ablehnungssatz ergeben."],
+      other: ["skip", "—"],
+      say: "Der Unit-Test prüft, dass die Regel im Prompt steht. Ob das Modell sich daran hält, kann nur der E2E-Test mit dem echten Modell zeigen." },
+    { name: "Scan-PDF", what: "Eine gescannte PDF wird nicht als Fehler erkannt",
+      unit: ["ok", "pdf.test.ts: Eine PDF nur aus Bildseiten hat zu wenig Text."],
+      e2e: ["ok", "PDF-Test: Die Oberfläche zeigt „keinen lesbaren Text“ und „Als Text einfügen“."],
+      other: ["skip", "—"],
+      say: "Die Regel prüft der Unit-Test. Der E2E-Test prüft den ganzen Weg: Upload, Verarbeitung, Fehlermeldung und den Ausweg in der Oberfläche." },
+    { name: "Löschen", what: "Beim Löschen bleibt die Datei in Storage liegen",
+      unit: ["skip", "Kein Unit-Test: Löschen ist nur Datenbank und Storage, keine eigene Logik."],
+      e2e: ["ok", "PDF-Test: Nach dem Löschen sieht der Test nach. Zeile, Datei und Embeddings müssen weg sein."],
+      other: ["ok", "Von Hand in Schritt 6: Podcast gelöscht, die MP3 war weg, die andere blieb."],
+      say: "Nur der E2E-Test merkt es, weil er hinter die Oberfläche schaut. Ohne den Blick in die Datenbank wäre auch er blind." },
+    { name: "Fremde Daten", what: "Ein Nutzer sieht ein fremdes Notebook",
+      unit: ["skip", "Kein Unit-Test: Die Regel steht in der Datenbank, nicht im TypeScript."],
+      e2e: ["ok", "Zugriffs-Test: Eine unbekannte ID ergibt 404. Für die App sehen fremd und unbekannt gleich aus."],
+      other: ["ok", "supabase/checks/rls.sql: zwei Testnutzer, A sieht und ändert nichts von B."],
+      say: "Die SQL-Prüfung testet die Regel selbst mit zwei echten Nutzern. Der E2E-Test prüft, dass die App dann 404 zeigt und nicht 403." },
+    { name: "Suche", what: "Die hybride Suche findet die falschen Abschnitte",
+      unit: ["skip", "Die Suche ist eine SQL-Funktion, kein TypeScript."],
+      e2e: ["ok", "Indirekt: Ohne den richtigen Abschnitt käme „vier Wochen“ nicht in die Antwort."],
+      other: ["ok", "supabase/checks/match_chunks.sql: Rangfolge, Filter nach Quellen, fremde Nutzer."],
+      say: "Die SQL-Prüfung prüft die Rangfolge genau. Der E2E-Test merkt nur, wenn die Suche ganz danebenliegt." },
+    { name: "Podcast", what: "Der Podcast hat eine falsche Länge oder falsche Startzeiten",
+      unit: ["ok", "mp3.test.ts, podcast.test.ts, concurrency.test.ts: Dauer, Zusammenfügen, Skript, Reihenfolge."],
+      e2e: ["skip", "Kein E2E-Test: Jeder Lauf würde ElevenLabs-Credits kosten und fast eine Minute dauern."],
+      other: ["ok", "Von Hand live: Demo-Podcast erstellt, 29 Redebeiträge, 3:40 Min. In Schritt 6: Dauer gegen das Mac-Werkzeug afinfo geprüft."],
+      say: "Die Logik prüfen Unit-Tests. Den ganzen Weg mit echten Stimmen habe ich live geprüft. Geht dort etwas kaputt, merkt es ein Mensch, kein Test." },
+    { name: "Webseite", what: "Eine Webseite als Quelle liefert keinen Text mehr",
+      unit: ["ok", "fetch-url.test.ts, readable.test.ts: SSRF-Schutz, Zeichensatz, Menü und Werbung weg."],
+      e2e: ["skip", "Kein E2E-Test: Eine fremde Seite kann sich ändern oder ausfallen. Der Test wäre ohne eigene Schuld rot."],
+      other: ["ok", "Von Hand live: Wikipedia „Bauhaus“ im Demo-Notebook, 26 Abschnitte."],
+      say: "Die Regeln prüfen Unit-Tests mit festem HTML. Ob eine echte Seite funktioniert, zeigt nur der Versuch, hier mit Wikipedia." }
+  ];
+  var coverTry = el("coverTry"), activeCover = 0;
+  coverTry.innerHTML = COVER.map(function (c, i) {
+    return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(c.name) + '</button>';
+  }).join("");
+  function gate(label, g) {
+    var st = g[0] === "ok" ? "merkt es" : "merkt es nicht";
+    return '<div class="gate ' + (g[0] === "ok" ? "ok" : "skip") + '"><div class="gh">' + label + '<span class="st">' + st + '</span></div><p>' + esc(g[1]) + '</p></div>';
+  }
+  function renderCover() {
+    var c = COVER[activeCover];
+    el("coverExplain").innerHTML = "<b>Kaputt: " + esc(c.what) + ".</b> " + esc(c.say);
+    el("coverGates").innerHTML = gate("UNIT-TEST (VITEST)", c.unit) + gate("E2E-TEST (PLAYWRIGHT)", c.e2e) + gate("SQL-PRÜFUNG ODER VON HAND", c.other);
+  }
+  coverTry.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    activeCover = Number(b.getAttribute("data-i"));
+    Array.prototype.forEach.call(coverTry.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    renderCover();
+  });
+  renderCover();
+
+  /* ---------- Selbsttest ---------- */
+  var qa = [
+    { q: "Was ist der Unterschied zwischen einem Unit-Test und einem E2E-Test, und wann nimmst du welchen?", a: ["Ein [[unittest|Unit-Test]] prüft eine einzelne Funktion: Eingabe rein, Ausgabe prüfen. Ohne Browser und Netz, in Millisekunden. Bei Rot zeigt er auf genau eine Funktion. Faden hat 193 davon, etwa für Belege, Abschnitte und den MP3-Parser.", "Ein [[e2e|E2E-Test]] bedient die ganze App von außen in einem echten Browser, bis zur Datenbank. Er ist langsam, kostet etwas und zeigt bei Rot nur „irgendwo auf dem Weg“. Darum: viele Unit-Tests für die Logik, wenige E2E-Tests für die wichtigsten Wege. Faden hat 6."] },
+    { q: "Der E2E-Test nutzt das echte Modell. Wie verhinderst du, dass er wegen anderer Formulierungen rot wird?", a: ["Er prüft Fakten, nicht den Wortlaut: „vier Wochen“ oder „4 Wochen“ in der Antwort, ein Knopf „Beleg 1 anzeigen“, die Markierung in der Quelle. Bei der fremden Frage prüft er den festen Satz NO_ANSWER. Den importiert er aus dem App-Code.", "Die Quelle ist erfunden, eine Stadtteilbibliothek. Steht „vier Wochen“ in der Antwort, kann das nur aus der Quelle stammen. Und der Test wartet auf Ereignisse statt auf feste Zeiten: bis der Beleg-Knopf erscheint, höchstens 60 Sekunden. Nach der Korrektur lief der Kernpfad siebenmal, alle grün."] },
+    { q: "Ein Test war grün, obwohl die Quelle noch in der Datenbank stand. Was war der Grund?", a: ["Nach dem Klick auf „Löschen“ bleibt der Bestätigungsdialog offen, bis der Server fertig ist. Solange setzt Radix die Seite dahinter auf [[ariahidden|aria-hidden]]. Der Rollen-[[locator|Locator]] für die Spalte „Quellen“ überspringt versteckte Elemente. Er fand die Spalte nicht, also war „Zeile nicht sichtbar“ sofort wahr.", "Gemerkt hat es erst der PDF-Test, weil er danach in der Datenbank nachsah. Die Lösung: erst warten, bis der Dialog zu ist, dann prüfen. Dieselbe Lücke steckte unbemerkt im Kernpfad-Test. Die Lehre: Ein Test, der „etwas ist weg“ prüft, kann aus falschem Grund grün sein."] },
+    { q: "Die Tests laufen gegen die echte Datenbank. Wie stellst du sicher, dass nichts liegen bleibt und nichts kaputtgeht?", a: ["Die Tests laufen als eigener Testnutzer, [[rls|RLS]] trennt seine Daten von allen anderen. Jeder Test gibt seinem Notebook einen eigenen Titel mit Uhrzeit. [[aftereach|afterEach]] löscht das Notebook auch dann, wenn der Test scheitert.", "Nach den Läufen habe ich per SQL geprüft: kein Notebook „E2E …“ übrig, keine Datei ohne Notebook, kein Abschnitt ohne Quelle. Die Grenze: Wer einen Lauf hart abbricht, hinterlässt vielleicht ein Notebook beim Testnutzer. Das sieht nur der Testnutzer selbst."] },
+    { q: "Was testest du bewusst nicht automatisch, und warum?", a: ["Podcast und Karteikarten im E2E-Test: Ein Podcast kostet ElevenLabs-Credits und braucht fast eine Minute. Webseiten als Quelle: Eine fremde Seite kann sich ändern, dann wäre der Test ohne eigene Schuld rot ([[flaky|flaky]]). Umbenennen hat auch keinen E2E-Test: eine kleine Server Action nach demselben Muster wie Anlegen.", "Die Logik dahinter prüfen Unit-Tests: MP3-Parser, Skript, Karten, SSRF-Schutz, Lesetext. Den ganzen Weg habe ich live mit dem Demo-Notebook geprüft: Wikipedia-Seite und PDF eingelesen, Podcast und Karteikarten erstellt, eine Frage mit Belegen gestellt. Die Tests laufen nur auf meinem Rechner, weil sie Zugangsdaten brauchen. Ein nächster Schritt wäre GitHub Actions mit einem eigenen Test-Projekt."] }
+  ];
+  var known = {};
+  try { known = JSON.parse(store("faden-doc-s7-quiz") || "{}") || {}; } catch (e) { known = {}; }
+  var cardsEl = el("cards");
+  var chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  cardsEl.innerHTML = qa.map(function (c, i) {
+    return '<div class="fc" data-i="' + i + '"><button class="fc-q" type="button" aria-expanded="false"><span class="num">0' + (i + 1) + '</span><span>' + esc(c.q) + '</span>' + chev + '</button>' +
+      '<div class="fc-a"><div><div class="inner">' + c.a.map(function (p) { return "<p>" + rich(p) + "</p>"; }).join("") +
+      '<div class="fc-actions"><button class="btn accent" type="button" data-k="1">Gewusst</button><button class="btn ghost" type="button" data-k="0">Noch nicht</button></div></div></div></div></div>';
+  }).join("");
+  function paintQuiz() {
+    var n = 0;
+    Array.prototype.forEach.call(cardsEl.children, function (card, i) { var k = !!known[i]; card.classList.toggle("known", k); if (k) n++; });
+    el("score").textContent = n + " von " + qa.length + " gewusst";
+    el("bar").style.width = (n / qa.length * 100) + "%";
+  }
+  cardsEl.addEventListener("click", function (e) {
+    var card = e.target.closest(".fc"); if (!card) return;
+    var i = card.getAttribute("data-i");
+    if (e.target.closest(".fc-q")) {
+      var open = card.classList.toggle("open");
+      card.querySelector(".fc-q").setAttribute("aria-expanded", String(open));
+      return;
+    }
+    var a = e.target.closest("[data-k]");
+    if (a) {
+      if (a.getAttribute("data-k") === "1") known[i] = true; else delete known[i];
+      store("faden-doc-s7-quiz", JSON.stringify(known));
+      card.classList.remove("open"); card.querySelector(".fc-q").setAttribute("aria-expanded", "false");
+      paintQuiz();
+    }
+  });
+  el("resetQuiz").addEventListener("click", function () { known = {}; store("faden-doc-s7-quiz", "{}"); paintQuiz(); });
+  paintQuiz();
+})();
+</script>
+</body>
+</html>
