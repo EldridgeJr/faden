@@ -37,6 +37,7 @@ Dann <http://localhost:3000> öffnen.
 | `npm run lint` | ESLint ausführen |
 | `npm run typecheck` | Routen-Typen erzeugen und TypeScript prüfen |
 | `npm test` | Unit-Tests mit Vitest |
+| `npm run e2e` | End-to-End-Tests mit Playwright (braucht den Testnutzer in `.env.local`, startet den Dev-Server bei Bedarf selbst) |
 | `npm run db:types` | TypeScript-Typen aus dem Datenbankschema neu erzeugen (braucht `supabase login`) |
 
 ## Datenbank

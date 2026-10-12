@@ -46,3 +46,8 @@ next-env.d.ts
 
 # Local test files (generated, not part of the repo)
 /tmp/
+
+# Playwright: saved login session (could log in as the test user) and reports
+/playwright/.auth/
+/test-results/
+/playwright-report/
