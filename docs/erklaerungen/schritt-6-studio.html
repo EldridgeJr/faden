@@ -441,7 +441,7 @@
     <a href="#demo">Demos</a>
     <a href="#entscheidungen">Entscheidungen</a>
     <a href="#risiken">Was schiefgehen kann</a>
-    <a href="#interview">Interview-Check</a>
+    <a href="#selbsttest">Selbsttest</a>
   </nav>
 
   <header class="hero">
@@ -457,7 +457,7 @@
   <section id="kurz">
     <div class="sec-head"><span class="sec-num">01</span><h2>Das Wichtigste in 60 Sekunden</h2></div>
     <div class="tldr">
-      <p class="tldr-intro">Diese drei Sätze solltest du im Interview frei sagen können:</p>
+      <p class="tldr-intro">Der ganze Schritt in drei Sätzen:</p>
       <ol class="tldr-list">
         <li><b>Ein Klick startet einen Job im Hintergrund.</b> Der Server prüft erst Login, Eingabe, Limit und Rechte. Dann antwortet er sofort, und die Arbeit läuft danach weiter. Die Seite fragt alle 2 Sekunden nach dem Stand.</li>
         <li><b>Das Modell schreibt ein Skript mit Belegen.</b> Es bekommt 16 Abschnitte, gleichmäßig aus allen Quellen. Lea fragt, Tom erklärt. Ein Skript ganz ohne Beleg lehnt Faden ab.</li>
@@ -555,7 +555,7 @@
   <!-- 3 -->
   <section id="bausteine">
     <div class="sec-head"><span class="sec-num">03</span><h2>Die Bausteine</h2></div>
-    <p class="muted">Schritt 6 hat 22 Dateien geändert. Sie gehören zu sechs Bausteinen. Für das Interview reicht es, die Bausteine zu kennen.</p>
+    <p class="muted">Schritt 6 hat 22 Dateien geändert. Sie gehören zu sechs Bausteinen. Für den Überblick reicht es, die Bausteine zu kennen.</p>
     <div class="blocks" data-rich>
       <div class="block"><div class="block-num">1</div><h3>Start und Prüfung</h3><p>Der Klick landet bei einer [[serveraction|Server Action]]. Sie prüft Login, Eingabe, Limit und Rechte. Erst dann legt sie das Element an.</p><p class="why">Warum: Jeder kann eine Server Action aufrufen. Also muss sie alles selbst prüfen.</p><div class="files">studio-actions.ts · schemas.ts · rate-limit.ts</div></div>
       <div class="block"><div class="block-num">2</div><h3>Arbeit im Hintergrund</h3><p>Ein [[job|Job]] nimmt das Element an, erledigt die Arbeit und speichert das Ergebnis oder den Fehler. Die Seite fragt alle 2 Sekunden nach.</p><p class="why">Warum: Ein Podcast dauert fast eine Minute. So wartet niemand auf eine Antwort.</p><div class="files">job.ts · status.ts · generate-flashcards.ts · generate-podcast.ts · use-polling.ts</div></div>
@@ -602,7 +602,7 @@
   <!-- 4 -->
   <section id="code">
     <div class="sec-head"><span class="sec-num">04</span><h2>Wichtigster Code</h2></div>
-    <p class="muted">Drei Stellen, nach denen im Interview am ehesten gefragt wird. Lies zuerst „Rein und raus“, dann Teil für Teil: links die Erklärung, rechts der Code. Mit <b>Auf Deutsch</b> steht rechts dasselbe ohne Programmiersprache.</p>
+    <p class="muted">Die drei wichtigsten Stellen. Lies zuerst „Rein und raus“, dann Teil für Teil: links die Erklärung, rechts der Code. Mit <b>Auf Deutsch</b> steht rechts dasselbe ohne Programmiersprache.</p>
     <div class="code-tabs" role="tablist" id="codeTabs"></div>
     <div class="code-card">
       <div class="code-head">
@@ -678,7 +678,7 @@
   <!-- 6 -->
   <section id="entscheidungen">
     <div class="sec-head"><span class="sec-num">06</span><h2>Entscheidungen und Alternativen</h2></div>
-    <p class="muted">Der fette Satz ist die Antwort, die du im Interview sagen kannst. Darunter steht, warum, und was die Alternative gewesen wäre.</p>
+    <p class="muted">Der fette Satz ist die Entscheidung in einem Satz. Darunter steht, warum, und was die Alternative gewesen wäre.</p>
     <div class="says" data-rich>
       <div class="say"><p class="said">„Das Modell bekommt 16 Abschnitte, gleichmäßig aus allen Quellen. Gesucht wird nicht.“</p><p>Es gibt keine Frage, nach der man suchen könnte. So kommt jede Quelle vor, mit Anfang, Mitte und Ende.</p><p class="whynot"><b>Warum nicht erst jede Quelle zusammenfassen?</b> Das kostet mehr Zeit und Geld. Die Belege würden dann auf Zusammenfassungen zeigen statt auf den Originaltext.</p></div>
       <div class="say"><p class="said">„Die Arbeit läuft im Hintergrund, die Seite fragt alle 2 Sekunden nach.“</p><p>Ein Podcast dauert fast eine Minute. Niemand soll so lange auf eine Antwort warten.</p><p class="whynot"><b>Warum keine echte Warteschlange?</b> Für unter eine Minute reicht [[after|after()]]. Eine [[queue|Warteschlange]] ist mehr Aufbau und steht unter „Nächste Schritte“.</p></div>
@@ -705,8 +705,8 @@
   </section>
 
   <!-- 7 -->
-  <section id="interview">
-    <div class="sec-head"><span class="sec-num">08</span><h2>Interview-Check</h2></div>
+  <section id="selbsttest">
+    <div class="sec-head"><span class="sec-num">08</span><h2>Selbsttest</h2></div>
     <div class="quiz-top">
       <div class="progress" aria-hidden="true"><span id="bar"></span></div>
       <span class="score" id="score">0 von 5 gewusst</span>
