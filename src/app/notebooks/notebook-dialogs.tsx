@@ -1,7 +1,7 @@
 "use client";
 
 import { MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useId, useState, useTransition } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,14 +49,17 @@ function FormError({ error }: { error: string | null }) {
 // Title field + button. On success the action redirects to the new notebook.
 export function CreateNotebookForm({ autoFocus = false }: { autoFocus?: boolean }) {
   const [state, formAction, pending] = useActionState(createNotebook, initialState);
+  // The overview shows this form twice (on the page and in the dialog).
+  // A fixed id would exist twice, and the label would point to the wrong field.
+  const inputId = useId();
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
-      <label htmlFor="new-notebook-title" className="sr-only">
+      <label htmlFor={inputId} className="sr-only">
         Titel des neuen Notebooks
       </label>
       <Input
-        id="new-notebook-title"
+        id={inputId}
         name="title"
         required
         maxLength={200}
