@@ -5,6 +5,8 @@ Faden antwortet **nur aus diesen Quellen**. Jede Aussage hat einen Beleg wie `[1
 
 **Live:** <https://faden-one.vercel.app> · Demo-Zugang mit fertigem Notebook „Bauhaus“ auf Anfrage (es gibt keine offene Registrierung).
 
+![Faden: Antwort im Chat, rechts die Beleg-Ansicht mit der markierten Stelle in der Quelle](docs/screenshots/beleg-ansicht.webp)
+
 ## Was Faden kann
 
 - **Notebooks** anlegen, umbenennen und löschen. Ein Notebook sammelt die Quellen zu einem Thema.
@@ -17,6 +19,8 @@ Faden antwortet **nur aus diesen Quellen**. Jede Aussage hat einen Beleg wie `[1
 - **Audio-Zusammenfassung:** ein Podcast mit zwei Stimmen (Lea und Tom). Mit Transkript zum Mitlesen, Belegen und MP3-Download.
 - **Karteikarten:** 12 Lernkarten aus den Quellen, ebenfalls mit Belegen.
 - Hell und dunkel, auf dem Handy und am Desktop.
+
+![Notebook mit drei Spalten: Quellen, Chat mit Belegen, Studio mit Podcast und Karteikarten](docs/screenshots/notebook.webp)
 
 ## Architektur
 
@@ -154,6 +158,7 @@ e2e/                       Playwright-Tests
 supabase/migrations/       Das komplette Schema als SQL
 supabase/checks/           SQL-Prüfungen für RLS und Suche
 docs/erklaerungen/         Eine Erklärseite pro Bauschritt
+docs/screenshots/          Bilder für dieses README
 ```
 
 ## Grenzen
