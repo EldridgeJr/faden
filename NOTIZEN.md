@@ -78,7 +78,7 @@
 - **`typecheck` = `next typegen && tsc --noEmit`.** Next erzeugt Typen wie `LayoutProps<"/">` erst selbst. Ohne `typegen` scheitert der Typecheck auf einem frischen Checkout.
 - **shadcn/ui erst in Schritt 5.** `shadcn init` überschreibt `globals.css` mit eigenen Farbvariablen. Das gehört zum Design-Schritt.
 - **Vercel über Git verbunden.** Jeder Push auf `main` erzeugt ein Production-Deployment, jeder andere Branch ein Preview. Alternative: manuell mit `vercel deploy`.
-- **Eigene Supabase-Organisation „Faden“** (Free, Projekt `faden`, Frankfurt). Trennt das Bewerbungsprojekt von RetainLens. Kein zusätzliches Gratis-Kontingent.
+- **Eigene Supabase-Organisation „Faden“** (Free, Projekt `faden`, Frankfurt). Trennt dieses Projekt von RetainLens. Kein zusätzliches Gratis-Kontingent.
 - **Projekt-Optionen:** Data API an (braucht `supabase-js`), „Automatically expose new tables“ aus, automatisches RLS an.
 - **Kein Docker → keine lokale Supabase.** Migrationen gehen per Supabase-MCP direkt auf das Projekt. Die SQL-Dateien in `supabase/migrations/` tragen dieselbe Versionsnummer wie in der Datenbank. Alternative: Supabase-CLI mit lokalem Stack (braucht Docker).
 - **Zwei Schutzschichten: `grant` + RLS.** `anon` bekommt gar nichts, `authenticated` nur die nötigen Rechte (`chunks` und `messages` ohne `update`). Ein Fehler in einer Policy allein öffnet noch nichts.

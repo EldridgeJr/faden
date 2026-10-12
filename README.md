@@ -3,7 +3,7 @@
 Faden ist ein NotebookLM-Klon. Du lädst Quellen hoch (PDF, Webseite, Text) und stellst Fragen.
 Faden antwortet **nur aus diesen Quellen** – mit klickbaren Belegen, die direkt zur Textstelle springen.
 
-> Status: im Aufbau. Testprojekt für die Bewerbung als Junior Entwickler bei Everlast AI.
+> Status: im Aufbau. Testprojekt: eine Web-App nach dem Vorbild von NotebookLM.
 
 **Live:** <https://faden-one.vercel.app>
 

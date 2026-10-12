@@ -1,6 +1,6 @@
 # Faden – NotebookLM-Klon
 
-Testprojekt für die Bewerbung als Junior Entwickler bei Everlast AI.
+Testprojekt: eine Web-App nach dem Vorbild von NotebookLM.
 Faden lässt Nutzer Quellen hochladen und beantwortet Fragen **nur aus diesen Quellen**, mit klickbaren Belegen, die direkt zur Textstelle springen.
 
 ## Abgabe
