@@ -269,3 +269,10 @@
 
 ## Schwierigstes Problem
 <!-- Problem · woran gemerkt · was probiert · Lösung · was ich mitnehme -->
+
+**Die hybride Suche war heimlich nur eine Vektorsuche (Schritt 4a).**
+- **Problem:** Faden kombiniert zwei Suchen: nach Bedeutung (Vektoren) und nach Wörtern (Volltext). Die Volltextsuche lieferte bei echten Fragen aber nie einen Treffer. Die Antworten waren trotzdem gut, darum fiel es nicht auf.
+- **Woran gemerkt:** Beim Live-Test die Werte der Suche angesehen. Alle lagen bei höchstens 1/61, also dem Wert für Platz 1 in nur einer Liste. Aus der Volltextliste kam nichts dazu.
+- **Was probiert:** Die Suchanfrage zur Frage „Wann ist Ruhezeit im Haus?“ angesehen. `websearch_to_tsquery` machte daraus `'wann' & 'ruhezeit' & 'haus'`. Das `&` heißt UND: Ein Abschnitt musste alle drei Wörter enthalten, auch „wann“. Das kommt in echten Texten fast nie vor.
+- **Lösung:** Eine zweite Migration ersetzt `&` durch `|` (ODER). Jetzt zählt ein Abschnitt, wenn er eines der Wörter enthält, und `ts_rank_cd` bewertet Abschnitte mit mehr Treffern höher. Ein Test im Prüfskript `supabase/checks/match_chunks.sql` sichert das ab. Preis: Häufige Wörter zählen mit, die Rangfolge wird etwas unschärfer.
+- **Was ich mitnehme:** Nicht nur prüfen, ob ein Ergebnis kommt, sondern ob es aus dem richtigen Grund kommt. Eine Funktion, die nichts beiträgt, sieht von außen genauso aus wie eine, die funktioniert.
