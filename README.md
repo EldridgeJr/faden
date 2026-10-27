@@ -137,7 +137,7 @@ Dann <http://localhost:3000> öffnen.
 | `npm run typecheck` | Routen-Typen erzeugen und TypeScript prüfen |
 | `npm test` | Unit-Tests mit Vitest |
 | `npm run e2e` | End-to-End-Tests mit Playwright (braucht den Testnutzer und `SUPABASE_SECRET_KEY` in `.env.local`, startet den Dev-Server bei Bedarf selbst) |
-| `npm run db:types` | TypeScript-Typen aus dem Datenbankschema neu erzeugen (braucht `supabase login`) |
+| `npm run db:types` | TypeScript-Typen aus dem Datenbankschema neu erzeugen (braucht `supabase login`). Achtung: Schlägt der Befehl fehl, ist die Typdatei trotzdem leer. Dann `git checkout src/lib/supabase/database.types.ts` |
 
 ## Projektstruktur
 
